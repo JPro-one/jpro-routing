@@ -1,0 +1,37 @@
+System.setProperty("file.encoding", "UTF-8")
+
+buildscript {
+  repositories {
+    jcenter()
+    maven {
+      url "http://sandec.bintray.com/repo"
+    }
+  }
+
+  dependencies {
+    classpath 'com.jprotechnologies.jpro:jpro-plugin-gradle:2017.1.0-SNAPSHOT'
+    classpath "SANDEC:simplefx-plugin-gradle:$SIMPLEFX_VERSION"
+  }
+}
+
+configure([project(':core'),project(':example')]) {
+  repositories {
+    jcenter()
+  }
+
+  apply plugin: 'de.sandec.simplefx'
+  apply plugin: 'com.jprotechnologies.jpro'
+}
+
+configure([project(':core')]) {
+  dependencies {
+    compile "SANDEC:jnodes:$JNODES_VERSION"
+  }
+}
+
+configure([project(':example')]) {
+  mainClassName = "example.TestWebApplication"
+  dependencies {
+    compile project(':core')
+  }
+}
