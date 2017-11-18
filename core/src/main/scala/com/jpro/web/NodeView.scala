@@ -4,5 +4,5 @@ import simplefx.core._
 import simplefx.all._
 
 trait NodeView extends View { this: Node =>
-  override def content = this
+  final override def content = this
 }

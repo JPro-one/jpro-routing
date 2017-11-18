@@ -12,22 +12,25 @@ trait SessionManager { THIS =>
   def goto(url: String): Unit = {
     println(s"goto: $url")
     val view = getView(url)
-    view.url = url
-    goto(view)
+    goto(url, view, true)
   }
-  def goto(x: View) = {
-    page = x.content
-    if(WebAPI.isBrowser && webAPI != null) {
-      webAPI.executeScript(s"history.pushState(null, null, '${x.url}');")
-      webAPI.executeScript("document.title = \"" + x.title + "\";")
+  def goto(url: String, x: Result, pushState: Boolean): Unit = {
+    x match {
+      case Redirect(url) => goto(url)
+      case view: View =>
+        view.url = url
+        page = view.realContent
+        if(WebAPI.isBrowser && webAPI != null) {
+          webAPI.executeScript(s"history.pushState(null, null, '${view.url}');")
+          webAPI.executeScript("document.title = \"" + view.title + "\";")
+        }
     }
   }
-  def getView(url: String): View
+  def getView(url: String): Result
   def gotoURL(x: String) = {
     val url = new URL(x)
-    val newPage = getView(url.getFile())
-    webAPI.executeScript("document.title = \"" + newPage.title + "\";")
-    page = newPage.content
+    val newResult = getView(url.getFile())
+    goto(url.getFile(), newResult, false)
   }
 
   def start() = {

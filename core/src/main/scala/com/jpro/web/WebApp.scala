@@ -10,18 +10,17 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   val sessionManager = new SessionManager {
     override def webAPI = THIS.webAPI
-    override def getView(url: String): View = {
+    override def getView(url: String): Result = {
       println("getting: " + url)
       val view = route(url)
-      println("title: " + view.title)
       view
     }
   }
 
   SessionManagerContext.setContext(this, sessionManager)
 
-  var route: PartialFunction[String, View] = PartialFunction.empty[String, View]
-  def addRoute(fun: PartialFunction[String, View]): Unit = {
+  var route: PartialFunction[String, Result] = PartialFunction.empty
+  def addRoute(fun: PartialFunction[String, Result]): Unit = {
     route = route orElse fun
   }
 
