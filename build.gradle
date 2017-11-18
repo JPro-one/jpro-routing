@@ -11,6 +11,7 @@ buildscript {
   dependencies {
     classpath 'com.jprotechnologies.jpro:jpro-plugin-gradle:2017.1.0-SNAPSHOT'
     classpath "SANDEC:simplefx-plugin-gradle:$SIMPLEFX_VERSION"
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
   }
 }
 
@@ -24,8 +25,41 @@ configure([project(':core'),project(':example')]) {
 }
 
 configure([project(':core')]) {
+  apply plugin: 'java'
+  apply plugin: 'maven-publish'
+  apply plugin: 'com.jfrog.bintray'
+
   dependencies {
     compile "SANDEC:jnodes:$JNODES_VERSION"
+  }
+
+  group = 'com.jprotechnologies.jpro'
+  version = "$JPRO_WEB_VERSION"
+
+  publishing {
+    publications {
+      mavenJava(MavenPublication) {
+        from components.java
+        groupId project.group
+        artifactId ("jpro-web-" + project.name)
+        version project.version
+      }
+    }
+  }
+
+  bintray {
+    if(project.hasProperty("BINTRAY_USER")) {
+      user = BINTRAY_USER
+      key  = BINTRAY_KEY
+    }
+    publications = ['mavenJava']
+    publish = true
+    override = true
+    pkg {
+      repo = 'repo'
+      name = "jpro-web-" + project.name
+      userOrg = 'sandec'
+    }
   }
 }
 
