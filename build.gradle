@@ -9,7 +9,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.jprotechnologies.jpro:jpro-plugin-gradle:2017.1.0-SNAPSHOT'
+    classpath 'com.sandec.jpro:jpro-plugin-gradle:2018.1.0-SNAPSHOT'
     classpath "SANDEC:simplefx-plugin-gradle:$SIMPLEFX_VERSION"
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
   }
@@ -21,7 +21,7 @@ configure([project(':core'),project(':example')]) {
   }
 
   apply plugin: 'de.sandec.simplefx'
-  apply plugin: 'com.jprotechnologies.jpro'
+  apply plugin: 'com.sandec.jpro'
 }
 
 configure([project(':core')]) {
@@ -33,7 +33,7 @@ configure([project(':core')]) {
     compile "SANDEC:jnodes:$JNODES_VERSION"
   }
 
-  group = 'com.jprotechnologies.jpro'
+  group = 'com.sandec.jpro'
   version = "$JPRO_WEB_VERSION"
 
   publishing {
