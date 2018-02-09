@@ -63,8 +63,6 @@ trait SessionManager { THIS =>
       })
       webAPI.executeScript(
       """window.addEventListener("scroll", function(e) {
-        |  console.log("got e");
-        |  console.log("e" + location.href);
         |  var doc = document.documentElement;
         |  if(history.state != null && history.state.saveScroll) {
         |    history.replaceState({
