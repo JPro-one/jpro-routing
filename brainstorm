@@ -1,0 +1,50 @@
+
+features:
+ done - history-api
+ - Redirect
+ - asdf
+
+
+later
+ - support desktop-mode
+ - support gluon-mobile-mode
+ - forward link
+
+ Result
+  - View
+  - Redirect
+
+
+class View {
+  def title: String
+  //var url: String
+  var content: String
+}
+
+class View {
+  def realView = ???
+}
+
+clas SubView(view: Node) {
+
+}
+
+class MyView extends SubView(realView) {
+  def realView
+}
+
+
+
+class NodeView extends View{ this: Node =>
+  def content = this
+}
+
+class WebContent(stage: Stage) {
+  def addRoute( String => View)
+
+}
+
+object Util {
+  setLink(Node,url: String)
+  setLinkExternal(Node,url: String)
+}

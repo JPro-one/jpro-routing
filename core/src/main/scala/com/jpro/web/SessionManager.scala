@@ -23,11 +23,24 @@ trait SessionManager { THIS =>
 
         if(WebAPI.isBrowser && webAPI != null) {
           webAPI.executeScript("document.title = \"" + view.title + "\";")
-          webAPI.executeScript("scroll(0,0);")
-          //webAPI.executeScript(s"history.replaceState(null, null, '${view.url}');")
           if(pushState) {
-            webAPI.executeScript(s"history.pushState(null, null, '${view.url}');")
+            webAPI.executeScript(s"""var doc = document.documentElement;
+                                    |history.replaceState({
+                                    |marker: "goto",
+                                    |scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
+                                    |}, null, null);
+                                    |""".stripMargin)
+            webAPI.executeScript(s"history.pushState({saveScroll: true}, null, '${view.url}');")
           }
+          //in(0.3 s) --> {
+            webAPI.executeScript(
+              """var scrollY = 0;
+                |if(history.state != null) {
+                |  scrollY = history.state.scrollTop || 0;
+                |}
+                |scroll(0,scrollY)
+              """.stripMargin)
+          //}
         }
     }
   }
@@ -47,11 +60,23 @@ trait SessionManager { THIS =>
           gotoURL(s.drop(1).dropRight(1), true)
         }
       })
-      webAPI.executeScript("""window.addEventListener('popstate', function(e) {
-          console.log("got e");
-          console.log("e" + location.href);
-          jpro.popstatejava(location.href);
-        });""")
+      webAPI.executeScript(
+      """window.addEventListener("scroll", function(e) {
+        |  console.log("got e");
+        |  console.log("e" + location.href);
+        |  var doc = document.documentElement;
+        |  if(history.state.saveScroll) {
+        |    history.replaceState({
+        |      marker: "pop",
+        |      saveScroll: true,
+        |      scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
+        |    }, null, null);
+        |  }
+        |
+        |});
+        |window.addEventListener('popstate', function(e) {
+        |  jpro.popstatejava(location.href);
+        |});""".stripMargin)
     } else {
       goto("/")
     }

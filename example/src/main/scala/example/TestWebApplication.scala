@@ -55,8 +55,11 @@ class MainView extends Page {
   val content = new VBox {
     spacing = 200
     this <++ new Label("MAIN") { font = new Font(60)}
-    this <++ new Label(" label 123")
-    this <++ new Label("paralax" ) { setLink(this, "/?page=paralax" ) }
+    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/?page=paralax" ) }
+
   }
 }
 
@@ -74,7 +77,7 @@ class ParalaxPage extends Page {
   val content = new VBox {
     spacing = 200
     this <++ new ParalaxView(img1) {
-      minWH = (250,700)
+      minWH = (250,300)
       style = "-fx-border-width:1; -fx-border-color:black;"
     }
     this <++ new ParalaxView(img1) {
@@ -85,6 +88,9 @@ class ParalaxPage extends Page {
       minWH = (250,700)
       style = "-fx-border-width:1; -fx-border-color:black;"
     }
+    this <++ new Label("asdf")
+    this <++ new Label("asdf")
+    this <++ new Label("asdf")
   }
 
 }
