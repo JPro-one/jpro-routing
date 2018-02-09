@@ -22,26 +22,26 @@ trait SessionManager { THIS =>
         page = view.realContent
 
         if(WebAPI.isBrowser && webAPI != null) {
-          webAPI.executeScript("document.title = \"" + view.title + "\";")
           if(pushState) {
-            webAPI.executeScript(s"""var doc = document.documentElement;
-                                    |history.replaceState({
-                                    |marker: "goto",
-                                    |scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
-                                    |}, null, null);
-                                    |""".stripMargin)
-            val initialState = if(view.saveScrollPosition) "{saveScroll: true}" else "null"
-            webAPI.executeScript(s"history.pushState($initialState, null, '${view.url}');")
+            //webAPI.executeScript(s"""var doc = document.documentElement;
+            //                        |history.replaceState({
+            //                        |marker: "goto",
+            //                        |scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
+            //                        |}, null, null);
+            //                        |""".stripMargin)
+            webAPI.executeScript(s"history.pushState(null, null, '${view.url}');")
           }
-          //in(0.3 s) --> {
-            webAPI.executeScript(
-              """var scrollY = 0;
-                |if(history.state != null) {
-                |  scrollY = history.state.scrollTop || 0;
-                |}
-                |scroll(0,scrollY)
-              """.stripMargin)
-          //}
+          val initialState = if(view.saveScrollPosition) "{saveScroll: true}" else "{saveScroll: false}"
+
+          webAPI.executeScript(
+          """var scrollY = 0;
+              |if(history.state != null) {
+              |  scrollY = history.state.scrollTop || 0;
+              |}
+              |scroll(0,scrollY)
+            """.stripMargin)
+          webAPI.executeScript("document.title = \"" + view.title + "\";")
+          webAPI.executeScript(s"history.replaceState($initialState, null, null)")
         }
     }
   }
@@ -66,7 +66,7 @@ trait SessionManager { THIS =>
         |  console.log("got e");
         |  console.log("e" + location.href);
         |  var doc = document.documentElement;
-        |  if(history.state.saveScroll) {
+        |  if(history.state != null && history.state.saveScroll) {
         |    history.replaceState({
         |      marker: "pop",
         |      saveScroll: true,

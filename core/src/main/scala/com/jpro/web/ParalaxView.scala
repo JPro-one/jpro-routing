@@ -64,7 +64,7 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
             |   x.style.backgroundPosition = ("50% " + perc2 + "%");
             |});
             |window.addEventListener("scroll", update);
-            |update();
+            |  update();
             |})();
           """.stripMargin)
       }
