@@ -68,4 +68,7 @@ configure([project(':example')]) {
   dependencies {
     compile project(':core')
   }
+  jpro {
+    openingPath = "/"
+  }
 }

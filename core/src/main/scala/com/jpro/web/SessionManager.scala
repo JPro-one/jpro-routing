@@ -20,14 +20,19 @@ trait SessionManager { THIS =>
       case view: View =>
         view.url = url
         page = view.realContent
+
         if(WebAPI.isBrowser && webAPI != null) {
-          webAPI.executeScript(s"history.pushState(null, null, '${view.url}');")
           webAPI.executeScript("document.title = \"" + view.title + "\";")
+          webAPI.executeScript("scroll(0,0);")
+          //webAPI.executeScript(s"history.replaceState(null, null, '${view.url}');")
+          if(pushState) {
+            webAPI.executeScript(s"history.pushState(null, null, '${view.url}');")
+          }
         }
     }
   }
   def getView(url: String): Result
-  def gotoURL(x: String) = {
+  def gotoURL(x: String, pushState: Boolean = true) = {
     val url = new URL(x)
     val newResult = getView(url.getFile())
     goto(url.getFile(), newResult, false)
@@ -39,7 +44,7 @@ trait SessionManager { THIS =>
       println("registering popstate")
       webAPI.registerJavaFunction("popstatejava", new WebCallback {
         override def callback(s: String): Unit = {
-          gotoURL(s.drop(1).dropRight(1))
+          gotoURL(s.drop(1).dropRight(1), true)
         }
       })
       webAPI.executeScript("""window.addEventListener('popstate', function(e) {
