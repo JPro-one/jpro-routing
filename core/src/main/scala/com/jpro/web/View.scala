@@ -8,5 +8,6 @@ trait View extends Result {
   var url: String = null
   def realContent: Node = content
   def content: Node
+  def saveScrollPosition = true
 }
 

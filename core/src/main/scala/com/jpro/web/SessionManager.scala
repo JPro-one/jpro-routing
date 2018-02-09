@@ -30,7 +30,8 @@ trait SessionManager { THIS =>
                                     |scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
                                     |}, null, null);
                                     |""".stripMargin)
-            webAPI.executeScript(s"history.pushState({saveScroll: true}, null, '${view.url}');")
+            val initialState = if(view.saveScrollPosition) "{saveScroll: true}" else "null"
+            webAPI.executeScript(s"history.pushState($initialState, null, '${view.url}');")
           }
           //in(0.3 s) --> {
             webAPI.executeScript(

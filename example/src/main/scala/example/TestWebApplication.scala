@@ -72,6 +72,8 @@ class SubView extends Page {
 class ParalaxPage extends Page {
   def title = "Paralax"
 
+  override def saveScrollPosition: Boolean = false
+
   val img1 = getClass().getResource("/images/img1.jpg")
 
   val content = new VBox {
