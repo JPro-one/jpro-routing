@@ -9,5 +9,6 @@ trait View extends Result {
   def realContent: Node = content
   def content: Node
   def saveScrollPosition = true
+  def nativeScrolling = true
 }
 

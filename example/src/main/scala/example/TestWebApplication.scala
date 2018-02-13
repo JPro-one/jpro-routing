@@ -4,8 +4,18 @@ import com.jpro.web._
 import simplefx.core._
 import simplefx.all._
 import com.jpro.web.Util._
+import com.jpro.webapi.WebAPI
 
 class MyApp(stage: Stage) extends WebApp(stage) {
+
+  override def requestLayout(): Unit = {
+    //println("request layout called!")
+    if ((this.scene ne null) && WebAPI.isBrowser) {
+      WebAPI.getWebAPI(stage).requestLayout(this.scene)
+    }
+    super.requestLayout
+  }
+
   addRoute { case "/"                => new MainView()}
   addRoute { case "/?page=main"      => new MainView()}
   addRoute { case "/?page=sub"       => new SubView()}
@@ -72,27 +82,39 @@ class SubView extends Page {
 class ParalaxPage extends Page {
   def title = "Paralax"
 
+  override def nativeScrolling = false
+
   override def saveScrollPosition: Boolean = false
 
   val img1 = getClass().getResource("/images/img1.jpg")
 
-  val content = new VBox {
-    spacing = 200
-    this <++ new ParalaxView(img1) {
-      minWH = (250,300)
-      style = "-fx-border-width:1; -fx-border-color:black;"
+  val content = new StackPane {
+    this <++ new Region {
+      maxWidthProp = 5
+      style = "-fx-background-color: green;"
     }
-    this <++ new ParalaxView(img1) {
-      minWH = (250,700)
-      style = "-fx-border-width:1; -fx-border-color:black;"
+    this <++ new VBox {
+      spacing = 200
+      this <++ new ParalaxView(img1) {
+        minWH = (250,300)
+        style = "-fx-border-width:1; -fx-border-color:black;"
+      }
+      this <++ new ParalaxView(img1) {
+        minWH = (250,700)
+        style = "-fx-border-width:1; -fx-border-color:black;"
+      }
+      this <++ new ParalaxView(img1) {
+        minWH = (250,700)
+        style = "-fx-border-width:1; -fx-border-color:black;"
+      }
+      this <++ new Label("asdf")
+      this <++ new Label("asdf")
+      this <++ new Label("asdf")
     }
-    this <++ new ParalaxView(img1) {
-      minWH = (250,700)
-      style = "-fx-border-width:1; -fx-border-color:black;"
+    this <++ new Region {
+      maxWidthProp = 5
+      style = "-fx-background-color: green;"
     }
-    this <++ new Label("asdf")
-    this <++ new Label("asdf")
-    this <++ new Label("asdf")
   }
 
 }

@@ -40,6 +40,7 @@ trait SessionManager { THIS =>
               |}
               |scroll(0,scrollY)
             """.stripMargin)
+          webAPI.executeScript(s"""document.getElementsByTagName("jpro-app")[0].sfxelem.setScrolling(${view.nativeScrolling})""")
           webAPI.executeScript("document.title = \"" + view.title + "\";")
           webAPI.executeScript(s"history.replaceState($initialState, null, null)")
         }
