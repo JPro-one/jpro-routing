@@ -17,13 +17,13 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
     }
   }
 
-  override def requestLayout(): Unit = {
-    //println("request layout called!")
-    if ((this.scene ne null) && WebAPI.isBrowser) {
-      webAPI.requestLayout(this.scene)
-    }
-    super.requestLayout
-  }
+  //override def requestLayout(): Unit = {
+  //  //println("request layout called!")
+  //  if ((this.scene ne null) && WebAPI.isBrowser) {
+  //    webAPI.requestLayout(this.scene)
+  //  }
+  //  super.requestLayout
+  //}
 
   SessionManagerContext.setContext(this, sessionManager)
 
