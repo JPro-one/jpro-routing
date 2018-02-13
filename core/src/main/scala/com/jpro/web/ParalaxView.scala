@@ -2,7 +2,7 @@ package com.jpro.web
 
 import java.net.URL
 
-import com.jpro.webapi.{HTMLView, WebAPI}
+import com.jpro.webapi.{HTMLView, SVGView, WebAPI}
 import simplefx.all._
 import simplefx.core._
 
@@ -13,24 +13,32 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
   private var webAPI: WebAPI = null
 
   val id = "mynodeid_" + random[Int]
+  val patternid = "mypatternid_" + random[Int]
+  val imgid = "myimgid_" + random[Int]
 
   def backgroundSize = "background-size:100% 200%;"
+
+  def relativeHeight = 100
 
   updated {
     onceWhen(scene != null) --> {
       webAPI = WebAPI.getWebAPI(this.scene)
 
-      this <++ new HTMLView {
+      this <++ new SVGView {
         @Bind var content: String = contentProperty().toBindable
 
         content <-- {
-          s"""<div id="$id" style="width: 100%;
-             |height: 100%;
-             |-webkit-transform: translate3d(0, 0, 0);
-             |transform: translate3d(0, 0, 0);
-             |background-repeat:no-repeat;
-             |${backgroundSize}
-             |background-image: url('${webAPI.createPublicFile(imgurl)}'); "></div>
+          s"""<defs>
+             |  <pattern id="$patternid" patternUnits="userSpaceOnUse" width="100%" height="100%">
+             |            <image id="$imgid" xlink:href="${webAPI.createPublicFile(imgurl)}"
+             |            x="0" y="-${relativeHeight}%"
+             |            preserveAspectRatio="xMidYMid slice"
+             |            width="100%" height="${100 + relativeHeight}%" />
+             |  </pattern>
+             |</defs>
+             |
+             |<rect id="$id" width="100%" height="100%" fill="url(#$patternid)"></rect>
+             |
              |""".stripMargin
         }
 
@@ -46,6 +54,7 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
           s"""(function() {
             |var update = (function() {
             |   var x = document.getElementById("${id}");
+            |   var img = document.getElementById("${imgid}");
             |   var nodeHeight = x.getBoundingClientRect().height;
             |   var nodeY = x.getBoundingClientRect().top;
             |      console.log(window);
@@ -57,11 +66,11 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
             |   var max = screenHeight;
             |   var dif = max - min;
             |   var perc = (nodeY - min) / dif
-            |   var perc2 = Math.max(0.0, Math.min(perc,1.0)) * 100;
+            |   var perc2 = Math.max(0.0, Math.min(perc,1.0))
             |
             |   console.log("perc2: " + perc2);
             |
-            |   x.style.backgroundPosition = ("50% " + perc2 + "%");
+            |   img.setAttribute("y", "" + (-perc2 * ${relativeHeight}) + "%");
             |});
             |window.addEventListener("scroll", update);
             |  update();
