@@ -29,9 +29,9 @@ class Header extends HBox {
   this <++ new Label("main"    ) { setLink(this, "/?page=main") }
   this <++ new Label("subpage" ) { setLink(this, "/?page=sub" ) }
   this <++ new Label("redirect") { setLink(this, "/?page=redirect" ) }
-  this <++ new Label("google"  ) { setLinkExternal(this, "http://google.com" ) }
+  this <++ new Label("google"  ) { setLink(this, "http://google.com" ) }
   this <++ new Label("paralax" ) { setLink(this, "/?page=paralax" ) }
-  this <++ new Label("dead"    ) { setLink(this, "/?page=asdf" ) }
+  this <++ new Label("dead"    ) { setLink(this, "/?page=as df" ) }
 }
 
 class Footer extends HBox {
@@ -65,10 +65,10 @@ class MainView extends Page {
   val content = new VBox {
     spacing = 200
     this <++ new Label("MAIN") { font = new Font(60)}
-    this <++ new Label(" label 123") { font = new Font(60)}
-    this <++ new Label(" label 123") { font = new Font(60)}
-    this <++ new Label(" label 123") { font = new Font(60)}
-    this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/?page=paralax" ) }
+  //  this <++ new Label(" label 123") { font = new Font(60)}
+  //  this <++ new Label(" label 123") { font = new Font(60)}
+  //  this <++ new Label(" label 123") { font = new Font(60)}
+  //  this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/?page=paralax" ) }
 
   }
 }

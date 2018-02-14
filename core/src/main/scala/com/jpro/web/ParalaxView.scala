@@ -16,8 +16,6 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
   val patternid = "mypatternid_" + random[Int]
   val imgid = "myimgid_" + random[Int]
 
-  def backgroundSize = "background-size:100% 200%;"
-
   def relativeHeight = 100
 
   updated {

@@ -10,7 +10,14 @@ object Util {
     SessionManagerContext.getContext(node)
   }
 
-  def setLink(node: Node, url: String) = {
+  def setLink(node: Node, url: String): Unit = {
+    if(url.startsWith("/")) {
+      setLinkInternal(node,url)
+    } else {
+      setLinkExternal(node,url)
+    }
+  }
+  def setLinkInternal(node: Node, url: String) = {
     node.cursor = javafx.scene.Cursor.HAND
     node.onMouseClicked --> { e =>
       if(e.isStillSincePress) Util.getSessionManager(node).goto(url)
