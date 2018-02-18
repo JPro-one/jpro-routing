@@ -18,7 +18,16 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
 
   def relativeHeight = 100
 
-  updated {
+  if(!WebAPI.isBrowser) {
+    this <++ new ImageView(image) {
+      fitWH       <-- (THIS.width, 0)
+      clip        <-- new Rectangle { this.wh <-- THIS.wh }
+      preserveRatio = true
+      managed       = false
+    }
+  }
+
+  if(WebAPI.isBrowser) (updated {
     onceWhen(scene != null) --> {
       webAPI = WebAPI.getWebAPI(this.scene)
 
@@ -71,13 +80,13 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
             |   img.setAttribute("y", "" + (-perc2 * ${relativeHeight}) + "%");
             |});
             |window.addEventListener("scroll", update);
-            |  update();
+            |update();
             |})();
           """.stripMargin)
       }
 
     }
-  }
+  })
 
 
 }
