@@ -8,6 +8,8 @@ import simplefx.core._
 
 trait SessionManager { THIS =>
 
+  var ganalytics = false
+
   def webAPI: WebAPI
   def goto(url: String): Unit = {
     println(s"goto: $url")
@@ -43,6 +45,17 @@ trait SessionManager { THIS =>
           webAPI.executeScript(s"""document.getElementsByTagName("jpro-app")[0].sfxelem.setScrolling(${view.nativeScrolling})""")
           webAPI.executeScript("document.title = \"" + view.title + "\";")
           webAPI.executeScript(s"history.replaceState($initialState, null, null)")
+          if(ganalytics) {
+            webAPI.executeScript(s"""
+            ga('set', {
+              page: '${view.url}',
+              title: '${view.title}'
+            });
+
+            // send it for tracking
+            ga('send', 'pageview');
+            """)
+          }
         }
     }
   }
