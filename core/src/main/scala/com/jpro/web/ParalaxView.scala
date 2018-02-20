@@ -61,10 +61,10 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
           s"""(function() {
             |var update = (function() {
             |   var x = document.getElementById("${id}");
+            |   if(x != null) {
             |   var img = document.getElementById("${imgid}");
             |   var nodeHeight = x.getBoundingClientRect().height;
             |   var nodeY = x.getBoundingClientRect().top;
-            |      console.log(window);
             |   var screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             |   var doc = document.documentElement;
             |   var scrollPosition = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
@@ -75,12 +75,12 @@ class ParalaxView(imgurl: URL) extends StackPane { THIS =>
             |   var perc = (nodeY - min) / dif
             |   var perc2 = Math.max(0.0, Math.min(perc,1.0))
             |
-            |   console.log("perc2: " + perc2);
-            |
             |   img.setAttribute("y", "" + (-perc2 * ${relativeHeight}) + "%");
+            |   }
             |});
             |window.addEventListener("scroll", update);
             |update();
+            |
             |})();
           """.stripMargin)
       }
