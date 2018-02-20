@@ -6,7 +6,7 @@ import com.jpro.webapi.{HTMLView, SVGView, WebAPI}
 import simplefx.all._
 import simplefx.core._
 
-class ParalaxView(imgurl: URL) extends StackPane { THIS =>
+class ParallaxView(imgurl: URL) extends StackPane { THIS =>
 
   @Bind var image: Image = new Image(imgurl.toString)
 
