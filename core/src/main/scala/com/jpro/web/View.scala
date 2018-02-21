@@ -6,6 +6,7 @@ import simplefx.all._
 trait View extends Result {
   def title: String
   var url: String = null
+  var isMobile: Boolean = false
   def realContent: Node = content
   def content: Node
   def saveScrollPosition = true

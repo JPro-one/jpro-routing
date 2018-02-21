@@ -21,6 +21,7 @@ trait SessionManager { THIS =>
       case Redirect(url) => goto(url)
       case view: View =>
         view.url = url
+        view.isMobile = webAPI.isMobile
         page = view.realContent
 
         if(WebAPI.isBrowser && webAPI != null) {
