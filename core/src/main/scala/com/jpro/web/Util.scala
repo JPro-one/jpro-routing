@@ -40,7 +40,6 @@ object Util {
     assert(theNode.parent.isInstanceOf[Pane], "The parent at setLink has to be a Pane")
     val parent = theNode.parent.asInstanceOf[Pane]
     parent <++ new Group(new HTMLView {
-      style = "-fx-background-color: #FF000044;"
       layoutXY    <-- /*(100,100) */theNode.bipXY
       this.minWH  <-- /*(100,100) */theNode.bipWH
       this.prefWH <-- /*(100,100) */theNode.bipWH
@@ -48,7 +47,7 @@ object Util {
       s"""onclick="console.log('BLUBBLUB!'); jpro.jproGotoURL('$url'); event.preventDefault();" """.stripMargin
 
       setContent(
-       s"""<a $fun href="$url" style="display: block; width: 100%; height: 100%; background-color: #0000FF66;"></a>""")
+       s"""<a $fun href="$url" style="display: block; width: 100%; height: 100%;"></a>""")
     }) {
       managed = false
     }
