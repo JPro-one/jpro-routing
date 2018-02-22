@@ -21,7 +21,7 @@ trait SessionManager { THIS =>
       case Redirect(url) => goto(url)
       case view: View =>
         view.url = url
-        view.isMobile = webAPI.isMobile
+        if(WebAPI.isBrowser) view.isMobile = webAPI.isMobile
         page = view.realContent
 
         if(WebAPI.isBrowser && webAPI != null) {
@@ -74,6 +74,11 @@ trait SessionManager { THIS =>
       webAPI.registerJavaFunction("popstatejava", new WebCallback {
         override def callback(s: String): Unit = {
           gotoURL(s.drop(1).dropRight(1), true)
+        }
+      })
+      webAPI.registerJavaFunction("jproGotoURL", new WebCallback {
+        override def callback(s: String): Unit = {
+          goto(s.drop(1).dropRight(1))
         }
       })
       webAPI.executeScript(

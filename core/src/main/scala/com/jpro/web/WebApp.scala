@@ -6,9 +6,9 @@ import simplefx.all._
 
 class WebApp(stage: Stage) extends StackPane { THIS =>
 
-  var webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
+  lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
 
-  val sessionManager = new SessionManager {
+  lazy val sessionManager = new SessionManager {
     override def webAPI = THIS.webAPI
     override def getView(url: String): Result = {
       println("getting: " + url)
