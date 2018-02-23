@@ -1,6 +1,7 @@
 package com.jpro.web
 
 import java.net.URL
+import java.net.URLDecoder
 
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import simplefx.all._
@@ -13,10 +14,12 @@ trait SessionManager { THIS =>
   def webAPI: WebAPI
   def goto(url: String): Unit = {
     println(s"goto: $url")
-    val view = getView(url)
-    goto(url, view, true)
+    val url2 = URLDecoder.decode(url,"UTF-8")
+    val view = getView(url2)
+    goto(url2, view, true)
   }
-  def goto(url: String, x: Result, pushState: Boolean): Unit = {
+  def goto(_url: String, x: Result, pushState: Boolean): Unit = {
+    val url = URLDecoder.decode(_url,"UTF-8")
     x match {
       case Redirect(url) => goto(url)
       case view: View =>
@@ -32,7 +35,7 @@ trait SessionManager { THIS =>
             //                        |scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
             //                        |}, null, null);
             //                        |""".stripMargin)
-            webAPI.executeScript(s"""history.pushState(null, null, "${view.url}");""")
+            webAPI.executeScript(s"""history.pushState(null, null, "${view.url.replace("\"","\\\"")}");""")
           }
           val initialState = if(view.saveScrollPosition) "{saveScroll: true}" else "{saveScroll: false}"
 
@@ -63,7 +66,7 @@ trait SessionManager { THIS =>
   def getView(url: String): Result
   def gotoURL(x: String, pushState: Boolean = true) = {
     val url = new URL(x)
-    val newResult = getView(url.getFile())
+    val newResult = getView(URLDecoder.decode(url.getFile(),"UTF-8"))
     goto(url.getFile(), newResult, false)
   }
 
@@ -73,12 +76,12 @@ trait SessionManager { THIS =>
       println("registering popstate")
       webAPI.registerJavaFunction("popstatejava", new WebCallback {
         override def callback(s: String): Unit = {
-          gotoURL(s.drop(1).dropRight(1), true)
+          gotoURL(s.drop(1).dropRight(1).replace("\\\"","\""), true)
         }
       })
       webAPI.registerJavaFunction("jproGotoURL", new WebCallback {
         override def callback(s: String): Unit = {
-          goto(s.drop(1).dropRight(1))
+          goto(s.drop(1).dropRight(1).replace("\\\"","\""))
         }
       })
       webAPI.executeScript(

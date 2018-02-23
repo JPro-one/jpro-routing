@@ -3,6 +3,7 @@ package com.jpro.web
 import com.jpro.webapi.{HTMLView, WebAPI}
 import simplefx.core._
 import simplefx.all._
+import java.net.URLEncoder
 
 object Util {
 
@@ -46,12 +47,12 @@ object Util {
       this.prefWH <-- /*(100,100) */theNode.bipWH
       val fun = if(!pushState) "" else
       setContent(
-       s"""<a id="$id" href="$url" style="display: block; width: 100%; height: 100%;"></a>""")
+       s"""<a id="$id" href="${url.replace(" ","%20").replace("\"","&quot;")}" style="display: block; width: 100%; height: 100%;"></a>""")
       if(pushState) {
         WebAPI.getWebAPI(theNode.scene).executeScript{
           s"""var x = document.getElementById("${id}");
             |x.addEventListener("click", function(event) {
-            |  jpro.jproGotoURL(\"$url\"); event.preventDefault();
+            |  jpro.jproGotoURL(\"${url.replace("\"","\\\"")}\"); event.preventDefault();
             |});
           """.stripMargin
         }
