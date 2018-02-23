@@ -45,7 +45,6 @@ object Util {
       layoutXY    <-- /*(100,100) */theNode.bipXY
       this.minWH  <-- /*(100,100) */theNode.bipWH
       this.prefWH <-- /*(100,100) */theNode.bipWH
-      val fun = if(!pushState) "" else
       setContent(
        s"""<a id="$id" href="${url.replace(" ","%20").replace("\"","&quot;")}" style="display: block; width: 100%; height: 100%;"></a>""")
       if(pushState) {
