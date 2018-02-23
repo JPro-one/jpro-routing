@@ -39,15 +39,23 @@ object Util {
   private def setLinkSimple(url: String, pushState: Boolean)(theNode: Node) = if(WebAPI.isBrowser) onceWhen(theNode.scene != null) --> {
     assert(theNode.parent.isInstanceOf[Pane], "The parent at setLink has to be a Pane")
     val parent = theNode.parent.asInstanceOf[Pane]
+    val id = "linkid_"+random[Int]
     parent <++ new Group(new HTMLView {
       layoutXY    <-- /*(100,100) */theNode.bipXY
       this.minWH  <-- /*(100,100) */theNode.bipWH
       this.prefWH <-- /*(100,100) */theNode.bipWH
       val fun = if(!pushState) "" else
-      s"""onclick="console.log('BLUBBLUB!'); jpro.jproGotoURL('$url'); event.preventDefault();" """.stripMargin
-
       setContent(
-       s"""<a $fun href="$url" style="display: block; width: 100%; height: 100%;"></a>""")
+       s"""<a id="$id" href="$url" style="display: block; width: 100%; height: 100%;"></a>""")
+      if(pushState) {
+        WebAPI.getWebAPI(theNode.scene).executeScript{
+          s"""var x = document.getElementById("${id}");
+            |x.addEventListener("click", function(event) {
+            |  jpro.jproGotoURL(\"$url\"); event.preventDefault();
+            |});
+          """.stripMargin
+        }
+      }
     }) {
       managed = false
     }
