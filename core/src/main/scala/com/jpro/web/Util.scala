@@ -57,6 +57,7 @@ object Util {
         }
       }
     }) {
+      mouseTransparent = true
       managed = false
     }
   }
