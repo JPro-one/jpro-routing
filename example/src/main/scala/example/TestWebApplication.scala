@@ -4,9 +4,11 @@ import com.jpro.web._
 import simplefx.core._
 import simplefx.all._
 import com.jpro.web.Util._
-import com.jpro.webapi.WebAPI
+import com.jpro.webapi.{HTMLView, WebAPI}
 
 class MyApp(stage: Stage) extends WebApp(stage) {
+
+  stylesheets ::= "test.css"
 
   override def requestLayout(): Unit = {
     //println("request layout called!")
@@ -21,17 +23,27 @@ class MyApp(stage: Stage) extends WebApp(stage) {
   addRoute { case "/?page=sub"       => new SubView()}
   addRoute { case "/?page=redirect"  => Redirect("/sub")}
   addRoute { case "/?page=paralax"   => new ParalaxPage()}
+  addRoute { case "/?page=it's\" tricky" => new MainView()}
   addRoute { case x                  => new UnknownPage(x)}
 }
 
 class Header extends HBox {
+  padding = Insets(10)
   spacing = 10
-  this <++ new Label("main"    ) { setLink(this, "/?page=main") }
-  this <++ new Label("subpage" ) { setLink(this, "/?page=sub" ) }
-  this <++ new Label("redirect") { setLink(this, "/?page=redirect" ) }
-  this <++ new Label("google"  ) { setLink(this, "http://google.com" ) }
-  this <++ new Label("paralax" ) { setLink(this, "/?page=paralax" ) }
-  this <++ new Label("dead"    ) { setLink(this, "/?page=as df" ) }
+  class HeaderLink(str: String, url: String) extends Label (str) {
+    styleClass ::= "header-link"
+    if(!url.isEmpty) {
+      setLink(this, url)
+    }
+  }
+  this <++ new HeaderLink("main"    , "/?page=main")
+  this <++ new HeaderLink("subpage" , "/?page=sub" )
+  this <++ new HeaderLink("redirect", "/?page=redirect" )
+  this <++ new HeaderLink("tricky!" , "/?page=it's\" tricky" )
+  this <++ new HeaderLink("google"  , "http://google.com" )
+  this <++ new HeaderLink("paralax" , "/?page=paralax" )
+  this <++ new HeaderLink("dead"    , "/?page=as df" )
+  this <++ new HeaderLink("No Link" , "" )
 }
 
 class Footer extends HBox {
@@ -45,10 +57,12 @@ class Footer extends HBox {
 trait Page extends View {
   override def realContent = {
     new VBox {
+    //  transform = Scale(1.3,1.3)
       spacing = 10
       this <++ new Header
       this <++ content
       this <++ new Footer
+      this <++ new Header
     }
   }
 }
@@ -64,11 +78,22 @@ class MainView extends Page {
 
   val content = new VBox {
     spacing = 200
-    this <++ new Label("MAIN") { font = new Font(60)}
-  //  this <++ new Label(" label 123") { font = new Font(60)}
-  //  this <++ new Label(" label 123") { font = new Font(60)}
-  //  this <++ new Label(" label 123") { font = new Font(60)}
-  //  this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/?page=paralax" ) }
+    this <++ new StackPane(new Label("GOOGL") {
+      font = new Font(60);
+
+    }) {
+      this <++ new HTMLView {
+        setContent(
+          """
+            |<a style="display: block; width: 100%; height: 100%; background-color: #66666666;" href="http://google.com"></a>
+          """.stripMargin
+        )
+      }
+    }
+    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/?page=paralax" ) }
 
   }
 }
@@ -82,9 +107,7 @@ class SubView extends Page {
 class ParalaxPage extends Page {
   def title = "Paralax"
 
-  override def nativeScrolling = false
-
-  override def saveScrollPosition: Boolean = false
+  //override def saveScrollPosition: Boolean = false
 
   val img1 = getClass().getResource("/images/img1.jpg")
 
@@ -95,16 +118,17 @@ class ParalaxPage extends Page {
     }
     this <++ new VBox {
       spacing = 200
-      this <++ new ParalaxView(img1) {
+
+      this <++ new ParallaxView(img1) {
         minWH = (250,300)
         style = "-fx-border-width:1; -fx-border-color:black;"
       }
-      this <++ new ParalaxView(img1) {
-        minWH = (250,700)
+      this <++ new ParallaxView(img1) {
+        minWH = (250,400)
         style = "-fx-border-width:1; -fx-border-color:black;"
       }
-      this <++ new ParalaxView(img1) {
-        minWH = (250,700)
+      this <++ new ParallaxView(img1) {
+        minWH = (250,400)
         style = "-fx-border-width:1; -fx-border-color:black;"
       }
       this <++ new Label("asdf")
@@ -124,5 +148,13 @@ object TestWebApplication extends App
 @SimpleFXApp class TestWebApplication {
   val app = new MyApp(stage)
   root = app
+  app.start()
+}
+object TestWebApplicationNative extends App
+@SimpleFXApp class TestWebApplicationNative {
+  val app = new MyApp(stage)
+  root = new ScrollPane(app) {
+    fitToWidth = true
+  }
   app.start()
 }
