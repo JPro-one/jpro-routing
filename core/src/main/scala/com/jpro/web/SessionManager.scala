@@ -99,6 +99,12 @@ trait SessionManager { THIS =>
         |window.addEventListener('popstate', function(e) {
         |  jpro.popstatejava(location.href);
         |});""".stripMargin)
+      webAPI.executeScript(
+        """if ('scrollRestoration' in history) {
+          |  // Back off, browser, I got this...
+          |  history.scrollRestoration = 'manual';
+          |}
+        """.stripMargin)
     } else {
       goto("/")
     }
