@@ -41,10 +41,10 @@ trait SessionManager { THIS =>
 
           webAPI.executeScript(
           """var scrollY = 0;
-              |if(history.state != null) {
-              |  scrollY = history.state.scrollTop || 0;
-              |}
-              |scroll(0,scrollY)
+            |if(history.state != null) {
+            |  scrollY = history.state.scrollTop || 0;
+            |}
+            |scroll(0,scrollY)
             """.stripMargin)
           webAPI.executeScript(s"""document.getElementsByTagName("jpro-app")[0].sfxelem.setScrolling(${view.nativeScrolling})""")
           webAPI.executeScript("document.title = \"" + view.title + "\";")
@@ -84,8 +84,14 @@ trait SessionManager { THIS =>
           goto(s.drop(1).dropRight(1).replace("\\\"","\""))
         }
       })
+
+      // Safari scrollsUp on popstate, when going back form external page (when scrollRestoration is manual)
+      // when this happens, the ws-connection get's canceled by safari, which tells us,
+      // that we have to move back to the saved scrollPosition.
+      // we have to check, whether the ws is still alive, shortly after popstate.
+      // we have to save the old scrollY immediately, so we remember it faster, than the safari resets it.
       webAPI.executeScript(
-      """window.addEventListener("scroll", function(e) {
+      s"""window.addEventListener("scroll", function(e) {
         |  var doc = document.documentElement;
         |  if(history.state != null && history.state.saveScroll) {
         |    history.replaceState({
@@ -97,6 +103,18 @@ trait SessionManager { THIS =>
         |
         |});
         |window.addEventListener('popstate', function(e) {
+        |  window.setTimeout(function(){console.log("popstate called!")},3000);
+        |  var scrollY = 0;
+        |  if(history.state != null) {
+        |    scrollY = history.state.scrollTop || 0;
+        |  }
+        |  window.setTimeout(function(){
+        |    if(!document.getElementsByTagName("jpro-app")[0].jproimpl.isConnected) {
+        |      window.setTimeout(function(){console.log("resetting scroly (wasn't connected")},3000);
+        |      console.log("scrollY: " + scrollY);
+        |      scroll(0,scrollY);
+        |    }
+        |  }, 1);
         |  jpro.popstatejava(location.href);
         |});""".stripMargin)
       webAPI.executeScript(
