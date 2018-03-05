@@ -85,23 +85,31 @@ trait SessionManager { THIS =>
         }
       })
 
+      webAPI.executeScript(
+      s"""var scheduled = false
+         |window.addEventListener("scroll", function(e) {
+         |  if(!scheduled) {
+         |    window.setTimeout(function(){
+         |      scheduled = false;
+         |      var doc = document.documentElement;
+         |      if(history.state != null && history.state.saveScroll) {
+         |        history.replaceState({
+         |          marker: "pop",
+         |          saveScroll: true,
+         |          scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
+         |        }, null, null);
+         |      }
+         |    },300);
+         |  }
+         |  scheduled = true;
+         |});
+        |""".stripMargin)
       // Safari scrollsUp on popstate, when going back form external page (when scrollRestoration is manual)
       // when this happens, the ws-connection get's canceled by safari, which tells us,
       // that we have to move back to the saved scrollPosition.
       // we have to check, whether the ws is still alive, shortly after popstate.
       // we have to save the old scrollY immediately, so we remember it faster, than the safari resets it.
-      webAPI.executeScript(
-      s"""window.addEventListener("scroll", function(e) {
-        |  var doc = document.documentElement;
-        |  if(history.state != null && history.state.saveScroll) {
-        |    history.replaceState({
-        |      marker: "pop",
-        |      saveScroll: true,
-        |      scrollTop: (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
-        |    }, null, null);
-        |  }
-        |
-        |});
+      webAPI.executeScript("""
         |window.addEventListener('popstate', function(e) {
         |  window.setTimeout(function(){console.log("popstate called!")},3000);
         |  var scrollY = 0;
