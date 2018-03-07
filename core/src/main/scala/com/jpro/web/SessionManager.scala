@@ -47,13 +47,13 @@ trait SessionManager { THIS =>
             |scroll(0,scrollY)
             """.stripMargin)
           webAPI.executeScript(s"""document.getElementsByTagName("jpro-app")[0].sfxelem.setScrolling(${view.nativeScrolling})""")
-          webAPI.executeScript("document.title = \"" + view.title + "\";")
+          webAPI.executeScript(s"""document.title = "${view.title.replace("\"","\\\"")}";""")
           webAPI.executeScript(s"history.replaceState($initialState, null, null)")
           if(ganalytics) {
             webAPI.executeScript(s"""
             ga('set', {
-              page: '${view.url}',
-              title: '${view.title}'
+              page: "${view.url.replace("\"","\\\"")}",
+              title: "${view.title.replace("\"","\\\"")}"
             });
 
             // send it for tracking
