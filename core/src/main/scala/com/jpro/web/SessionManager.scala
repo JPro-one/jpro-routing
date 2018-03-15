@@ -12,13 +12,13 @@ trait SessionManager { THIS =>
   var ganalytics = false
 
   def webAPI: WebAPI
-  def goto(url: String): Unit = {
+  def goto(url: String, track: Boolean = true): Unit = {
     println(s"goto: $url")
     val url2 = URLDecoder.decode(url,"UTF-8")
     val view = getView(url2)
-    goto(url2, view, true)
+    goto(url2, view, true, track)
   }
-  def goto(_url: String, x: Result, pushState: Boolean): Unit = {
+  def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
       case Redirect(url) => goto(url)
@@ -49,7 +49,7 @@ trait SessionManager { THIS =>
           webAPI.executeScript(s"""document.getElementsByTagName("jpro-app")[0].sfxelem.setScrolling(${view.nativeScrolling})""")
           webAPI.executeScript(s"""document.title = "${view.title.replace("\"","\\\"")}";""")
           webAPI.executeScript(s"history.replaceState($initialState, null, null)")
-          if(ganalytics) {
+          if(ganalytics && track) {
             webAPI.executeScript(s"""
             ga('set', {
               page: "${view.url.replace("\"","\\\"")}",
@@ -64,15 +64,15 @@ trait SessionManager { THIS =>
     }
   }
   def getView(url: String): Result
-  def gotoURL(x: String, pushState: Boolean = true) = {
+  def gotoURL(x: String, pushState: Boolean = true, track: Boolean = true) = {
     val url = new URL(x)
     val newResult = getView(URLDecoder.decode(url.getFile(),"UTF-8"))
-    goto(url.getFile(), newResult, pushState)
+    goto(url.getFile(), newResult, pushState, track)
   }
 
   def start() = {
     if(webAPI != null) {
-      gotoURL(webAPI.getServerName, false)
+      gotoURL(webAPI.getServerName, false, false)
       println("registering popstate")
       webAPI.registerJavaFunction("popstatejava", new WebCallback {
         override def callback(s: String): Unit = {
