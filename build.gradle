@@ -67,6 +67,7 @@ configure([project(':example')]) {
   mainClassName = "example.TestWebApplication"
   dependencies {
     compile project(':core')
+    compile 'org.controlsfx:controlsfx:8.40.14'
   }
   jpro {
     openingPath = "/"
