@@ -67,16 +67,16 @@ trait SessionManager { THIS =>
   def gotoURL(x: String, pushState: Boolean = true) = {
     val url = new URL(x)
     val newResult = getView(URLDecoder.decode(url.getFile(),"UTF-8"))
-    goto(url.getFile(), newResult, false)
+    goto(url.getFile(), newResult, pushState)
   }
 
   def start() = {
     if(webAPI != null) {
-      gotoURL(webAPI.getServerName)
+      gotoURL(webAPI.getServerName, false)
       println("registering popstate")
       webAPI.registerJavaFunction("popstatejava", new WebCallback {
         override def callback(s: String): Unit = {
-          gotoURL(s.drop(1).dropRight(1).replace("\\\"","\""), true)
+          gotoURL(s.drop(1).dropRight(1).replace("\\\"","\""), false)
         }
       })
       webAPI.registerJavaFunction("jproGotoURL", new WebCallback {
