@@ -13,33 +13,33 @@ object Util {
     SessionManagerContext.getContext(node)
   }
 
-  def setLink(node: Node, url: String): Unit = {
+  def setLink(node: Node, url: String, text: Option[String] = None): Unit = {
     if(url.startsWith("/")) {
-      setLinkInternal(node,url)
+      setLinkInternal(node,url, text)
     } else {
-      setLinkExternal(node,url)
+      setLinkExternal(node,url, text)
     }
   }
-  def setLinkInternal(node: Node, url: String) = {
+  def setLinkInternal(node: Node, url: String, text: Option[String] = None) = {
     node.cursor = javafx.scene.Cursor.HAND
     if(!WebAPI.isBrowser) {
       node.onMouseClicked --> { e =>
         if(e.isStillSincePress) Util.getSessionManager(node).goto(url)
       }
     } else {
-      setLinkSimple(url, true)(node)
+      setLinkSimple(url, text, true)(node)
     }
   }
-  def setLinkExternal(node: Node, url: String) = {
+  def setLinkExternal(node: Node, url: String, text: Option[String] = None) = {
     node.cursor = javafx.scene.Cursor.HAND
-    setLinkSimple(url, false)(node)
+    setLinkSimple(url, text, false)(node)
   }
 
   def gotoPage(node: Node, url: String) = {
     Util.getSessionManager(node).goto(url)
   }
 
-  private def setLinkSimple(url: String, pushState: Boolean)(theNode: Node) = if(WebAPI.isBrowser) onceWhen(theNode.scene != null) --> {
+  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node) = if(WebAPI.isBrowser) onceWhen(theNode.scene != null) --> {
     assert(theNode.parent.isInstanceOf[Pane], "The parent at setLink has to be a Pane")
     val parent = theNode.parent.asInstanceOf[Pane]
     val id = "linkid_"+random[Int]
@@ -48,8 +48,9 @@ object Util {
       theNode.bipWH --> { x =>
         this.resize(x._1,x._2)
       }
+      val styleAnchorText = if(text.isEmpty) "" else "line-height: 0; font-size: 0; color: transparent; "
       setContent(
-        s"""<a id="$id" href="${url.replace(" ","%20").replace("\"","&quot;")}" style="display: block; width: 100%; height: 100%;"></a>"""
+        s"""<a id="$id" href="${url.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>"""
       )
       hover --> { x =>
         theNode.useReflection.setHover(x)

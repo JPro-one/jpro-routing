@@ -5,6 +5,7 @@ import simplefx.core._
 import simplefx.all._
 import com.jpro.web.Util._
 import com.jpro.webapi.{HTMLView, WebAPI}
+import org.controlsfx.control.PopOver
 
 class MyApp(stage: Stage) extends WebApp(stage) {
 
@@ -33,7 +34,7 @@ class Header extends HBox {
   class HeaderLink(str: String, url: String) extends Label (str) {
     styleClass ::= "header-link"
     if(!url.isEmpty) {
-      setLink(this, url)
+      setLink(this, url, Some(str))
     }
   }
   this <++ new HeaderLink("main"    , "/?page=main")
@@ -69,30 +70,47 @@ trait Page extends View {
 
 class UnknownPage(x: String) extends Page {
   def title = "Unknown page: " + x
+  def description = "Unknown page: " + x
 
   def content = new Label("UNKNOWN PAGE: " + x) { font = new Font(60)}
 }
 
 class MainView extends Page {
   def title = "Main"
+  def description = "desc Main"
 
   val content = new VBox {
     spacing = 200
-    this <++ new StackPane(new Label("GOOGL") {
-      font = new Font(60);
-
-    }) {
-      this <++ new HTMLView {
-        setContent(
-          """
-            |<a style="display: block; width: 100%; height: 100%; background-color: #66666666;" href="http://google.com"></a>
-          """.stripMargin
-        )
+    def addGoogle: Node = {
+      new StackPane(new Label("GOOGL") {
+        font = new Font(60);
+      }) {
+        this <++ new HTMLView {
+          setContent(
+            """
+              |<a style="display: block; width: 100%; height: 100%; background-color: #66666666;" href="http://google.com"></a>
+            """.stripMargin
+          )
+        }
+      }
+    }
+    this <++ addGoogle
+    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ new Button("Open Popup") { button =>
+      onAction --> {
+        val content = new VBox { box =>
+          this <++ new Label("Im A Link to Google!") {
+            setLink(this,"http://google.com")
+          }
+          this <++ addGoogle
+        }
+        new PopOver(content) {
+        }.show(button)
       }
     }
     this <++ new Label(" label 123") { font = new Font(60)}
     this <++ new Label(" label 123") { font = new Font(60)}
-    this <++ new Label(" label 123") { font = new Font(60)}
+    this <++ addGoogle
     this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/?page=paralax" ) }
 
   }
@@ -100,12 +118,14 @@ class MainView extends Page {
 
 class SubView extends Page {
   def title = "SubView"
+  def description = "desc Sub"
 
   val content = new Label("SUBVIEW") { font = new Font(60)}
 }
 
 class ParalaxPage extends Page {
   def title = "Paralax"
+  def description = "desc Para"
 
   //override def saveScrollPosition: Boolean = false
 

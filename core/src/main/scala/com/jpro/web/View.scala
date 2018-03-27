@@ -5,6 +5,7 @@ import simplefx.all._
 
 trait View extends Result {
   def title: String
+  def description: String
   var url: String = null
   var isMobile: Boolean = false
   def realContent: Node = content
