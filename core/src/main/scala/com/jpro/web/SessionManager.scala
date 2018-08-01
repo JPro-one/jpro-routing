@@ -12,11 +12,11 @@ trait SessionManager { THIS =>
   var ganalytics = false
 
   def webAPI: WebAPI
-  def goto(url: String, track: Boolean = true): Unit = {
+  def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
     val url2 = URLDecoder.decode(url,"UTF-8")
     val view = getView(url2)
-    goto(url2, view, true, track)
+    goto(url2, view, pushState, track)
   }
   def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
@@ -25,7 +25,9 @@ trait SessionManager { THIS =>
       case view: View =>
         view.url = url
         if(WebAPI.isBrowser) view.isMobile = webAPI.isMobile
-        page = view.realContent
+        //setView() ???
+        webApp().getTransition((THIS.view,view,!pushState)).doTransition(webApp(),THIS.view,view)
+        THIS.view = view
 
         if(WebAPI.isBrowser && webAPI != null) {
           if(pushState) {
@@ -65,6 +67,7 @@ trait SessionManager { THIS =>
     }
   }
   def getView(url: String): Result
+  def webApp(): WebApp
   def gotoURL(x: String, pushState: Boolean = true, track: Boolean = true) = {
     val url = new URL(x)
     val newResult = getView(URLDecoder.decode(url.getFile(),"UTF-8"))
@@ -133,10 +136,12 @@ trait SessionManager { THIS =>
           |}
         """.stripMargin)
     } else {
-      goto("/")
+      goto("/", pushState = false)
     }
   }
 
   @Bind var url: String = null
-  @Bind var page: Node = null
+
+  @Bind var view: View = null
+  //@Bind var page: Node = null
 }

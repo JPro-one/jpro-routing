@@ -21,11 +21,16 @@ class MyApp(stage: Stage) extends WebApp(stage) {
 
   addRoute { case "/"                => new MainView()}
   addRoute { case "/?page=main"      => new MainView()}
+  addRoute { case "/?page=green"      => new GreenView()}
   addRoute { case "/?page=sub"       => new SubView()}
   addRoute { case "/?page=redirect"  => Redirect("/sub")}
   addRoute { case "/?page=paralax"   => new ParalaxPage()}
   addRoute { case "/?page=it's\" tricky" => new MainView()}
   addRoute { case x                  => new UnknownPage(x)}
+
+  addTransition{ case (null,view2,true ) => PageTransition.InstantTransition }
+  addTransition{ case (view,view2,true ) => PageTransition.MoveDown }
+  addTransition{ case (view,view2,false) => PageTransition.MoveUp }
 }
 
 class Header extends HBox {
@@ -44,6 +49,7 @@ class Header extends HBox {
   this <++ new HeaderLink("google"  , "http://google.com" )
   this <++ new HeaderLink("paralax" , "/?page=paralax" )
   this <++ new HeaderLink("dead"    , "/?page=as df" )
+  this <++ new HeaderLink("green"   , "/?page=green" )
   this <++ new HeaderLink("No Link" , "" )
 }
 
@@ -56,13 +62,16 @@ class Footer extends HBox {
 }
 
 trait Page extends View {
-  override def realContent = {
+  override lazy val realContent = {
     new VBox {
+      style = "-fx-background-color: white;"
     //  transform = Scale(1.3,1.3)
       spacing = 10
       this <++ new Header
-      this <++ content
-      this <++ new Footer
+      val theContent = content
+      javafx.scene.layout.VBox.setVgrow(theContent,Priority.ALWAYS)
+      this <++ theContent
+      //this <++ new Footer
       this <++ new Header
     }
   }
@@ -72,7 +81,17 @@ class UnknownPage(x: String) extends Page {
   def title = "Unknown page: " + x
   def description = "Unknown page: " + x
 
+  override def nativeScrolling = false
+
   def content = new Label("UNKNOWN PAGE: " + x) { font = new Font(60)}
+}
+class GreenView() extends Page {
+  def title = "Green Page"
+  def description = "desc Main"
+
+  override def nativeScrolling = false
+
+  def content = new StackPane { style = "-fx-background-color: green;"}
 }
 
 class MainView extends Page {
@@ -119,6 +138,7 @@ class MainView extends Page {
 class SubView extends Page {
   def title = "SubView"
   def description = "desc Sub"
+  //def ful
 
   val content = new Label("SUBVIEW") { font = new Font(60)}
 }
