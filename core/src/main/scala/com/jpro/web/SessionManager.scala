@@ -6,6 +6,7 @@ import java.net.URLDecoder
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import simplefx.all._
 import simplefx.core._
+import simplefx.experimental._
 
 trait SessionManager { THIS =>
 
@@ -15,8 +16,9 @@ trait SessionManager { THIS =>
   def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
     val url2 = URLDecoder.decode(url,"UTF-8")
-    val view = getView(url2)
-    goto(url2, view, pushState, track)
+    getView(url2).map { view =>
+      goto(url2, view, pushState, track)
+    }
   }
   def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
@@ -66,12 +68,13 @@ trait SessionManager { THIS =>
         }
     }
   }
-  def getView(url: String): Result
+  def getView(url: String): FXFuture[Result]
   def webApp(): WebApp
   def gotoURL(x: String, pushState: Boolean = true, track: Boolean = true) = {
     val url = new URL(x)
-    val newResult = getView(URLDecoder.decode(url.getFile(),"UTF-8"))
-    goto(url.getFile(), newResult, pushState, track)
+    getView(URLDecoder.decode(url.getFile(),"UTF-8")).map { newResult =>
+      goto(url.getFile(), newResult, pushState, track)
+    }
   }
 
   def start() = {

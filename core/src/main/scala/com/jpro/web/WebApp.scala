@@ -3,6 +3,7 @@ package com.jpro.web
 import com.jpro.webapi.WebAPI
 import simplefx.core._
 import simplefx.all._
+import simplefx.experimental._
 
 class WebApp(stage: Stage) extends StackPane { THIS =>
 
@@ -11,7 +12,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
   lazy val sessionManager = new SessionManager {
     override def webApp = THIS
     override def webAPI = THIS.webAPI
-    override def getView(url: String): Result = {
+    override def getView(url: String): FXFuture[Result] = {
       println("getting: " + url)
       val view = route(url)
       view
@@ -21,9 +22,12 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   SessionManagerContext.setContext(this, sessionManager)
 
-  var route: PartialFunction[String, Result] = PartialFunction.empty
-  def addRoute(fun: PartialFunction[String, Result]): Unit = {
+  var route: PartialFunction[String, FXFuture[Result]] = PartialFunction.empty
+  def addRouteFuture(fun: PartialFunction[String, FXFuture[Result]]): Unit = {
     route = route orElse fun
+  }
+  def addRoute(fun: PartialFunction[String, Result]): Unit = {
+    route = route orElse fun.andThen(x => FXFuture(x))
   }
 
   var transitionRoute: PartialFunction[(View,View,Boolean), PageTransition] = PartialFunction.empty

@@ -22,8 +22,9 @@ class MyApp(stage: Stage) extends WebApp(stage) {
   addRoute { case "/"                => new MainView()}
   addRoute { case "/?page=main"      => new MainView()}
   addRoute { case "/?page=green"      => new GreenView()}
+  addRoute { case "/?page=orange"      => new OrangeView()}
   addRoute { case "/?page=sub"       => new SubView()}
-  addRoute { case "/?page=redirect"  => Redirect("/sub")}
+  addRoute { case "/?page=redirect"  => Redirect("/?page=sub")}
   addRoute { case "/?page=paralax"   => new ParalaxPage()}
   addRoute { case "/?page=it's\" tricky" => new MainView()}
   addRoute { case x                  => new UnknownPage(x)}
@@ -50,6 +51,7 @@ class Header extends HBox {
   this <++ new HeaderLink("paralax" , "/?page=paralax" )
   this <++ new HeaderLink("dead"    , "/?page=as df" )
   this <++ new HeaderLink("green"   , "/?page=green" )
+  this <++ new HeaderLink("orange"  , "/?page=orange" )
   this <++ new HeaderLink("No Link" , "" )
 }
 
@@ -84,6 +86,14 @@ class UnknownPage(x: String) extends Page {
   override def nativeScrolling = false
 
   def content = new Label("UNKNOWN PAGE: " + x) { font = new Font(60)}
+}
+class OrangeView() extends Page {
+  def title = "Orange Page"
+  def description = "desc Main"
+
+  override def nativeScrolling = false
+
+  def content = new StackPane { style = "-fx-background-color: orange;"}
 }
 class GreenView() extends Page {
   def title = "Green Page"
