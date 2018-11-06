@@ -31,7 +31,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
   }
 
   var transitionRoute: PartialFunction[(View,View,Boolean), PageTransition] = PartialFunction.empty
-  var defaultTransition: PageTransition = PageTransition.FadingTransition
+  var defaultTransition: PageTransition = PageTransition.InstantTransition
   def addTransition(fun: PartialFunction[(View,View,Boolean), PageTransition]): Unit = {
     transitionRoute = transitionRoute orElse fun
   }
