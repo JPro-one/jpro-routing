@@ -50,7 +50,7 @@ trait SessionManager { THIS =>
             |}
             |scroll(0,scrollY)
             """.stripMargin)
-          webAPI.executeScript(s"""document.getElementsByTagName("jpro-app")[0].sfxelem.setScrolling(${view.nativeScrolling})""")
+          webAPI.executeScript(s"""document.getElementsByTagName("jpro-app")[0].sfxelem.setFXHeight(${!view.fullscreen})""")
           webAPI.executeScript(s"""document.title = "${view.title.replace("\"","\\\"")}";""")
           webAPI.executeScript(s"""document.querySelector('meta[name="description"]').setAttribute("content", "${view.description.replace("\"","\\\"")}");""")
           webAPI.executeScript(s"history.replaceState($initialState, null, null)")

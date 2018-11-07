@@ -29,9 +29,9 @@ class MyApp(stage: Stage) extends WebApp(stage) {
   addRoute { case "/?page=it's\" tricky" => new MainView()}
   addRoute { case x                  => new UnknownPage(x)}
 
-  addTransition{ case (null,view2,true ) => PageTransition.InstantTransition }
-  addTransition{ case (view,view2,true ) => PageTransition.MoveDown }
-  addTransition{ case (view,view2,false) => PageTransition.MoveUp }
+ // addTransition{ case (null,view2,true ) => PageTransition.InstantTransition }
+ // addTransition{ case (view,view2,true ) => PageTransition.MoveDown }
+ // addTransition{ case (view,view2,false) => PageTransition.MoveUp }
 }
 
 class Header extends HBox {
@@ -83,7 +83,7 @@ class UnknownPage(x: String) extends Page {
   def title = "Unknown page: " + x
   def description = "Unknown page: " + x
 
-  override def nativeScrolling = false
+  override def fullscreen = false
 
   def content = new Label("UNKNOWN PAGE: " + x) { font = new Font(60)}
 }
@@ -91,7 +91,7 @@ class OrangeView() extends Page {
   def title = "Orange Page"
   def description = "desc Main"
 
-  override def nativeScrolling = false
+  override def fullscreen = false
 
   def content = new StackPane { style = "-fx-background-color: orange;"}
 }
@@ -99,7 +99,7 @@ class GreenView() extends Page {
   def title = "Green Page"
   def description = "desc Main"
 
-  override def nativeScrolling = false
+  override def fullscreen = false
 
   def content = new StackPane { style = "-fx-background-color: green;"}
 }
@@ -109,7 +109,7 @@ class MainView extends Page {
   def description = "desc Main"
 
   val content = new VBox {
-    spacing = 200
+    spacing = 100
     def addGoogle: Node = {
       new StackPane(new Label("GOOGL") {
         font = new Font(60);
@@ -148,9 +148,12 @@ class MainView extends Page {
 class SubView extends Page {
   def title = "SubView"
   def description = "desc Sub"
-  //def ful
+  override def fullscreen=true
 
-  val content = new Label("SUBVIEW") { font = new Font(60)}
+  val content = new VBox {
+    this <++ new Label("SUBVIEW") { font = new Font(60)}
+    this <++ new Label("I'm fullscreen!") { font = new Font(60)}
+  }
 }
 
 class ParalaxPage extends Page {

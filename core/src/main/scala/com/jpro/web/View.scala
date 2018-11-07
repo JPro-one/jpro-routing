@@ -11,6 +11,6 @@ trait View extends Result {
   lazy val realContent: Node = content
   def content: Node
   def saveScrollPosition = true
-  def nativeScrolling = true
+  def fullscreen = false
 }
 
