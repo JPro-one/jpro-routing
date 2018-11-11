@@ -42,7 +42,7 @@ object Util {
   private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node) = if(WebAPI.isBrowser) onceWhen(theNode.scene != null) --> {
     assert(theNode.parent.isInstanceOf[Pane], "The parent at setLink has to be a Pane")
     val parent = theNode.parent.asInstanceOf[Pane]
-    val id = "linkid_"+random[Int]
+    val id = "linkid_"+random[Int].abs
     val htmlNode = new HTMLView { htmlNode =>
       layoutXY    <-- theNode.bipXY
       theNode.bipWH --> { x =>
