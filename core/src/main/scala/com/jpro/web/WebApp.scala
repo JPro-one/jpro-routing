@@ -29,6 +29,20 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
   def addRoute(fun: PartialFunction[String, Result]): Unit = {
     route = route orElse fun.andThen(x => FXFuture(x))
   }
+  def addRouteJava(fun: java.util.function.Function[String,Result]) = {
+    class Extractor[A, B](val f: A => Option[B]) {
+      def unapply(a: A) = f(a)
+    }
+
+    def unlift[A, B](f: A => Option[B]): PartialFunction[A, B] = {
+      val LocalExtractor = new Extractor(f)
+
+      // Create the PartialFunction from a partial function literal
+      { case LocalExtractor(b) => b }
+    }
+
+    addRoute(unlift((x: String) => Option(fun(x))))
+  }
 
   var transitionRoute: PartialFunction[(View,View,Boolean), PageTransition] = PartialFunction.empty
   var defaultTransition: PageTransition = PageTransition.InstantTransition

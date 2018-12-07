@@ -13,6 +13,12 @@ object Util {
     SessionManagerContext.getContext(node)
   }
 
+  def setLink(node: Node, url: String): Unit = {
+    setLink(node,url,None)
+  }
+  def setLink(node: Node, url: String, text: String): Unit = {
+    setLink(node,url,Some(text))
+  }
   def setLink(node: Node, url: String, text: Option[String] = None): Unit = {
     if(url.startsWith("/")) {
       setLinkInternal(node,url, text)
