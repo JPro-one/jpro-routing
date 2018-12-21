@@ -11,6 +11,8 @@ import simplefx.experimental._
 trait SessionManager { THIS =>
 
   var ganalytics = false
+  var gtags = false
+  var trackingID = ""
 
   def webAPI: WebAPI
   def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
@@ -56,14 +58,22 @@ trait SessionManager { THIS =>
           webAPI.executeScript(s"history.replaceState($initialState, null, null)")
           if(ganalytics && track) {
             webAPI.executeScript(s"""
-            ga('set', {
-              page: "${view.url.replace("\"","\\\"")}",
-              title: "${view.title.replace("\"","\\\"")}"
-            });
-
-            // send it for tracking
-            ga('send', 'pageview');
-            """)
+            |ga('set', {
+            |  page: "${view.url.replace("\"","\\\"")}",
+            |  title: "${view.title.replace("\"","\\\"")}"
+            |});
+            |
+            |// send it for tracking
+            |ga('send', 'pageview');
+            """.stripMargin)
+          }
+          if(gtags && track) {
+            assert(!trackingID.isEmpty)
+            webAPI.executeScript(s"""
+            |gtag('config', '$trackingID', {
+            |  'page_title' : "${view.title.replace("\"","\\\"")}"
+            |  'page_location': "${view.title.replace("\"","\\\"")}"
+            |});""".stripMargin)
           }
         }
     }
