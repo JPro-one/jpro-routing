@@ -1,3 +1,6 @@
+## 0.5.1
+ * fixed syntax error when using gtags
+
 ## 0.5.0
  * The API's are now easier to use from java
  * added support for gtags in combination with google-analytics

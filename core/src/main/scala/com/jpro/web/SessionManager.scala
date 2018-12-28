@@ -71,7 +71,7 @@ trait SessionManager { THIS =>
             assert(!trackingID.isEmpty)
             webAPI.executeScript(s"""
             |gtag('config', '$trackingID', {
-            |  'page_title' : "${view.title.replace("\"","\\\"")}"
+            |  'page_title' : "${view.title.replace("\"","\\\"")}",
             |  'page_location': "${view.title.replace("\"","\\\"")}"
             |});""".stripMargin)
           }
