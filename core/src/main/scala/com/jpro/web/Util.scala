@@ -41,6 +41,13 @@ object Util {
     setLinkSimple(url, text, false)(node)
   }
 
+  def goBack(node: Node): Unit = {
+    SessionManagerContext.getContext(node).goBack()
+  }
+
+  def goForward(node: Node): Unit = {
+    SessionManagerContext.getContext(node).goForward()
+  }
   def gotoPage(node: Node, url: String) = {
     Util.getSessionManager(node).goto(url)
   }
@@ -54,23 +61,25 @@ object Util {
       theNode.bipWH --> { x =>
         this.resize(x._1,x._2)
       }
+      val script = if(pushState) {
+        s"""<script>var x = document.getElementById("${id}");
+           | x.addEventListener("click", function(event) {
+           |   jpro.jproGotoURL(\"${url.replace("\"","\\\"")}\"); event.preventDefault();
+           | });</script>
+        """.stripMargin
+      } else ""
+
       val styleAnchorText = if(text.isEmpty) "" else "line-height: 0; font-size: 0; color: transparent; "
       setContent(
-        s"""<a id="$id" href="${url.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>"""
+        s"""<a id="$id" href="${url.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
+           |$script
+         """.stripMargin
       )
       hover --> { x =>
         theNode.useReflection.setHover(x)
       }
 
-      if(pushState) {
-        WebAPI.getWebAPI(theNode.scene).executeScript {
-          s"""var x = document.getElementById("${id}");
-            |x.addEventListener("click", function(event) {
-            |  jpro.jproGotoURL(\"${url.replace("\"","\\\"")}\"); event.preventDefault();
-            |});
-          """.stripMargin
-        }
-      }
+
       managed = false
     }
 

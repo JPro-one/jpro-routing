@@ -19,6 +19,8 @@ class MyApp(stage: Stage) extends WebApp(stage) {
     super.requestLayout
   }
 
+
+
   addRoute { case "/"                => new MainView()}
   addRoute { case "/?page=main"      => new MainView()}
   addRoute { case "/?page=green"      => new GreenView()}
@@ -53,6 +55,22 @@ class Header extends HBox {
   this <++ new HeaderLink("green"   , "/?page=green" )
   this <++ new HeaderLink("orange"  , "/?page=orange" )
   this <++ new HeaderLink("No Link" , "" )
+
+  nextFrame --> {
+    val manager = getSessionManager(this)
+    this <++ new Button("Backward") {
+      disable <-- manager.historyBackward.isEmpty
+      onAction --> {
+        goBack(this)
+      }
+    }
+    this <++ new Button("Forward") {
+      disable <-- manager.historyForward.isEmpty
+      onAction --> {
+        goForward(this)
+      }
+    }
+  }
 }
 
 class Footer extends HBox {
@@ -200,14 +218,8 @@ class ParalaxPage extends Page {
 object TestWebApplication extends App
 @SimpleFXApp class TestWebApplication {
   val app = new MyApp(stage)
-  root = app
-  app.start()
-}
-object TestWebApplicationNative extends App
-@SimpleFXApp class TestWebApplicationNative {
-  val app = new MyApp(stage)
-  root = new ScrollPane(app) {
+  scene = new Scene(if(WebAPI.isBrowser) app else new ScrollPane(app) {
     fitToWidth = true
-  }
+  }, 1400,800)
   app.start()
 }

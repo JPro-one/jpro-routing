@@ -14,6 +14,39 @@ trait SessionManager { THIS =>
   var gtags = false
   var trackingID = ""
 
+  def saveHistory = webAPI == null
+  @Bind var historyBackward: List[String] = Nil
+  @Bind var historyCurrent : String = null
+  @Bind var historyForward : List[String] = Nil
+  private def logHistory() = {
+    println("historyBackward: " + historyBackward)
+    println("historyCurrent : " + historyCurrent )
+    println("historyForward : " + historyForward )
+  }
+
+  def goBack(): Unit = {
+    if(webAPI != null) {
+      webAPI.executeScript("history.go(-1);")
+    } else {
+      assert(!historyBackward.isEmpty, "Can't go back, there is no entry in the back history!")
+      historyForward = historyCurrent :: historyForward
+      historyCurrent = historyBackward.head
+      historyBackward = historyBackward.tail
+      goto(historyCurrent, false, true)
+    }
+  }
+  def goForward(): Unit = {
+    if(webAPI != null) {
+      webAPI.executeScript("history.go(1);")
+    } else {
+      assert(!historyForward.isEmpty, "Can't go forward, there is no entry in the forward history!")
+      historyBackward = historyCurrent :: historyBackward
+      historyCurrent = historyForward.head
+      historyForward = historyForward.tail
+      goto(historyCurrent, false, true)
+    }
+  }
+
   def webAPI: WebAPI
   def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
@@ -32,6 +65,7 @@ trait SessionManager { THIS =>
         //setView() ???
         webApp().getTransition((THIS.view,view,!pushState)).doTransition(webApp(),THIS.view,view)
         THIS.view = view
+
 
         if(WebAPI.isBrowser && webAPI != null) {
           if(pushState) {
@@ -75,6 +109,14 @@ trait SessionManager { THIS =>
             |  'page_location': "${view.title.replace("\"","\\\"")}"
             |});""".stripMargin)
           }
+        } else {
+          if(pushState ) {
+            historyForward = Nil
+            if(historyCurrent != null) {
+              historyBackward = historyCurrent :: historyBackward
+            }
+            historyCurrent = url
+          }
         }
     }
   }
@@ -86,6 +128,7 @@ trait SessionManager { THIS =>
       goto(url.getFile(), newResult, pushState, track)
     }
   }
+
 
   def start() = {
     if(webAPI != null) {
@@ -149,7 +192,7 @@ trait SessionManager { THIS =>
           |}
         """.stripMargin)
     } else {
-      goto("/", pushState = false)
+      goto("/", pushState = true)
     }
   }
 

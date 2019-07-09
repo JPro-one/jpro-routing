@@ -1,3 +1,9 @@
+
+## 0.6.0
+ * Added the option to implement an own forward/backward button. 
+ This is quite useful for native clients.
+ * updated dependencies
+
 ## 0.5.1
  * fixed syntax error when using gtags
 
