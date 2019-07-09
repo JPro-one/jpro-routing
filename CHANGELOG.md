@@ -1,5 +1,6 @@
 
 ## 0.6.0
+ * Added a reference to the SessionManager to the View
  * Added the option to implement an own forward/backward button. 
  This is quite useful for native clients.
  * updated dependencies

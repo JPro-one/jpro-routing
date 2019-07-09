@@ -36,7 +36,7 @@ class MyApp(stage: Stage) extends WebApp(stage) {
  // addTransition{ case (view,view2,false) => PageTransition.MoveUp }
 }
 
-class Header extends HBox {
+class Header(sessionManager: SessionManager) extends HBox {
   padding = Insets(10)
   spacing = 10
   class HeaderLink(str: String, url: String) extends Label (str) {
@@ -56,19 +56,17 @@ class Header extends HBox {
   this <++ new HeaderLink("orange"  , "/?page=orange" )
   this <++ new HeaderLink("No Link" , "" )
 
-  nextFrame --> {
-    val manager = getSessionManager(this)
-    this <++ new Button("Backward") {
-      disable <-- manager.historyBackward.isEmpty
-      onAction --> {
-        goBack(this)
-      }
+
+  this <++ new Button("Backward") {
+    disable <-- (!WebAPI.isBrowser && sessionManager.historyBackward.isEmpty)
+    onAction --> {
+      goBack(this)
     }
-    this <++ new Button("Forward") {
-      disable <-- manager.historyForward.isEmpty
-      onAction --> {
-        goForward(this)
-      }
+  }
+  this <++ new Button("Forward") {
+    disable <-- (!WebAPI.isBrowser && sessionManager.historyForward.isEmpty)
+    onAction --> {
+      goForward(this)
     }
   }
 }
@@ -87,12 +85,12 @@ trait Page extends View {
       style = "-fx-background-color: white;"
     //  transform = Scale(1.3,1.3)
       spacing = 10
-      this <++ new Header
+      this <++ new Header(sessionManager)
       val theContent = content
       javafx.scene.layout.VBox.setVgrow(theContent,Priority.ALWAYS)
       this <++ theContent
       //this <++ new Footer
-      this <++ new Header
+      this <++ new Header(sessionManager)
     }
   }
 }
@@ -215,11 +213,16 @@ class ParalaxPage extends Page {
 }
 
 
+
 object TestWebApplication extends App
 @SimpleFXApp class TestWebApplication {
   val app = new MyApp(stage)
-  scene = new Scene(if(WebAPI.isBrowser) app else new ScrollPane(app) {
-    fitToWidth = true
-  }, 1400,800)
+  if(WebAPI.isBrowser) {
+    root = app
+  } else {
+    scene = new Scene(new ScrollPane(app) {
+      fitToWidth = true
+    }, 1400,800)
+  }
   app.start()
 }

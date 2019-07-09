@@ -60,6 +60,7 @@ trait SessionManager { THIS =>
     x match {
       case Redirect(url) => goto(url)
       case view: View =>
+        view.sessionManager = this
         view.url = url
         if(WebAPI.isBrowser) view.isMobile = webAPI.isMobile
         //setView() ???
