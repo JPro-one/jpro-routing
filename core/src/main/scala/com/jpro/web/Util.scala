@@ -5,6 +5,8 @@ import simplefx.core._
 import simplefx.all._
 import simplefx.util.ReflectionUtil._
 import java.net.URLEncoder
+
+import com.jpro.web.sessionmanager.SessionManager
 import javafx.collections.ObservableList
 
 object Util {

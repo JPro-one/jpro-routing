@@ -11,3 +11,12 @@ local:
 ```gradle
 gradle :core:publishToMavenLocal
 ```
+
+### run
+```gradle
+gradle example:run
+```
+
+```gradle
+gradle example:jproRun
+```

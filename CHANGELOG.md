@@ -1,4 +1,7 @@
 
+## 0.6.1
+ * Important Refactoring - The SessionManager now has different implementations
+
 ## 0.6.0
  * Added a reference to the SessionManager to the View
  * Added the option to implement an own forward/backward button. 

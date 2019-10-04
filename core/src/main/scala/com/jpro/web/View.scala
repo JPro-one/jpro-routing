@@ -1,5 +1,6 @@
 package com.jpro.web
 
+import com.jpro.web.sessionmanager.SessionManager
 import simplefx.core._
 import simplefx.all._
 

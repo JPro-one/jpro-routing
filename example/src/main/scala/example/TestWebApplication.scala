@@ -4,6 +4,7 @@ import com.jpro.web._
 import simplefx.core._
 import simplefx.all._
 import com.jpro.web.Util._
+import com.jpro.web.sessionmanager.SessionManager
 import com.jpro.webapi.{HTMLView, WebAPI}
 import org.controlsfx.control.PopOver
 
@@ -224,5 +225,5 @@ object TestWebApplication extends App
       fitToWidth = true
     }, 1400,800)
   }
-  app.start()
+  app.start(SessionManager.getDefault(app,stage))
 }

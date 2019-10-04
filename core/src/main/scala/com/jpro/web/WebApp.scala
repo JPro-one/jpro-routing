@@ -1,5 +1,6 @@
 package com.jpro.web
 
+import com.jpro.web.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.core._
 import simplefx.all._
@@ -9,18 +10,6 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
 
-  lazy val sessionManager = new SessionManager {
-    override def webApp = THIS
-    override def webAPI = THIS.webAPI
-    override def getView(url: String): FXFuture[Result] = {
-      println("getting: " + url)
-      val view = route(url)
-      view
-    }
-  }
-
-
-  SessionManagerContext.setContext(this, sessionManager)
 
   var route: PartialFunction[String, FXFuture[Result]] = PartialFunction.empty
   def addRouteFuture(fun: PartialFunction[String, FXFuture[Result]]): Unit = {
@@ -54,7 +43,8 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
   //def changeContent(parent: StackPane, oldNode: Node, newContent: Node)
   //children <-- List(sessionManager.page)
 
-  def start() = {
+  def start(sessionManager: SessionManager) = {
+    SessionManagerContext.setContext(this, sessionManager)
     sessionManager.start()
   }
 
