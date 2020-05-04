@@ -1,4 +1,7 @@
 
+## 0.7.0
+ * Updated SimpleFX and Scala. The project now only works with Java(FX) 11 and above.
+ 
 ## 0.6.1
  * Important Refactoring - The SessionManager now has different implementations
 
