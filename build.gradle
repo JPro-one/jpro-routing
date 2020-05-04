@@ -22,6 +22,24 @@ configure([project(':core'),project(':example')]) {
 
   apply plugin: 'de.sandec.simplefx'
   apply plugin: 'com.sandec.jpro'
+
+  simplefx {
+    scalaVersion = "$SCALA_VERSION"
+    scalaVersionShort = "$SCALA_VERSION_SHORT"
+  }
+
+  apply plugin: 'com.google.osdetector'
+  ext.platform = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
+
+  dependencies {
+    compile "org.openjfx:javafx-base:$JAVAFX_VERSION:$platform"
+    compile "org.openjfx:javafx-graphics:$JAVAFX_VERSION:$platform"
+    compile "org.openjfx:javafx-controls:$JAVAFX_VERSION:$platform"
+    compile "org.openjfx:javafx-fxml:$JAVAFX_VERSION:$platform"
+    compile "org.openjfx:javafx-media:$JAVAFX_VERSION:$platform"
+    compile "org.openjfx:javafx-web:$JAVAFX_VERSION:$platform"
+    compile "org.openjfx:javafx-swing:$JAVAFX_VERSION:$platform"
+  }
 }
 
 configure([project(':core')]) {
@@ -36,6 +54,26 @@ configure([project(':core')]) {
   group = 'com.sandec.jpro'
   version = "$JPRO_WEB_VERSION"
 
+  /*
+  task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+  }
+  task packageSources(type: Jar, dependsOn: 'classes') {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+  }
+  artifacts {
+    archives packageJavadoc
+    archives packageSources
+  }
+
+  task sourcesJar(type: Jar) {
+      from sourceSets.main.allJava
+      archiveClassifier.set("sources")
+  }*/
+
+
   publishing {
     publications {
       mavenJava(MavenPublication) {
@@ -43,6 +81,7 @@ configure([project(':core')]) {
         groupId project.group
         artifactId ("jpro-web-" + project.name)
         version project.version
+        //artifact sourcesJar
       }
     }
   }
@@ -63,11 +102,13 @@ configure([project(':core')]) {
   }
 }
 
+
+
 configure([project(':example')]) {
   mainClassName = "example.TestWebApplication"
   dependencies {
     compile project(':core')
-    compile 'org.controlsfx:controlsfx:8.40.14'
+    compile 'org.controlsfx:controlsfx:11.0.1'
   }
   jpro {
     openingPath = "/"
