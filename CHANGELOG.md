@@ -1,4 +1,5 @@
-
+## 0.7.1
+ * Updated another missed dependency.
 ## 0.7.0
  * Updated SimpleFX and Scala. The project now only works with Java(FX) 11 and above.
  
