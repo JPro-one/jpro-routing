@@ -12,14 +12,6 @@ class MyApp(stage: Stage) extends WebApp(stage) {
 
   stylesheets ::= "test.css"
 
-  override def requestLayout(): Unit = {
-    //println("request layout called!")
-    if ((this.scene ne null) && WebAPI.isBrowser) {
-      WebAPI.getWebAPI(stage).requestLayout(this.scene)
-    }
-    super.requestLayout
-  }
-
 
 
   addRoute { case "/"                => new MainView()}

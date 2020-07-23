@@ -8,6 +8,14 @@ import simplefx.experimental._
 
 class WebApp(stage: Stage) extends StackPane { THIS =>
 
+  override def requestLayout(): Unit = {
+    if ((this.scene ne null) && WebAPI.isBrowser) {
+      WebAPI.getWebAPI(stage).requestLayout(this.scene)
+    }
+    super.requestLayout
+  }
+
+
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
 
 
