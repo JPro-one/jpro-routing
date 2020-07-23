@@ -10,11 +10,13 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   styleClass ::= "jpro-web-app"
 
-  override def requestLayout(): Unit = {
+  override def layoutChildren(): Unit = {
     if ((this.scene ne null) && WebAPI.isBrowser) {
-      WebAPI.getWebAPI(stage).requestLayout(this.scene)
+      webAPI.requestLayout(this.scene)
+      super.layoutChildren()
+    } else {
+      super.layoutChildren()
     }
-    super.requestLayout
   }
 
 
