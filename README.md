@@ -4,19 +4,24 @@
 
 bintray:
 ```gradle
-gradle :core:bintrayUpload
+./gradlew :core:bintrayUpload
 ```
 
 local:
 ```gradle
-gradle :core:publishToMavenLocal
+./gradlew :core:publishToMavenLocal
 ```
 
 ### run
 ```gradle
-gradle example:run
+./gradlew example:run
 ```
 
 ```gradle
-gradle example:jproRun
+./gradlew example:jproRun
+```
+
+### clear cache:
+```
+find ~/.m2 ~/.gradle | grep jpro-web | grep 0.8.0 | xargs rm -r
 ```
