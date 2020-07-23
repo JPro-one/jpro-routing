@@ -1,6 +1,7 @@
 ## 0.8.0
  * jpro-web now ensures that the size of the webpage is automatically resized. 
    Previously this was handled by the application itself.
+ * The class WebApp now has the styleClass `jpro-web-app`. 
 ## 0.7.1
  * Updated another missed dependency.
 ## 0.7.0

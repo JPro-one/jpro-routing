@@ -8,6 +8,8 @@ import simplefx.experimental._
 
 class WebApp(stage: Stage) extends StackPane { THIS =>
 
+  styleClass ::= "jpro-web-app"
+
   override def requestLayout(): Unit = {
     if ((this.scene ne null) && WebAPI.isBrowser) {
       WebAPI.getWebAPI(stage).requestLayout(this.scene)
