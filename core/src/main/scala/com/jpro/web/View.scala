@@ -14,5 +14,6 @@ abstract class View extends Result {
   def content: Node
   def saveScrollPosition = true
   def fullscreen = false
+  def onClose(): Unit = {}
 }
 

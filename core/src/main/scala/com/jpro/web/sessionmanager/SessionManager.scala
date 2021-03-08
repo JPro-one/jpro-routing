@@ -5,6 +5,7 @@ import java.net.URLDecoder
 
 import com.jpro.web.{Result, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
+import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
@@ -47,6 +48,9 @@ trait SessionManager {
   }
   def start(): Unit
 
+  def markViewCollectable(view: View): Unit = {
+    JMemoryBuddyLive.markCollectable(s"Page url: ${view.url} title: ${view.title}", view.realContent)
+  }
 }
 
 object SessionManager {

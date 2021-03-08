@@ -6,7 +6,10 @@ import simplefx.all._
 import com.jpro.web.Util._
 import com.jpro.web.sessionmanager.SessionManager
 import com.jpro.webapi.{HTMLView, WebAPI}
+import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import org.controlsfx.control.PopOver
+
+import scala.collection.JavaConverters.asScalaBufferConverter
 
 class MyApp(stage: Stage) extends WebApp(stage) {
 
@@ -14,6 +17,7 @@ class MyApp(stage: Stage) extends WebApp(stage) {
 
 
 
+  addRoute { case ""                => new MainView()}
   addRoute { case "/"                => new MainView()}
   addRoute { case "/?page=main"      => new MainView()}
   addRoute { case "/?page=green"      => new GreenView()}
@@ -21,6 +25,10 @@ class MyApp(stage: Stage) extends WebApp(stage) {
   addRoute { case "/?page=sub"       => new SubView()}
   addRoute { case "/?page=redirect"  => Redirect("/?page=sub")}
   addRoute { case "/?page=paralax"   => new ParalaxPage()}
+  addRoute { case "/?page=pdf"       => new PDFTest()}
+  addRoute { case "/?page=leak"       => new LeakingPage()}
+  addRoute { case "/?page=collect"       => new CollectingPage()}
+  addRoute { case "/?page=jmemorybuddy"       => new JMemoryBuddyPage()}
   addRoute { case "/?page=it's\" tricky" => new MainView()}
   addRoute { case x                  => new UnknownPage(x)}
 
@@ -47,6 +55,10 @@ class Header(sessionManager: SessionManager) extends HBox {
   this <++ new HeaderLink("dead"    , "/?page=as df" )
   this <++ new HeaderLink("green"   , "/?page=green" )
   this <++ new HeaderLink("orange"  , "/?page=orange" )
+  this <++ new HeaderLink("pdf"     , "/?page=pdf" )
+  this <++ new HeaderLink("leak"    , "/?page=leak" )
+  this <++ new HeaderLink("collect"    , "/?page=collect" )
+  this <++ new HeaderLink("jmemorybuddy"    , "/?page=jmemorybuddy" )
   this <++ new HeaderLink("No Link" , "" )
 
 
@@ -75,7 +87,7 @@ class Footer extends HBox {
 trait Page extends View {
   override lazy val realContent = {
     new VBox {
-      style = "-fx-background-color: white;"
+  // Cousing leak? style = "-fx-background-color: white;"
     //  transform = Scale(1.3,1.3)
       spacing = 10
       this <++ new Header(sessionManager)
@@ -162,6 +174,64 @@ class SubView extends Page {
   val content = new VBox {
     this <++ new Label("SUBVIEW") { font = new Font(60)}
     this <++ new Label("I'm fullscreen!") { font = new Font(60)}
+  }
+}
+
+class PDFTest extends Page {
+  def title = "pdf"
+  def description = "pdf desc"
+
+  val content = new VBox {
+    this <++ new Label("PAGE 1") { font = new Font(60)}
+    this <++ new HTMLView("<div style=\"break-after:page\"></div>")
+    this <++ new Label("PAGE 2") { font = new Font(60)}
+    this <++ new HTMLView("<div style=\"break-after:page\"></div>")
+    this <++ new Label("PAGE 3") { font = new Font(60)}
+  }
+}
+object LeakingPage {
+  var instances: List[Page] = Nil
+}
+class LeakingPage extends Page {
+  def title = "leak"
+  def description = "leaks"
+
+  LeakingPage.instances ::= this
+
+  val content = new VBox {
+    this <++ new Label("Leaks") { font = new Font(60)}
+  }
+}
+class CollectingPage extends Page {
+  def title = "collect"
+  def description = "collect"
+
+  LeakingPage.instances ::= this
+
+  override def onClose(): Unit = {
+    println("onClose called!")
+    LeakingPage.instances = LeakingPage.instances.filter(_ != this)
+  }
+
+  val content = new VBox {
+    this <++ new Label("Leaks") { font = new Font(60)}
+  }
+}
+class JMemoryBuddyPage extends Page {
+  def title = "buddy"
+  def description = "buddy"
+
+  System.gc()
+
+  val content = new VBox {
+    this <++ new Label() {
+      text = JMemoryBuddyLive.getReport.toString
+      wrapText = true
+    }
+    this <++ new Label() {
+      text = JMemoryBuddyLive.getReport.uncollectedEntries.asScala.map(_.name).mkString("\n")
+      wrapText = true
+    }
   }
 }
 

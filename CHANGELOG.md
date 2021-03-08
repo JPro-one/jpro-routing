@@ -1,3 +1,7 @@
+## 0.8.2
+ * Pages now have a onClose method.
+ * We now use JMemoryBuddy to detect leaking pages
+
 ## 0.8.1
  * Fixed performance regression.
 

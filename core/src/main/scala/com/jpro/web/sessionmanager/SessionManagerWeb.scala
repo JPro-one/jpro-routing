@@ -29,6 +29,11 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
 
   }
 
+  webAPI.addInstanceCloseListener(() => {
+    THIS.view.onClose()
+    THIS.view.sessionManager = null
+    markViewCollectable(THIS.view)
+  })
 
   def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
@@ -42,6 +47,11 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
 
         //setView() ???
         webApp.getTransition((THIS.view,view,!pushState)).doTransition(webApp,THIS.view,view)
+        if(THIS.view != null) {
+          THIS.view.onClose()
+          THIS.view.sessionManager = null
+          markViewCollectable(THIS.view)
+        }
         THIS.view = view
 
 
