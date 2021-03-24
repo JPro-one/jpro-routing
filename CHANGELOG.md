@@ -1,3 +1,5 @@
+## 0.8.3
+ * It's now possible to open links in a new tab, while pressing ctrl or shift.
 ## 0.8.2
  * Pages now have a onClose method.
  * We now use JMemoryBuddy to detect leaking pages

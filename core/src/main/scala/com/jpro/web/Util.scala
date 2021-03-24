@@ -66,7 +66,9 @@ object Util {
       val script = if(pushState) {
         s"""<script>var x = document.getElementById("${id}");
            | x.addEventListener("click", function(event) {
-           |   jpro.jproGotoURL(\"${url.replace("\"","\\\"")}\"); event.preventDefault();
+           |   if(!event.shiftKey && !event.metaKey) {
+           |     jpro.jproGotoURL(\"${url.replace("\"","\\\"")}\"); event.preventDefault();
+           |   }
            | });</script>
         """.stripMargin
       } else ""
