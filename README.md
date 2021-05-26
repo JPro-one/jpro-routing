@@ -4,7 +4,7 @@
 
 bintray:
 ```gradle
-./gradlew :core:bintrayUpload
+./gradlew :core:publish
 ```
 
 local:
