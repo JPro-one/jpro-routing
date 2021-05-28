@@ -47,7 +47,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
 
         //setView() ???
         webApp.getTransition((THIS.view,view,!pushState)).doTransition(webApp,THIS.view,view)
-        if(THIS.view != null) {
+        if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null
           markViewCollectable(THIS.view)

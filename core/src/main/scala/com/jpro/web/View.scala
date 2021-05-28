@@ -15,5 +15,12 @@ abstract class View extends Result {
   def saveScrollPosition = true
   def fullscreen = false
   def onClose(): Unit = {}
+
+  /**
+   * Only overwrite this method, if you handle the url-change by yourself.
+   * @param the path
+   * @return whether the view handles the url change
+   */
+  def handleURL(x: String): Boolean = false
 }
 

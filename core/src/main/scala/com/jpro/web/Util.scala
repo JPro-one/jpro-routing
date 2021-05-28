@@ -16,31 +16,34 @@ object Util {
   }
 
   def setLink(node: Node, url: String): Unit = {
-    setLink(node,url,None)
+    setLink(node,url,None, null)
   }
   def setLink(node: Node, url: String, text: String): Unit = {
-    setLink(node,url,Some(text))
+    setLink(node,url,Some(text), null)
   }
-  def setLink(node: Node, url: String, text: Option[String] = None): Unit = {
+  def setLink(node: Node, url: String, text: String, children: ObservableList[Node]): Unit = {
+    setLink(node,url,Some(text), children)
+  }
+  def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null): Unit = {
     if(url.startsWith("/")) {
-      setLinkInternal(node,url, text)
+      setLinkInternal(node,url, text, children)
     } else {
-      setLinkExternal(node,url, text)
+      setLinkExternal(node,url, text, children)
     }
   }
-  def setLinkInternal(node: Node, url: String, text: Option[String] = None) = {
+  def setLinkInternal(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null) = {
     node.cursor = javafx.scene.Cursor.HAND
     if(!WebAPI.isBrowser) {
       node.onMouseClicked --> { e =>
         if(e.isStillSincePress) Util.getSessionManager(node).goto(url)
       }
     } else {
-      setLinkSimple(url, text, true)(node)
+      setLinkSimple(url, text, true)(node, children)
     }
   }
-  def setLinkExternal(node: Node, url: String, text: Option[String] = None) = {
+  def setLinkExternal(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null) = {
     node.cursor = javafx.scene.Cursor.HAND
-    setLinkSimple(url, text, false)(node)
+    setLinkSimple(url, text, false)(node, children)
   }
 
   def goBack(node: Node): Unit = {
@@ -54,9 +57,9 @@ object Util {
     Util.getSessionManager(node).goto(url)
   }
 
-  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node) = if(WebAPI.isBrowser) onceWhen(theNode.scene != null) --> {
-    assert(theNode.parent.isInstanceOf[Pane], "The parent at setLink has to be a Pane")
-    val parent = theNode.parent.asInstanceOf[Pane]
+  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = if(WebAPI.isBrowser) onceWhen(theNode.scene != null) --> {
+    assert(children != null || theNode.parent.isInstanceOf[Region], "The parent at setLink has to be a Pane")
+    //val parent = theNode.parent.asInstanceOf[Region]
     val id = "linkid_"+random[Int].abs
     val htmlNode = new HTMLView { htmlNode =>
       layoutXY    <-- theNode.bipXY
@@ -87,6 +90,7 @@ object Util {
       managed = false
     }
 
-    parent.children = parent.children ::: htmlNode :: Nil
+    val theChildren = if(children == null) theNode.parent.asInstanceOf[Pane].getChildren else children
+    theChildren.add(htmlNode)
   }
 }

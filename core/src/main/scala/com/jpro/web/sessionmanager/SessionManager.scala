@@ -31,7 +31,10 @@ trait SessionManager {
   def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
     val url2 = URLDecoder.decode(url,"UTF-8")
-    getView(url2).map { view =>
+    val newView = if(view != null && view.handleURL(url2)) FXFuture(view) else {
+      getView(url2)
+    }
+    newView.map { view =>
       goto(url2, view, pushState, track)
     }
   }
@@ -42,7 +45,10 @@ trait SessionManager {
   def getView(url: String): FXFuture[Result]
   def gotoURL(x: String, pushState: Boolean = true, track: Boolean = true) = {
     val url = new URL(x)
-    getView(URLDecoder.decode(url.getFile(),"UTF-8")).map { newResult =>
+    val newView = if(view != null && view.handleURL(url.getFile())) FXFuture(view) else {
+      getView(URLDecoder.decode(url.getFile(),"UTF-8"))
+    }
+    newView.map { newResult =>
       goto(url.getFile(), newResult, pushState, track)
     }
   }

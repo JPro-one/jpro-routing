@@ -1,3 +1,6 @@
+## 0.8.5
+* Added the method handleURL to the View.
+It can be used to handle the url-change yourself, instead of going through the route.
 ## 0.8.4
  * Removed bintray, updated many many dependencies
 ## 0.8.3
