@@ -37,7 +37,7 @@ class MyApp(stage: Stage) extends WebApp(stage) {
  // addTransition{ case (view,view2,false) => PageTransition.MoveUp }
 }
 
-class Header(sessionManager: SessionManager) extends HBox {
+class Header(var sessionManager: SessionManager) extends HBox {
   padding = Insets(10)
   spacing = 10
   class HeaderLink(str: String, url: String) extends Label (str) {
