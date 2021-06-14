@@ -76,12 +76,15 @@ class Header(var sessionManager: SessionManager) extends HBox {
   }
 }
 
-class Footer extends HBox {
+class Footer(sessionManager: SessionManager) extends HBox {
   spacing = 10
   this <++ new Label("asd")
-  this <++ new Label("asd")
-  this <++ new Label("asd")
-  this <++ new Label("asd")
+  this <++ new Label("url: " + sessionManager.url)
+  this <++ new Button("refresh") {
+    onAction --> {
+      Util.refresh(this)
+    }
+  }
 }
 
 trait Page extends View {
@@ -94,8 +97,8 @@ trait Page extends View {
       val theContent = content
       javafx.scene.layout.VBox.setVgrow(theContent,Priority.ALWAYS)
       this <++ theContent
-      //this <++ new Footer
-      this <++ new Header(sessionManager)
+      this <++ new Footer(sessionManager)
+      //this <++ new Header(sessionManager)
     }
   }
 }
@@ -129,7 +132,7 @@ class MainView extends Page {
   def title = "Main"
   def description = "desc Main"
 
-  val content = new VBox {
+  lazy val content = new VBox {
     spacing = 100
     def addGoogle: Node = {
       new StackPane(new Label("GOOGL") {
@@ -171,7 +174,7 @@ class SubView extends Page {
   def description = "desc Sub"
   override def fullscreen=true
 
-  val content = new VBox {
+  lazy val content = new VBox {
     this <++ new Label("SUBVIEW") { font = new Font(60)}
     this <++ new Label("I'm fullscreen!") { font = new Font(60)}
   }
@@ -181,7 +184,7 @@ class PDFTest extends Page {
   def title = "pdf"
   def description = "pdf desc"
 
-  val content = new VBox {
+  lazy val content = new VBox {
     this <++ new Label("PAGE 1") { font = new Font(60)}
     this <++ new HTMLView("<div style=\"break-after:page\"></div>")
     this <++ new Label("PAGE 2") { font = new Font(60)}

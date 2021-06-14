@@ -56,8 +56,15 @@ object Util {
   def gotoPage(node: Node, url: String) = {
     Util.getSessionManager(node).goto(url)
   }
+  def getCurrentPage(node: Node): String = {
+    Util.getSessionManager(node).url
+  }
+  def refresh(node: Node): Unit = {
+    val man = Util.getSessionManager(node)
+    man.goto(man.url)
+  }
 
-  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = if(WebAPI.isBrowser) onceWhen(theNode.scene != null) --> {
+  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = if(WebAPI.isBrowser) onceWhen(theNode.parent != null) --> {
     assert(children != null || theNode.parent.isInstanceOf[Region], "The parent at setLink has to be a Pane")
     //val parent = theNode.parent.asInstanceOf[Region]
     val id = "linkid_"+random[Int].abs
@@ -85,9 +92,7 @@ object Util {
       hover --> { x =>
         theNode.useReflection.setHover(x)
       }
-
-
-      managed = false
+      setManaged(false)
     }
 
     val theChildren = if(children == null) theNode.parent.asInstanceOf[Pane].getChildren else children

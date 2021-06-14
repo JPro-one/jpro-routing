@@ -1,3 +1,8 @@
+## 0.8.7
+* support for refresh
+* current link is now available through the sessionmanager
+* simplified link areas, avoiding crashing JavaFX bug
+
 ## 0.8.6
 * Better support for the java module system
 ## 0.8.5
