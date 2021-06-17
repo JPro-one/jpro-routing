@@ -1,3 +1,6 @@
+## 0.8.8
+ * Fixed a bug when switching pages
+
 ## 0.8.7
 * support for refresh
 * current link is now available through the sessionmanager

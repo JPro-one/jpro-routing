@@ -46,6 +46,7 @@ trait SessionManager {
   def gotoURL(x: String, pushState: Boolean = true, track: Boolean = true) = {
     val url = new URL(x)
     val newView = if(view != null && view.handleURL(url.getFile())) FXFuture(view) else {
+      println("Keeping view")
       getView(URLDecoder.decode(url.getFile(),"UTF-8"))
     }
     newView.map { newResult =>

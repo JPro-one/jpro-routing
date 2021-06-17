@@ -40,8 +40,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
     x match {
       case Redirect(url) => goto(url)
       case view: View =>
-        this.view = view
-        this.url = _url
+        this.url = url
         view.sessionManager = this
         view.url = url
 
