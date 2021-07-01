@@ -1,3 +1,5 @@
+## 0.8.9
+* Fixed setLink for popups on desktop.
 ## 0.8.8
  * Fixed a bug when switching pages
 
