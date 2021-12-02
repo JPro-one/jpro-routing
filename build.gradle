@@ -40,7 +40,12 @@ configure([project(':core')]) {
   dependencies {
     compile "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     compile "SANDEC:jnodes:$JNODES_VERSION"
-    compile "de.sandec:JMemoryBuddy:0.5.0"
+    compile "de.sandec:JMemoryBuddy:0.5.1"
+    testCompile "junit:junit:4.13"
+  }
+
+  compileScala {
+    targetCompatibility = "1.8"
   }
 
   group = 'com.sandec.jpro'
