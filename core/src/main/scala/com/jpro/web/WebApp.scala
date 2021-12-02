@@ -19,9 +19,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
     }
   }
 
-
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
-
 
   var route: PartialFunction[String, FXFuture[Result]] = PartialFunction.empty
   def addRouteFuture(fun: PartialFunction[String, FXFuture[Result]]): Unit = {

@@ -25,6 +25,10 @@ object Util {
     setLink(node,url,Some(text), children)
   }
   def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null): Unit = {
+    node.getProperties.put("link",url)
+    text.map {desc =>
+      node.getProperties.put("description",desc)
+    }
     if(url.startsWith("/")) {
       setLinkInternal(node,url, text, children)
     } else {
@@ -86,7 +90,7 @@ object Util {
       val styleAnchorText = if(text.isEmpty) "" else "line-height: 0; font-size: 0; color: transparent; "
       setContent(
         s"""<a id="$id" href="${url.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
-           |$script
+
          """.stripMargin
       )
       hover --> { x =>
