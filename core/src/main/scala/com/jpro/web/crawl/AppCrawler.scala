@@ -1,7 +1,9 @@
 package com.jpro.web.crawl
 
-import com.jpro.web.{Redirect, View, WebApp}
-import simplefx.all.{Node, Parent}
+import com.jpro.web._
+import simplefx.all._
+import simplefx.core._
+import simplefx.experimental._
 
 object AppCrawler {
   case class LinkInfo(url: String, description: String)
