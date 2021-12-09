@@ -1,3 +1,6 @@
+## 0.9.1
+* The desktop version now uses a ScrollPane, when fullscreen is false.
+ It also fixes an issue with transitions on desktop
 ## 0.8.9
 * Fixed setLink for popups on desktop.
 ## 0.8.8

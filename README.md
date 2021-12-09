@@ -19,7 +19,7 @@ repositories {
     }
 }
 dependencies {
-    implementation "com.sandec.jpro:jpro-web-core:0.8.4"
+    implementation "com.sandec.jpro:jpro-web-core:0.9.1"
 }
 ```
 ### Maven
@@ -34,7 +34,7 @@ dependencies {
 dependency>
         <groupId>com.sandec.jpro</groupId>
         <artifactId>jpro-web-core</artifactId>
-        <version>0.8.4</version>
+        <version>0.9.1</version>
         <scope>compile</scope>
 </dependency>
 ```
@@ -66,5 +66,5 @@ internal:
 
 ### clear cache:
 ```
-find ~/.m2 ~/.gradle | grep jpro-web | grep 0.8.0 | xargs rm -r
+find ~/.m2 ~/.gradle | grep jpro-web | grep 0.9.1 | xargs rm -r
 ```

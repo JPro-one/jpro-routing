@@ -38,13 +38,14 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     x match {
       case Redirect(url) => goto(url)
       case view: View =>
+        val oldView = this.view
         this.view = view
         this.url = _url
         view.sessionManager = this
         view.url = url
 
-        //setView() ???
-        webApp.getTransition((THIS.view,view,!pushState)).doTransition(webApp,THIS.view,view)
+        isFullscreen = view.fullscreen
+        webApp.getTransition((THIS.view,view,!pushState)).doTransition(container,oldView,view)
         if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null
@@ -61,10 +62,17 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
         }
     }
   }
+  val container = new StackPane()
+  val scrollpane = new ScrollPane() {
+    fitToWidth = true
+    content <-- container
+    fitToHeight <-- isFullscreen
+    vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.ALWAYS)
+  }
+  webApp <++ scrollpane
+  @Bind var isFullscreen = true
 
   def start() = {
-
     goto("/", pushState = true)
-
   }
 }

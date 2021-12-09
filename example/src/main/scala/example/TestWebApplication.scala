@@ -286,9 +286,7 @@ object TestWebApplication extends App
   if(WebAPI.isBrowser) {
     root = app
   } else {
-    scene = new Scene(new ScrollPane(app) {
-      fitToWidth = true
-    }, 1400,800)
+    scene = new Scene(app, 1400,800)
   }
   app.start(SessionManager.getDefault(app,stage))
 }
