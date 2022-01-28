@@ -101,12 +101,17 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
     }
   }
 
+  def gotoFullEncodedURL(x: String, pushState: Boolean = true, track: Boolean = true): Unit = {
+    val url = new URL(x)
+    goto(URLDecoder.decode(url.getFile(),"UTF-8"), pushState, track)
+  }
+
   def start() = {
-    gotoURL(webAPI.getServerName, false, false)
+    gotoFullEncodedURL(webAPI.getServerName, false, false)
     println("registering popstate")
     webAPI.registerJavaFunction("popstatejava", new WebCallback {
       override def callback(s: String): Unit = {
-        gotoURL(s.drop(1).dropRight(1).replace("\\\"","\""), false)
+        gotoFullEncodedURL(s.drop(1).dropRight(1).replace("\\\"","\""), false)
       }
     })
     webAPI.registerJavaFunction("jproGotoURL", new WebCallback {

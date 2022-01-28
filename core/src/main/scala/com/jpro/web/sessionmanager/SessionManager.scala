@@ -30,29 +30,18 @@ trait SessionManager {
   def goForward(): Unit
   def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
-    val url2 = URLDecoder.decode(url,"UTF-8")
-    val newView = if(view != null && view.handleURL(url2)) FXFuture(view) else {
-      getView(url2)
+    val newView = if(view != null && view.handleURL(url)) FXFuture(view) else {
+      getView(url)
     }
     newView.map { view =>
-      goto(url2, view, pushState, track)
+      goto(url, view, pushState, track)
     }
   }
-
 
   def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit
 
   def getView(url: String): FXFuture[Result]
-  def gotoURL(x: String, pushState: Boolean = true, track: Boolean = true) = {
-    val url = new URL(x)
-    val newView = if(view != null && view.handleURL(url.getFile())) FXFuture(view) else {
-      println("Keeping view")
-      getView(URLDecoder.decode(url.getFile(),"UTF-8"))
-    }
-    newView.map { newResult =>
-      goto(url.getFile(), newResult, pushState, track)
-    }
-  }
+
   def start(): Unit
 
   def markViewCollectable(view: View): Unit = {

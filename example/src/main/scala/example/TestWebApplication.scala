@@ -37,7 +37,7 @@ class MyApp(stage: Stage) extends WebApp(stage) {
  // addTransition{ case (view,view2,false) => PageTransition.MoveUp }
 }
 
-class Header(var sessionManager: SessionManager) extends HBox {
+class Header(view: View, sessionManager: SessionManager) extends HBox {
   padding = Insets(10)
   spacing = 10
   class HeaderLink(str: String, url: String) extends Label (str) {
@@ -61,6 +61,7 @@ class Header(var sessionManager: SessionManager) extends HBox {
   this <++ new HeaderLink("jmemorybuddy"    , "/?page=jmemorybuddy" )
   this <++ new HeaderLink("No Link" , "" )
 
+  this <++ new Label(view.url)
 
   this <++ new Button("Backward") {
     disable <-- (!WebAPI.isBrowser && sessionManager.historyBackward.isEmpty)
@@ -87,13 +88,13 @@ class Footer(sessionManager: SessionManager) extends HBox {
   }
 }
 
-trait Page extends View {
+trait Page extends View { view =>
   override lazy val realContent = {
     new VBox {
   // Cousing leak? style = "-fx-background-color: white;"
     //  transform = Scale(1.3,1.3)
       spacing = 10
-      this <++ new Header(sessionManager)
+      this <++ new Header(view, sessionManager)
       val theContent = content
       javafx.scene.layout.VBox.setVgrow(theContent,Priority.ALWAYS)
       this <++ theContent
