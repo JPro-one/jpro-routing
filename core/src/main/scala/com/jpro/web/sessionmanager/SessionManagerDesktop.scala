@@ -22,7 +22,7 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     historyForward = historyCurrent :: historyForward
     historyCurrent = historyBackward.head
     historyBackward = historyBackward.tail
-    goto(historyCurrent, false, true)
+    gotoURL(historyCurrent, false, true)
   }
 
   def goForward(): Unit = {
@@ -30,13 +30,13 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     historyBackward = historyCurrent :: historyBackward
     historyCurrent = historyForward.head
     historyForward = historyForward.tail
-    goto(historyCurrent, false, true)
+    gotoURL(historyCurrent, false, true)
   }
 
-  def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
+  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
-      case Redirect(url) => goto(url)
+      case Redirect(url) => gotoURL(url)
       case view: View =>
         val oldView = this.view
         this.view = view
@@ -73,6 +73,6 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
   @Bind var isFullscreen = true
 
   def start() = {
-    goto("/", pushState = true)
+    gotoURL("/", pushState = true)
   }
 }

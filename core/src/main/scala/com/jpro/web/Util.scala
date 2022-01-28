@@ -35,7 +35,7 @@ object Util {
     node.cursor = javafx.scene.Cursor.HAND
     if(!WebAPI.isBrowser) {
       node.onMouseClicked --> { e =>
-        if(e.isStillSincePress) Util.getSessionManager(node).goto(url)
+        if(e.isStillSincePress) Util.getSessionManager(node).gotoURL(url)
       }
     } else {
       setLinkSimple(url, text, true)(node, children)
@@ -54,14 +54,14 @@ object Util {
     SessionManagerContext.getContext(node).goForward()
   }
   def gotoPage(node: Node, url: String) = {
-    Util.getSessionManager(node).goto(url)
+    Util.getSessionManager(node).gotoURL(url)
   }
   def getCurrentPage(node: Node): String = {
     Util.getSessionManager(node).url
   }
   def refresh(node: Node): Unit = {
     val man = Util.getSessionManager(node)
-    man.goto(man.url)
+    man.gotoURL(man.url)
   }
 
   private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = if(WebAPI.isBrowser) onceWhen(theNode.parent != null) --> {

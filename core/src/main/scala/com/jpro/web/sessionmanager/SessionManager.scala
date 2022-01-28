@@ -28,17 +28,17 @@ trait SessionManager {
 
   def goBack(): Unit
   def goForward(): Unit
-  def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
+  def gotoURL(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
     val newView = if(view != null && view.handleURL(url)) FXFuture(view) else {
       getView(url)
     }
     newView.map { view =>
-      goto(url, view, pushState, track)
+      gotoURL(url, view, pushState, track)
     }
   }
 
-  def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit
+  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit
 
   def getView(url: String): FXFuture[Result]
 
