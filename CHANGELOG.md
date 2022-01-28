@@ -1,5 +1,6 @@
 ## 0.9.2
 * Ranamed goto to gotoURL in the SessionManager, to make it accessible in Java, because goto is a keyword.
+* Added a version of gotoURL with only 1 argument, to make it more accessible from Java.
 
 ## 0.9.1
 * The desktop version now uses a ScrollPane, when fullscreen is false.

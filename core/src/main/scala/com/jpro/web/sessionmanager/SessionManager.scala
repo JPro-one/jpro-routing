@@ -28,6 +28,7 @@ trait SessionManager {
 
   def goBack(): Unit
   def goForward(): Unit
+  def gotoURL(url: String): Unit = gotoURL(url,true,true)
   def gotoURL(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
     val newView = if(view != null && view.handleURL(url)) FXFuture(view) else {

@@ -102,6 +102,11 @@ trait Page extends View { view =>
       //this <++ new Header(sessionManager)
     }
   }
+
+  override def handleURL(x: String): Boolean = {
+    println("handleURL called: " + x);
+    return false;
+  }
 }
 
 class UnknownPage(x: String) extends Page {
