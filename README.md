@@ -19,7 +19,7 @@ repositories {
     }
 }
 dependencies {
-    implementation "com.sandec.jpro:jpro-web-core:0.9.1"
+    implementation "com.sandec.jpro:jpro-web-core:0.9.3"
 }
 ```
 ### Maven
@@ -34,7 +34,7 @@ dependencies {
 dependency>
         <groupId>com.sandec.jpro</groupId>
         <artifactId>jpro-web-core</artifactId>
-        <version>0.9.1</version>
+        <version>0.9.3</version>
         <scope>compile</scope>
 </dependency>
 ```
