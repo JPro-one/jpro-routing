@@ -2,10 +2,11 @@ package com.jpro.web.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
-
 import com.jpro.web.{Result, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
+import javafx.beans.property.{ObjectProperty, Property, SimpleStringProperty, StringProperty}
+import javafx.collections.{FXCollections, ObservableList}
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
@@ -19,9 +20,13 @@ trait SessionManager {
   var gtags = false
   var trackingID = ""
 
-  @Bind var historyBackward: List[String] = Nil
-  @Bind var historyCurrent : String = null
-  @Bind var historyForward : List[String] = Nil
+  def getHistoryBackward: ObservableList[String] = FXCollections.observableArrayList()
+  def currentHistoryProperty: StringProperty = new SimpleStringProperty("")
+  def getHistoryForwards: ObservableList[String] = FXCollections.observableArrayList()
+
+  @Bind var historyBackward: List[String] = getHistoryBackward.toBindable
+  @Bind var historyCurrent : String = currentHistoryProperty.toBindable
+  @Bind var historyForward : List[String] = getHistoryForwards.toBindable
 
   @Bind var url: String = null
   @Bind var view: View = null
