@@ -1,3 +1,6 @@
+## 0.9.3
+* Fixed issue with setLink. Now only one link is set per node. If you update the link of a Node, the old link now gets removed.
+
 ## 0.9.2
 * Ranamed goto to gotoURL in the SessionManager, to make it accessible in Java, because goto is a keyword.
 * Added a version of gotoURL with only 1 argument, to make it more accessible from Java.

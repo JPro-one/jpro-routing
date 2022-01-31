@@ -60,6 +60,15 @@ class Header(view: View, sessionManager: SessionManager) extends HBox {
   this <++ new HeaderLink("collect"    , "/?page=collect" )
   this <++ new HeaderLink("jmemorybuddy"    , "/?page=jmemorybuddy" )
   this <++ new HeaderLink("No Link" , "" )
+  this <++ new HeaderLink("ManyLinks" , "" ) {
+    setLink(this, "/?1", Some("/?1"))
+    setLink(this, "/?2", Some("/?2"))
+    setLink(this, "/?3", Some("/?3"))
+    setLink(this, "/?4", Some("/?4"))
+    setLink(this, "/?5", Some("/?5"))
+    setLink(this, "/?6", Some("/?6"))
+    setLink(this, "/?7", Some("/?7"))
+  }
 
   this <++ new Label(view.url)
 
