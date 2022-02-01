@@ -1,4 +1,7 @@
-## 0.9.3
+## 0.9.4
+* Fixed the featuers added in the previous update
+
+## 0.9.3 (done use)
 * Fixed issue with setLink. Now only one link is set per node. If you update the link of a Node, the old link now gets removed.
 * Added the method `ObservableList<String> getHistoryBackward()`, `ObservableList<String> getHistoryForward()` and `StringProperty currentHistoryProperty()` to the session manager.
 

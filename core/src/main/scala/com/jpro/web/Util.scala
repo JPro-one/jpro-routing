@@ -82,7 +82,7 @@ object Util {
     @Bind var text: Option[String] = None
 
     val id = "linkid_"+random[Int].abs
-    val htmlNode = new HTMLView { htmlNode =>
+    @Bind val htmlNode = new HTMLView { htmlNode =>
       layoutXY    <-- node.bipXY
       node.bipWH --> { x =>
         this.resize(x._1,x._2)
@@ -109,12 +109,20 @@ object Util {
       }
       setManaged(false)
     }
-    when(link != null && (children != null || node.parent != null)) ==> {
-      assert(children != null || node.parent.isInstanceOf[Region], s"The parent at setLink has to be a Pane but was $node")
-      val theChildren = if(children == null) node.parent.asInstanceOf[Pane].getChildren else children
-      val currentNode = htmlNode
-      theChildren.add(htmlNode)
-      onDispose(theChildren.remove(currentNode))
+    if(!WebAPI.isBrowser) {
+      node.onMouseClicked --> { e =>
+        if(e.isStillSincePress) Util.getSessionManager(node).gotoURL(link)
+      }
+    } else {
+      when(node.parent != null && link != null) ==> {
+        assert(children != null || node.parent.isInstanceOf[Region] || node.parent.isInstanceOf[Group], s"The parent at setLink has to be a Pane but was ${node.parent}")
+        val theChildren = if(node.parent.isInstanceOf[Region]) node.parent.asInstanceOf[Pane].getChildren
+          else if(node.parent.isInstanceOf[Group])  node.parent.asInstanceOf[Group].getChildren
+          else children
+        val currentNode = htmlNode
+        theChildren.add(htmlNode)
+        onDispose(theChildren.remove(currentNode))
+      }
     }
   }
 

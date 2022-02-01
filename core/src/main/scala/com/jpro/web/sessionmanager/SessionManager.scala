@@ -20,9 +20,9 @@ trait SessionManager {
   var gtags = false
   var trackingID = ""
 
-  def getHistoryBackward: ObservableList[String] = FXCollections.observableArrayList()
-  def currentHistoryProperty: StringProperty = new SimpleStringProperty("")
-  def getHistoryForwards: ObservableList[String] = FXCollections.observableArrayList()
+  val getHistoryBackward: ObservableList[String] = FXCollections.observableArrayList()
+  val currentHistoryProperty: StringProperty = new SimpleStringProperty("")
+  val getHistoryForwards: ObservableList[String] = FXCollections.observableArrayList()
 
   @Bind var historyBackward: List[String] = getHistoryBackward.toBindable
   @Bind var historyCurrent : String = currentHistoryProperty.toBindable
