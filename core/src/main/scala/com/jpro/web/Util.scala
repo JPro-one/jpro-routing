@@ -35,13 +35,7 @@ object Util {
   }
   def setLinkInternal(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null) = {
     node.cursor = javafx.scene.Cursor.HAND
-    if(!WebAPI.isBrowser) {
-      node.onMouseClicked --> { e =>
-        if(e.isStillSincePress) Util.getSessionManager(node).gotoURL(url)
-      }
-    } else {
-      setLinkSimple(url, text, true)(node, children)
-    }
+    setLinkSimple(url, text, true)(node, children)
   }
   def setLinkExternal(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null) = {
     node.cursor = javafx.scene.Cursor.HAND
@@ -127,7 +121,7 @@ object Util {
   }
 
 
-  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = if(WebAPI.isBrowser) {
+  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = {
     theNode.setNewLink(url,text,pushState,children)
   }
 }
