@@ -1,5 +1,6 @@
-## 0.9.5
+## 0.9.6
 * Fixed the featuers added in the previous update
+## 0.9.5 (done use)
 ## 0.9.4 (done use)
 ## 0.9.3 (done use)
 * Fixed issue with setLink. Now only one link is set per node. If you update the link of a Node, the old link now gets removed.

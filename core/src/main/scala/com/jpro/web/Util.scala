@@ -115,7 +115,7 @@ object Util {
           else children
         val currentNode = htmlNode
         theChildren.add(htmlNode)
-        onDispose(theChildren.remove(currentNode))
+        onDispose(theChildren.remove(htmlNode))
       }
     }
   }
