@@ -1,5 +1,6 @@
-## 0.9.6
+## 0.9.7
 * Fixed the featuers added in the previous update
+## 0.9.6 (done use)
 ## 0.9.5 (done use)
 ## 0.9.4 (done use)
 ## 0.9.3 (done use)

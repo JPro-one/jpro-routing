@@ -108,14 +108,23 @@ object Util {
         if(e.isStillSincePress) Util.getSessionManager(node).gotoURL(link)
       }
     } else {
-      when(node.parent != null && link != null) ==> {
+      var currentParent: ObservableList[Node] = null
+      def cleanCurrentParent(): Unit = {
+        if(currentParent != null) {
+          if(currentParent.contains(htmlNode)) {
+            currentParent.remove(htmlNode)
+          }
+          currentParent = null
+        }
+      }
+      when(node.parent != null && link != null) --> {
         assert(children != null || node.parent.isInstanceOf[Region] || node.parent.isInstanceOf[Group], s"The parent at setLink has to be a Pane but was ${node.parent}")
-        val theChildren = if(node.parent.isInstanceOf[Region]) node.parent.asInstanceOf[Pane].getChildren
+        cleanCurrentParent()
+        currentParent = if(node.parent.isInstanceOf[Region]) node.parent.asInstanceOf[Pane].getChildren
           else if(node.parent.isInstanceOf[Group])  node.parent.asInstanceOf[Group].getChildren
           else children
-        val currentNode = htmlNode
-        theChildren.add(htmlNode)
-        onDispose(theChildren.remove(htmlNode))
+        currentParent.add(htmlNode)
+        onDispose(cleanCurrentParent())
       }
     }
   }
