@@ -2,10 +2,11 @@ package com.jpro.web.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
-
 import com.jpro.web.{Result, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
+import javafx.beans.property.{ObjectProperty, Property, SimpleStringProperty, StringProperty}
+import javafx.collections.{FXCollections, ObservableList}
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
@@ -19,40 +20,34 @@ trait SessionManager {
   var gtags = false
   var trackingID = ""
 
-  @Bind var historyBackward: List[String] = Nil
-  @Bind var historyCurrent : String = null
-  @Bind var historyForward : List[String] = Nil
+  val getHistoryBackward: ObservableList[String] = FXCollections.observableArrayList()
+  val currentHistoryProperty: StringProperty = new SimpleStringProperty("")
+  val getHistoryForwards: ObservableList[String] = FXCollections.observableArrayList()
+
+  @Bind var historyBackward: List[String] = getHistoryBackward.toBindable
+  @Bind var historyCurrent : String = currentHistoryProperty.toBindable
+  @Bind var historyForward : List[String] = getHistoryForwards.toBindable
 
   @Bind var url: String = null
   @Bind var view: View = null
 
   def goBack(): Unit
   def goForward(): Unit
-  def goto(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
+  def gotoURL(url: String): Unit = gotoURL(url,true,true)
+  def gotoURL(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     println(s"goto: $url")
-    val url2 = URLDecoder.decode(url,"UTF-8")
-    val newView = if(view != null && view.handleURL(url2)) FXFuture(view) else {
-      getView(url2)
+    val newView = if(view != null && view.handleURL(url)) FXFuture(view) else {
+      getView(url)
     }
     newView.map { view =>
-      goto(url2, view, pushState, track)
+      gotoURL(url, view, pushState, track)
     }
   }
 
-
-  def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit
+  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit
 
   def getView(url: String): FXFuture[Result]
-  def gotoURL(x: String, pushState: Boolean = true, track: Boolean = true) = {
-    val url = new URL(x)
-    val newView = if(view != null && view.handleURL(url.getFile())) FXFuture(view) else {
-      println("Keeping view")
-      getView(URLDecoder.decode(url.getFile(),"UTF-8"))
-    }
-    newView.map { newResult =>
-      goto(url.getFile(), newResult, pushState, track)
-    }
-  }
+
   def start(): Unit
 
   def markViewCollectable(view: View): Unit = {

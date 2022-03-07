@@ -35,10 +35,10 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
     markViewCollectable(THIS.view)
   })
 
-  def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
+  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
-      case Redirect(url) => goto(url)
+      case Redirect(url) => gotoURL(url)
       case view: View =>
         this.url = url
         view.sessionManager = this
@@ -101,17 +101,22 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
     }
   }
 
+  def gotoFullEncodedURL(x: String, pushState: Boolean = true, track: Boolean = true): Unit = {
+    val url = new URL(x)
+    gotoURL(URLDecoder.decode(url.getFile(),"UTF-8"), pushState, track)
+  }
+
   def start() = {
-    gotoURL(webAPI.getServerName, false, false)
+    gotoFullEncodedURL(webAPI.getServerName, false, false)
     println("registering popstate")
     webAPI.registerJavaFunction("popstatejava", new WebCallback {
       override def callback(s: String): Unit = {
-        gotoURL(s.drop(1).dropRight(1).replace("\\\"","\""), false)
+        gotoFullEncodedURL(s.drop(1).dropRight(1).replace("\\\"","\""), false)
       }
     })
     webAPI.registerJavaFunction("jproGotoURL", new WebCallback {
       override def callback(s: String): Unit = {
-        goto(s.drop(1).dropRight(1).replace("\\\"","\""))
+        gotoURL(s.drop(1).dropRight(1).replace("\\\"","\""))
       }
     })
 

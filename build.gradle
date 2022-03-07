@@ -85,24 +85,6 @@ configure([project(':example')]) {
     compile 'org.controlsfx:controlsfx:11.1.0'
   }
 
-  compileJava {
-    doFirst {
-      options.compilerArgs = [
-              '--module-path', classpath.asPath,
-              '--add-modules', 'javafx.fxml,javafx.controls'
-      ]
-    }
-  }
-
-  run {
-    doFirst {
-      jvmArgs = [
-              '--module-path', classpath.asPath,
-              '--add-modules', 'javafx.fxml,javafx.controls'
-      ]
-    }
-  }
-
   jpro {
     openingPath = "/"
   }

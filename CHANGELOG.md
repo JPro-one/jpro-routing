@@ -1,3 +1,19 @@
+## 0.9.7
+* Fixed the featuers added in the previous update
+## 0.9.6 (done use)
+## 0.9.5 (done use)
+## 0.9.4 (done use)
+## 0.9.3 (done use)
+* Fixed issue with setLink. Now only one link is set per node. If you update the link of a Node, the old link now gets removed.
+* Added the method `ObservableList<String> getHistoryBackward()`, `ObservableList<String> getHistoryForward()` and `StringProperty currentHistoryProperty()` to the session manager.
+
+## 0.9.2
+* Ranamed goto to gotoURL in the SessionManager, to make it accessible in Java, because goto is a keyword.
+* Added a version of gotoURL with only 1 argument, to make it more accessible from Java.
+
+## 0.9.1
+* The desktop version now uses a ScrollPane, when fullscreen is false.
+ It also fixes an issue with transitions on desktop
 ## 0.8.9
 * Fixed setLink for popups on desktop.
 ## 0.8.8

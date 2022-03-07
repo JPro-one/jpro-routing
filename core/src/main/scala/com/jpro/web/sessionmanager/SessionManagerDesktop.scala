@@ -22,7 +22,7 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     historyForward = historyCurrent :: historyForward
     historyCurrent = historyBackward.head
     historyBackward = historyBackward.tail
-    goto(historyCurrent, false, true)
+    gotoURL(historyCurrent, false, true)
   }
 
   def goForward(): Unit = {
@@ -30,21 +30,22 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     historyBackward = historyCurrent :: historyBackward
     historyCurrent = historyForward.head
     historyForward = historyForward.tail
-    goto(historyCurrent, false, true)
+    gotoURL(historyCurrent, false, true)
   }
 
-  def goto(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
+  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
-      case Redirect(url) => goto(url)
+      case Redirect(url) => gotoURL(url)
       case view: View =>
+        val oldView = this.view
         this.view = view
         this.url = _url
         view.sessionManager = this
         view.url = url
 
-        //setView() ???
-        webApp.getTransition((THIS.view,view,!pushState)).doTransition(webApp,THIS.view,view)
+        isFullscreen = view.fullscreen
+        webApp.getTransition((THIS.view,view,!pushState)).doTransition(container,oldView,view)
         if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null
@@ -61,10 +62,17 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
         }
     }
   }
+  val container = new StackPane()
+  val scrollpane = new ScrollPane() {
+    fitToWidth = true
+    content <-- container
+    fitToHeight <-- isFullscreen
+    vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.ALWAYS)
+  }
+  webApp <++ scrollpane
+  @Bind var isFullscreen = true
 
   def start() = {
-
-    goto("/", pushState = true)
-
+    gotoURL("/", pushState = true)
   }
 }
