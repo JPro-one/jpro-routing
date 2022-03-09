@@ -31,7 +31,7 @@ class TestAppCrawler {
       addRoute { case "/" => new Page1}
       addRoute { case "/page2" => new Page2}
     }
-    val result = AppCrawler.crawlApp(() => app)
+    val result = AppCrawler.crawlApp("http://localhost", () => app)
 
     assert(result.pages.contains("/"), result.pages)
     assert(result.pages.contains("/page2"), result.pages)

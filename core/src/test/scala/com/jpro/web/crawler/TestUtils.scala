@@ -32,6 +32,12 @@ object TestUtils {
       this <++ new Label("222") {
         Util.setLink(this,"/page3", "desc2")
       }
+      this <++ new Label("222") {
+        Util.setLink(this,"http://localhost/page4", "desc2")
+      }
+      this <++ new Label("222") {
+        Util.setLink(this,"http://external/link", "desc2")
+      }
     }
   }
 }

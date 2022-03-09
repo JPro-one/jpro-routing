@@ -43,7 +43,7 @@ object AppCrawler {
     CrawlReportPage(page.url, foundLinks, images, page.title, page.description)
   }
 
-  def crawlApp(createApp: () => WebApp): CrawlReportApp = {
+  def crawlApp(prefix: String, createApp: () => WebApp): CrawlReportApp = {
     var toIndex = Set[String]("/")
     var indexed = Set[String]()
     var redirects = Set[String]()
@@ -67,9 +67,13 @@ object AppCrawler {
           view.url = crawlNext
           val newReport = inFX(crawlPage(view))
           reports = newReport :: reports
+          def simplifyLink(x: String) = {
+            if(x.startsWith(prefix)) x.drop(prefix.length) else x
+          }
           newReport.links.map { link =>
-            if (!indexed.contains(link.url) && !toIndex.contains(link.url)) {
-              toIndex += link.url
+            val url = simplifyLink(link.url)
+            if (!indexed.contains(url) && !toIndex.contains(url)) {
+              toIndex += url
             }
           }
         case null =>
