@@ -15,6 +15,10 @@ object TestUtils {
       this <++ new Label("222") {
         Util.setLink(this,"/page2", "desc2")
       }
+      this <++ new ImageView() {
+        image = new Image("/testfiles/test.jpg")
+        this.setAccessibleRoleDescription("The Description")
+      }
     }
   }
   class Page2 extends View {

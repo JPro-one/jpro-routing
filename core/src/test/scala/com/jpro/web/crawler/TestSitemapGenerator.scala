@@ -7,7 +7,6 @@ import com.jpro.web.crawl.{AppCrawler, SitemapGenerator}
 import simplefx.core._
 
 class TestSitemapGenerator {
-
   @Test
   def test(): Unit = {
     def app = new WebApp(null) {

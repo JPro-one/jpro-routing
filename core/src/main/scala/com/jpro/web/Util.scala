@@ -137,4 +137,8 @@ object Util {
   private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = {
     theNode.setNewLink(url,text,pushState,children)
   }
+
+  def setImageViewDescription(view: ImageView, description: String): Unit = {
+    view.setAccessibleRoleDescription(description)
+  }
 }

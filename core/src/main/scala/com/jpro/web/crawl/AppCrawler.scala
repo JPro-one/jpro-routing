@@ -10,9 +10,9 @@ object AppCrawler {
 
   case class ImageInfo(url: String, description: String)
 
-  case class CrawlReportPage(links: List[LinkInfo], pictures: List[ImageInfo], title: String, description: String)
+  case class CrawlReportPage(path: String, links: List[LinkInfo], pictures: List[ImageInfo], title: String, description: String)
 
-  case class CrawlReportApp(pages: List[String], deadLinks: List[String])
+  case class CrawlReportApp(pages: List[String], reports: List[CrawlReportPage], deadLinks: List[String])
 
   def crawlPage(page: View): CrawlReportPage = {
     var foundLinks: List[LinkInfo] = Nil
@@ -30,11 +30,17 @@ object AppCrawler {
       if (x.isInstanceOf[Parent]) {
         x.asInstanceOf[Parent].childrenUnmodifiable.map(x => crawlNode(x))
       }
+      if(x.isInstanceOf[ImageView]) {
+        val view = x.asInstanceOf[ImageView]
+        val url = getImageURL(view.image)
+        val description = view.accessibleRoleDescription
+        images ::= ImageInfo(url,description)
+      }
     }
 
     crawlNode(page.content)
 
-    CrawlReportPage(foundLinks, images, page.title, page.description)
+    CrawlReportPage(page.url, foundLinks, images, page.title, page.description)
   }
 
   def crawlApp(createApp: () => WebApp): CrawlReportApp = {
@@ -58,6 +64,7 @@ object AppCrawler {
             toIndex += url
           }
         case view: View =>
+          view.url = crawlNext
           val newReport = inFX(crawlPage(view))
           reports = newReport :: reports
           newReport.links.map { link =>
@@ -70,7 +77,32 @@ object AppCrawler {
       }
     }
 
-    CrawlReportApp((indexed -- redirects -- emptyLinks).toList, emptyLinks.toList)
+    CrawlReportApp((indexed -- redirects -- emptyLinks).toList, reports, emptyLinks.toList)
   }
 
+  def getImageURL(x: Image): String = {
+    val url = simplifyURL(x.getUrl())
+    if(url.startsWith("http")) {
+      url
+    } else {
+      "/app/default/resourcesencoded/" + url
+    }
+  }
+
+
+  private val cpTriggers = List[String]("jar!","classes", "main")
+  def simplifyURL(x: String): String = {
+    cpTriggers.collectFirst{
+      Function.unlift{ (cpTrigger: String) =>
+        val split = x.split(cpTrigger)
+        if(split.length > 1) {
+          val cp = split.last
+          val idea = "cp://" + cp
+          val url = classOf[javafx.scene.Node].getResource(cp)
+          if (url != null && x == url.toString) {
+            Some(s"cp://$cp")
+          } else None
+        } else None
+      }}.getOrElse(x)
+  }
 }
