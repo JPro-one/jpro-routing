@@ -12,6 +12,10 @@ jobs:
         with:
           version: '11'
           architecture: x64
+      - name: prepare
+        run: |
+          sudo apt-get update
+          sudo apt-get install xorg libasound2 libgtk2.0-0
       - name: compile
         run: |
           ./gradlew assemble example:assemble
