@@ -20,7 +20,7 @@ class TestAppCrawler {
     println("Links: " + result.links)
     println("Links: " + result.pictures)
     assert(result.links contains LinkInfo("/page2", "desc1"))
-    assert(result.links contains LinkInfo("/page2", "desc2"))
+    assert(result.links contains LinkInfo("/page2", ""), result.links)
     assert(!result.pictures.filter(x => x.description == "The Description").isEmpty)
 
   }

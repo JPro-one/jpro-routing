@@ -13,7 +13,7 @@ object TestUtils {
         Util.setLink(this,"/page2", "desc1")
       }
       this <++ new Label("222") {
-        Util.setLink(this,"/page2", "desc2")
+        Util.setLink(this,"/page2")
       }
       this <++ new ImageView() {
         image = new Image("/testfiles/test.jpg")

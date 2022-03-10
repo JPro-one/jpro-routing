@@ -51,6 +51,14 @@ configure([project(':core')]) {
   group = 'com.sandec.jpro'
   version = "$JPRO_WEB_VERSION"
 
+  test {
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    testLogging.showExceptions true
+    testLogging.showCauses true
+    testLogging.showStackTraces true
+  }
+
   publishing {
     publications {
       mavenJava(MavenPublication) {

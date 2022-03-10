@@ -5,6 +5,9 @@ import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
 
+import java.util.function.Supplier
+import scala.collection.JavaConverters.asScalaBufferConverter
+
 object AppCrawler {
   case class LinkInfo(url: String, description: String)
 
@@ -24,11 +27,23 @@ object AppCrawler {
       if (visitedNodes.contains(x)) return
       visitedNodes += x
       if (x.getProperties.containsKey("link")) {
-        foundLinks ::= LinkInfo(x.getProperties.get("link").asInstanceOf[String], x.getProperties.get("description").asInstanceOf[String])
+        val link = x.getProperties.get("link").asInstanceOf[String]
+        var desc = x.getProperties.get("description").asInstanceOf[String]
+        if(desc == null) desc = ""
+        foundLinks ::= LinkInfo(link, desc)
       }
 
       if (x.isInstanceOf[Parent]) {
         x.asInstanceOf[Parent].childrenUnmodifiable.map(x => crawlNode(x))
+      }
+      if (x.isInstanceOf[Region]) {
+        val region = x.asInstanceOf[Region]
+        var rimages = List.empty[Image]
+        if(region.border != null) rimages :::= region.border.getImages.asScala.map(_.getImage).toList
+        if(region.background != null) rimages :::= region.background.getImages.asScala.map(_.getImage).toList
+        rimages.foreach{ image =>
+          images ::= ImageInfo(getImageURL(image),region.accessibleRoleDescription)
+        }
       }
       if(x.isInstanceOf[ImageView]) {
         val view = x.asInstanceOf[ImageView]
@@ -38,12 +53,12 @@ object AppCrawler {
       }
     }
 
-    crawlNode(page.content)
+    crawlNode(page.realContent)
 
-    CrawlReportPage(page.url, foundLinks, images, page.title, page.description)
+    CrawlReportPage(page.url, foundLinks.reverse, images.reverse, page.title, page.description)
   }
 
-  def crawlApp(prefix: String, createApp: () => WebApp): CrawlReportApp = {
+  def crawlApp(prefix: String, createApp: Supplier[WebApp]): CrawlReportApp = {
     var toIndex = Set[String]("/")
     var indexed = Set[String]()
     var redirects = Set[String]()
@@ -55,7 +70,7 @@ object AppCrawler {
       toIndex -= crawlNext
       indexed += crawlNext
       val result = inFX {
-        createApp().route.lift(crawlNext).getOrElse(FXFuture(null))
+        createApp.get().route.lift(crawlNext).getOrElse(FXFuture(null))
       }.await
       result match {
         case Redirect(url) =>
@@ -70,7 +85,7 @@ object AppCrawler {
           def simplifyLink(x: String) = {
             if(x.startsWith(prefix)) x.drop(prefix.length) else x
           }
-          newReport.links.map { link =>
+          newReport.links.filter(x => x.url.startsWith(prefix) || !x.url.startsWith("http")).map { link =>
             val url = simplifyLink(link.url)
             if (!indexed.contains(url) && !toIndex.contains(url)) {
               toIndex += url
@@ -81,7 +96,7 @@ object AppCrawler {
       }
     }
 
-    CrawlReportApp((indexed -- redirects -- emptyLinks).toList, reports, emptyLinks.toList)
+    CrawlReportApp((indexed -- redirects -- emptyLinks).toList, reports.reverse, emptyLinks.toList)
   }
 
   def getImageURL(x: Image): String = {
