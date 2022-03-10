@@ -40,6 +40,9 @@ object AppCrawler {
       if (x.isInstanceOf[Labeled]) {
         crawlNode(x.asInstanceOf[Labeled].graphic)
       }
+      if (x.isInstanceOf[ScrollPane]) {
+        crawlNode(x.asInstanceOf[ScrollPane].content)
+      }
       if (x.isInstanceOf[ListView[_]]) {
         val lview = x.asInstanceOf[ListView[Any]]
         lview.items.zipWithIndex.map { case (item,index) =>

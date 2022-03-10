@@ -76,4 +76,19 @@ class TestAppCrawler {
     assert(r.links.contains(LinkInfo("/list9","")))
   }
 
+  @Test
+  def testScrollPane(): Unit = inFX{
+    val view = new View {
+      override def title: String = ""
+      override def description: String = ""
+      val content: all.Node = new ScrollPane {
+        this.content = new Label() {
+          Util.setLink(this, "/scrollpane")
+        }
+      }
+    }
+    val r = AppCrawler.crawlPage(view)
+    assert(r.links.contains(LinkInfo("/scrollpane","")))
+  }
+
 }
