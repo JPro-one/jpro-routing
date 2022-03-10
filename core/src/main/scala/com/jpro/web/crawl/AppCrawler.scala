@@ -24,6 +24,7 @@ object AppCrawler {
     var visitedNodes: Set[Node] = Set()
 
     def crawlNode(x: Node): Unit = {
+      if(x == null) return
       if (visitedNodes.contains(x)) return
       visitedNodes += x
       if (x.getProperties.containsKey("link")) {
@@ -35,6 +36,20 @@ object AppCrawler {
 
       if (x.isInstanceOf[Parent]) {
         x.asInstanceOf[Parent].childrenUnmodifiable.map(x => crawlNode(x))
+      }
+      if (x.isInstanceOf[Labeled]) {
+        crawlNode(x.asInstanceOf[Labeled].graphic)
+      }
+      if (x.isInstanceOf[ListView[_]]) {
+        val lview = x.asInstanceOf[ListView[Any]]
+        lview.items.zipWithIndex.map { case (item,index) =>
+          val cell: ListCell[Any] = lview.cellFactoryProperty().get().call(lview)
+          cell.setItem(item)
+          cell.updateIndex(index)
+          cell.updateListView(lview)
+          cell.layout()
+          crawlNode(cell)
+        }
       }
       if (x.isInstanceOf[Region]) {
         val region = x.asInstanceOf[Region]
@@ -55,6 +70,7 @@ object AppCrawler {
       }
     }
 
+    page.realContent.applyCss()
     crawlNode(page.realContent)
 
     CrawlReportPage(page.url, foundLinks.reverse, images.reverse, page.title, page.description)
@@ -74,6 +90,7 @@ object AppCrawler {
       val result = inFX {
         createApp.get().route.lift(crawlNext).getOrElse(FXFuture(null))
       }.await
+      FXFuture.runLater(() => ()).await
       result match {
         case Redirect(url) =>
           redirects += crawlNext

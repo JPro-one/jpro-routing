@@ -7,6 +7,7 @@ import org.junit.Test
 import simplefx.all._
 import simplefx.core._
 import TestUtils._
+import simplefx.all
 
 class TestAppCrawler {
 
@@ -51,6 +52,28 @@ class TestAppCrawler {
       }}
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
+  }
+
+  @Test
+  def testIndexListview(): Unit = inFX{
+    val view = new View {
+      override def title: String = ""
+      override def description: String = ""
+      val content: all.Node = new ListView[String] {
+        items = (List(1,2,3,4,5,6,7,8,9,10).map(_.toString): List[String])
+        class MyListCell extends ListCell[String] { listCell =>
+          listCell.setGraphic(new Label("123") {
+            listCell.itemProperty().addListener((p,o,n) => {
+              Util.setLink(this, "/list" + n)
+            })
+          })
+        }
+        cellFactory = (v: ListView[String]) => new MyListCell
+      }
+    }
+    val r = AppCrawler.crawlPage(view)
+    assert(r.links.contains(LinkInfo("/list1","")))
+    assert(r.links.contains(LinkInfo("/list9","")))
   }
 
 }
