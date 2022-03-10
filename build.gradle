@@ -35,13 +35,14 @@ configure([project(':core'),project(':example')]) {
 
 configure([project(':core')]) {
   apply plugin: 'java'
+  apply plugin: 'java-library'
   apply plugin: 'maven-publish'
 
   dependencies {
-    compile "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
-    compile "SANDEC:jnodes:$JNODES_VERSION"
-    compile "de.sandec:JMemoryBuddy:0.5.1"
-    testCompile "junit:junit:4.13"
+    api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
+    api "SANDEC:jnodes:$JNODES_VERSION"
+    api "de.sandec:JMemoryBuddy:0.5.1"
+    testImplementation "junit:junit:4.13"
   }
 
   compileScala {
@@ -89,8 +90,8 @@ configure([project(':example')]) {
   apply plugin: 'com.sandec.jpro'
   mainClassName = "example.TestWebApplication"
   dependencies {
-    compile project(':core')
-    compile 'org.controlsfx:controlsfx:11.1.0'
+    implementation project(':core')
+    implementation 'org.controlsfx:controlsfx:11.1.0'
   }
 
   jpro {
