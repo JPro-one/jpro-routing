@@ -39,4 +39,18 @@ class TestAppCrawler {
     assert(result.deadLinks.contains("/page3"), result.pages)
   }
 
+  @Test
+  def testEmptyImage(): Unit = {
+    def app = new WebApp(null) {
+      addRoute { case "/" => new View {
+        override def title: String = ""
+
+        override def description: String = ""
+
+        override def content: all.Node = new ImageView(null: Image)
+      }}
+    }
+    val result = AppCrawler.crawlApp("http://localhost", () => app)
+  }
+
 }

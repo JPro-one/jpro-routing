@@ -47,9 +47,11 @@ object AppCrawler {
       }
       if(x.isInstanceOf[ImageView]) {
         val view = x.asInstanceOf[ImageView]
-        val url = getImageURL(view.image)
-        val description = view.accessibleRoleDescription
-        images ::= ImageInfo(url,description)
+        if(view.image != null) {
+          val url = getImageURL(view.image)
+          val description = view.accessibleRoleDescription
+          images ::= ImageInfo(url,description)
+        }
       }
     }
 
