@@ -1,3 +1,6 @@
+## 0.9.8
+* Added Option, to crawl the whole App, which allows to check for leaks, create sitemap or to check for deadlinks.
+* It's now possible to unset Links, by calling `Util.setLink` with the link "null".
 ## 0.9.7
 * Fixed the featuers added in the previous update
 ## 0.9.6 (done use)

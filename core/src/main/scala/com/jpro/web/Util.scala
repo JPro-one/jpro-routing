@@ -31,7 +31,7 @@ object Util {
     text.map {desc =>
       node.getProperties.put("description",desc)
     }
-    if(url.startsWith("/")) {
+    if(url == null || url.startsWith("/")) {
       setLinkInternal(node,url, text, children)
     } else {
       setLinkExternal(node,url, text, children)
@@ -98,7 +98,8 @@ object Util {
       def styleAnchorText = if(text.isEmpty) "" else "line-height: 0; font-size: 0; color: transparent; "
       @Bind var content = contentProperty.toBindable
       content <-- {
-        s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
+        if(link == null) ""
+        else s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
            |$script
          """.stripMargin
       }
