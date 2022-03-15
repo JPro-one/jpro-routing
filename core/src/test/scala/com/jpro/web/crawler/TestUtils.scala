@@ -15,6 +15,9 @@ object TestUtils {
       this <++ new Label("222") {
         Util.setLink(this,"/page2")
       }
+      this <++ new Label("mail") {
+        Util.setLink(this,"mailto:a@b.com")
+      }
       this <++ new ImageView() {
         image = new Image("/testfiles/test.jpg")
         this.setAccessibleRoleDescription("The Description")

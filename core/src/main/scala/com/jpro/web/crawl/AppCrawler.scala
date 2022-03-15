@@ -114,7 +114,7 @@ object AppCrawler {
             def simplifyLink(x: String) = {
               if(x.startsWith(prefix)) x.drop(prefix.length) else x
             }
-            newReport.links.filter(x => x.url.startsWith(prefix) || !x.url.startsWith("http")).map { link =>
+            newReport.links.filter(x => x.url.startsWith(prefix) || x.url.startsWith("/")).map { link =>
               val url = simplifyLink(link.url)
               if (!indexed.contains(url) && !toIndex.contains(url)) {
                 toIndex += url

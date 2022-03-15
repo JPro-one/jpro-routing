@@ -13,11 +13,13 @@ class TestSitemapGenerator {
       addRoute { case "/" => new Page1}
       addRoute { case "/page2" => new Page2}
       addRoute { case "/page4" => new Page2}
+      addRoute { case _ => new Page1} // as error page
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
     val sm = SitemapGenerator.createSitemap("http://localhost", result)
     println("SiteMap: " + sm)
     assert(sm.contains("<loc>http://localhost/page4</loc>"))
     assert(!sm.contains("<loc>http://external/link</loc>"))
+    assert(!sm.contains("mailto"))
   }
 }
