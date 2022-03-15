@@ -4,9 +4,9 @@ import com.jpro.web._
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
-
+import java.io.File
 import java.util.function.Supplier
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.JavaConverters._
 
 object AppCrawler {
   case class LinkInfo(url: String, description: String)
@@ -45,22 +45,27 @@ object AppCrawler {
       }
       if (x.isInstanceOf[ListView[_]]) {
         val lview = x.asInstanceOf[ListView[Any]]
-        lview.items.zipWithIndex.map { case (item,index) =>
-          val cell: ListCell[Any] = lview.cellFactoryProperty().get().call(lview)
-          cell.setItem(item)
-          cell.updateIndex(index)
-          cell.updateListView(lview)
-          cell.layout()
-          crawlNode(cell)
+        if(lview.getItems != null) {
+          lview.getItems.asScala.zipWithIndex.map { case (item,index) =>
+            val cell: ListCell[Any] = lview.cellFactoryProperty().get().call(lview)
+            cell.setItem(item)
+            cell.updateIndex(index)
+            cell.updateListView(lview)
+            cell.layout()
+            crawlNode(cell)
+          }
         }
       }
       if (x.isInstanceOf[Region]) {
         val region = x.asInstanceOf[Region]
         var rimages = List.empty[Image]
-        if(region.border != null) rimages :::= region.border.getImages.asScala.map(_.getImage).toList
-        if(region.background != null) rimages :::= region.background.getImages.asScala.map(_.getImage).toList
+        if(region.border != null && region.border.getImages != null) rimages :::= region.border.getImages.asScala.map(_.getImage).toList
+        if(region.background != null && region.background.getImages != null) rimages :::= region.background.getImages.asScala.map(_.getImage).toList
         rimages.foreach{ image =>
-          images ::= ImageInfo(getImageURL(image),region.accessibleRoleDescription)
+          val imgURL = getImageURL(image)
+          if(imgURL != null) {
+            images ::= ImageInfo(imgURL,region.accessibleRoleDescription)
+          }
         }
       }
       if(x.isInstanceOf[ImageView]) {
@@ -68,7 +73,9 @@ object AppCrawler {
         if(view.image != null) {
           val url = getImageURL(view.image)
           val description = view.accessibleRoleDescription
-          images ::= ImageInfo(url,description)
+          if(url != null) {
+            images ::= ImageInfo(url,description)
+          }
         }
       }
     }
@@ -83,7 +90,7 @@ object AppCrawler {
     var toIndex = Set[String]("/")
     var indexed = Set[String]()
     var redirects = Set[String]()
-    var emptyLinks = Set[String]()
+    var deadLinks = Set[String]()
     var reports: List[CrawlReportPage] = List()
 
     while (!toIndex.isEmpty) {
@@ -93,7 +100,6 @@ object AppCrawler {
       val result = inFX {
         createApp.get().route.lift(crawlNext).getOrElse(FXFuture(null))
       }.await
-      FXFuture.runLater(() => ()).await
       result match {
         case Redirect(url) =>
           redirects += crawlNext
@@ -102,26 +108,34 @@ object AppCrawler {
           }
         case view: View =>
           view.url = crawlNext
-          val newReport = inFX(crawlPage(view))
-          reports = newReport :: reports
-          def simplifyLink(x: String) = {
-            if(x.startsWith(prefix)) x.drop(prefix.length) else x
-          }
-          newReport.links.filter(x => x.url.startsWith(prefix) || !x.url.startsWith("http")).map { link =>
-            val url = simplifyLink(link.url)
-            if (!indexed.contains(url) && !toIndex.contains(url)) {
-              toIndex += url
+          try {
+            val newReport = inFX(crawlPage(view))
+            reports = newReport :: reports
+            def simplifyLink(x: String) = {
+              if(x.startsWith(prefix)) x.drop(prefix.length) else x
             }
+            newReport.links.filter(x => x.url.startsWith(prefix) || !x.url.startsWith("http")).map { link =>
+              val url = simplifyLink(link.url)
+              if (!indexed.contains(url) && !toIndex.contains(url)) {
+                toIndex += url
+              }
+            }
+          } catch {
+            case e: Throwable =>
+              println("Error crawling page: " + crawlNext)
+              deadLinks += crawlNext
+              e.printStackTrace()
           }
         case null =>
-          emptyLinks += crawlNext
+          deadLinks += crawlNext
       }
     }
 
-    CrawlReportApp((indexed -- redirects -- emptyLinks).toList, reports.reverse, emptyLinks.toList)
+    CrawlReportApp((indexed -- redirects -- deadLinks).toList, reports.reverse, deadLinks.toList)
   }
 
   def getImageURL(x: Image): String = {
+    if(x.getUrl == null) return null;
     val url = simplifyURL(x.getUrl())
     if(url.startsWith("http")) {
       url
@@ -132,6 +146,15 @@ object AppCrawler {
 
 
   private val cpTriggers = List[String]("jar!","classes", "main")
+  private val local = new File("").getAbsoluteFile.toURI.toURL.toString
+  private val home = new File(System.getProperty("user.home")).getAbsoluteFile.toURI.toURL.toString
+  def fixFile(x: String) = "file://" + x.drop("file:".length)
+  private val shortcuts = List[(String,String)](
+    local -> "local://",
+    "jar:" + fixFile(local) -> "jar:local://",
+    home -> "home://",
+    "jar:" + fixFile(home) -> "jar:home://",
+  )
   def simplifyURL(x: String): String = {
     cpTriggers.collectFirst{
       Function.unlift{ (cpTrigger: String) =>
@@ -144,6 +167,11 @@ object AppCrawler {
             Some(s"cp://$cp")
           } else None
         } else None
+      }}.getOrElse {
+      shortcuts.collectFirst{ Function.unlift{ case (long,short) =>
+        if(x.startsWith(long)) { Some(short + x.drop(long.length))}
+        else None
       }}.getOrElse(x)
+    }
   }
 }
