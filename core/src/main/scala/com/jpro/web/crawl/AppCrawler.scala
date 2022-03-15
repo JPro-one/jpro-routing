@@ -93,6 +93,7 @@ object AppCrawler {
     var deadLinks = Set[String]()
     var reports: List[CrawlReportPage] = List()
 
+    def isOwnLink(x: String): Boolean = x.startsWith(prefix) || x.startsWith("/")
     while (!toIndex.isEmpty) {
       val crawlNext = toIndex.head
       toIndex -= crawlNext
@@ -104,7 +105,9 @@ object AppCrawler {
         case Redirect(url) =>
           redirects += crawlNext
           if (!indexed.contains(url) && !toIndex.contains(url)) {
-            toIndex += url
+            if (isOwnLink(url)) {
+              toIndex += url
+            }
           }
         case view: View =>
           view.url = crawlNext
@@ -114,7 +117,7 @@ object AppCrawler {
             def simplifyLink(x: String) = {
               if(x.startsWith(prefix)) x.drop(prefix.length) else x
             }
-            newReport.links.filter(x => x.url.startsWith(prefix) || x.url.startsWith("/")).map { link =>
+            newReport.links.filter(x => isOwnLink(x.url)).map { link =>
               val url = simplifyLink(link.url)
               if (!indexed.contains(url) && !toIndex.contains(url)) {
                 toIndex += url

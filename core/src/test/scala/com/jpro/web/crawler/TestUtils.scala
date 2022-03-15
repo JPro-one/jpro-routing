@@ -4,6 +4,17 @@ import com.jpro.web.{Util, View}
 import simplefx.all._
 
 object TestUtils {
+  def pageWithLink(links: List[String]) = new View {
+    def title = "title"
+    def description = "desc"
+    override def content: Node = new HBox {
+      links.map { link =>
+        this <++ new Label("Asdf") {
+          Util.setLink(this,"link", "desc1")
+        }
+      }
+    }
+  }
   class Page1 extends View {
     def title = "title"
     def description = "desc"

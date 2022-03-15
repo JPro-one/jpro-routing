@@ -1,6 +1,6 @@
 package com.jpro.web.crawler
 
-import com.jpro.web.WebApp
+import com.jpro.web.{Redirect, WebApp}
 import org.junit.Test
 import TestUtils._
 import com.jpro.web.crawl.{AppCrawler, SitemapGenerator}
@@ -21,5 +21,18 @@ class TestSitemapGenerator {
     assert(sm.contains("<loc>http://localhost/page4</loc>"))
     assert(!sm.contains("<loc>http://external/link</loc>"))
     assert(!sm.contains("mailto"))
+  }
+
+  @Test
+  def testMailToRedirect(): Unit = {
+    def app = new WebApp(null) {
+      addRoute { case "/" => pageWithLink(List("/page2", "/page3", "mailto:something"))}
+      addRoute { case "/page2" => new Redirect("mailto:something-2")}
+    }
+    val result = AppCrawler.crawlApp("http://localhost", () => app)
+    println("got result: " + result)
+    val sm = SitemapGenerator.createSitemap("http://localhost", result)
+    println("SiteMap2: " + sm)
+    assert(!sm.contains("mailto"), "sitemap contained mailto!")
   }
 }
