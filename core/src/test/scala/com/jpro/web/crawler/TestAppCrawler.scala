@@ -23,7 +23,13 @@ class TestAppCrawler {
     assert(result.links contains LinkInfo("/page2", "desc1"))
     assert(result.links contains LinkInfo("/page2", ""), result.links)
     assert(!result.pictures.filter(x => x.description == "The Description").isEmpty)
+  }
 
+  @Test
+  def nullFails(): Unit = inFX {
+    val page = pageWithLink(List(null))
+    val result = AppCrawler.crawlPage(page)
+    assert(result.links.isEmpty, result.links)
   }
 
   @Test

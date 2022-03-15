@@ -29,9 +29,11 @@ object AppCrawler {
       visitedNodes += x
       if (x.getProperties.containsKey("link")) {
         val link = x.getProperties.get("link").asInstanceOf[String]
-        var desc = x.getProperties.get("description").asInstanceOf[String]
-        if(desc == null) desc = ""
-        foundLinks ::= LinkInfo(link, desc)
+        if(link != null) {
+          var desc = x.getProperties.get("description").asInstanceOf[String]
+          if(desc == null) desc = ""
+          foundLinks ::= LinkInfo(link, desc)
+        }
       }
 
       if (x.isInstanceOf[Parent]) {

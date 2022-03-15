@@ -10,7 +10,7 @@ object TestUtils {
     override def content: Node = new HBox {
       links.map { link =>
         this <++ new Label("Asdf") {
-          Util.setLink(this,"link", "desc1")
+          Util.setLink(this,link, "desc1")
         }
       }
     }
