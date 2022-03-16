@@ -49,12 +49,15 @@ object AppCrawler {
         val lview = x.asInstanceOf[ListView[Any]]
         if(lview.getItems != null) {
           lview.getItems.asScala.zipWithIndex.map { case (item,index) =>
-            val cell: ListCell[Any] = lview.cellFactoryProperty().get().call(lview)
-            cell.setItem(item)
-            cell.updateIndex(index)
-            cell.updateListView(lview)
-            cell.layout()
-            crawlNode(cell)
+            val factory = lview.cellFactoryProperty().get()
+            if(factory != null) {
+              val cell: ListCell[Any] = factory.call(lview)
+              cell.setItem(item)
+              cell.updateIndex(index)
+              cell.updateListView(lview)
+              cell.layout()
+              crawlNode(cell)
+            }
           }
         }
       }
