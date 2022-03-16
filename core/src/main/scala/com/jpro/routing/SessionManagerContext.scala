@@ -1,6 +1,6 @@
-package com.jpro.web
+package com.jpro.routing
 
-import com.jpro.web.sessionmanager.SessionManager
+import com.jpro.routing.sessionmanager.SessionManager
 
 
 object SessionManagerContext extends de.sandec.jnodes.context.ContextManager[SessionManager]

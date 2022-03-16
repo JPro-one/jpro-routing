@@ -1,4 +1,4 @@
-package com.jpro.web
+package com.jpro.routing
 
 import simplefx.core._
 import simplefx.all._

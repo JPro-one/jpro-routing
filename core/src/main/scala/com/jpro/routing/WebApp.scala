@@ -1,6 +1,6 @@
-package com.jpro.web
+package com.jpro.routing
 
-import com.jpro.web.sessionmanager.SessionManager
+import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.core._
 import simplefx.all._
@@ -19,9 +19,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
     }
   }
 
-
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
-
 
   var route: PartialFunction[String, FXFuture[Result]] = PartialFunction.empty
   def addRouteFuture(fun: PartialFunction[String, FXFuture[Result]]): Unit = {

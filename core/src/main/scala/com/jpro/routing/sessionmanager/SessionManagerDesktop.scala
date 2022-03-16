@@ -1,9 +1,9 @@
-package com.jpro.web.sessionmanager
+package com.jpro.routing.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
 
-import com.jpro.web.{Redirect, Result, View, WebApp}
+import com.jpro.routing.{Redirect, Result, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import simplefx.all._
 import simplefx.core._

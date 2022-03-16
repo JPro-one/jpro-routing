@@ -1,4 +1,4 @@
-package com.jpro.web
+package com.jpro.routing
 
 import com.jpro.webapi.{HTMLView, WebAPI}
 import simplefx.core._
@@ -8,7 +8,7 @@ import simplefx.util.ReflectionUtil._
 import simplefx.util.Predef._
 import java.net.URLEncoder
 
-import com.jpro.web.sessionmanager.SessionManager
+import com.jpro.routing.sessionmanager.SessionManager
 import javafx.collections.ObservableList
 
 object Util {
@@ -27,7 +27,11 @@ object Util {
     setLink(node,url,Some(text), children)
   }
   def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null): Unit = {
-    if(url.startsWith("/")) {
+    node.getProperties.put("link",url)
+    text.map {desc =>
+      node.getProperties.put("description",desc)
+    }
+    if(url == null || url.startsWith("/")) {
       setLinkInternal(node,url, text, children)
     } else {
       setLinkExternal(node,url, text, children)
@@ -94,7 +98,8 @@ object Util {
       def styleAnchorText = if(text.isEmpty) "" else "line-height: 0; font-size: 0; color: transparent; "
       @Bind var content = contentProperty.toBindable
       content <-- {
-        s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
+        if(link == null) ""
+        else s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
            |$script
          """.stripMargin
       }
@@ -132,5 +137,9 @@ object Util {
 
   private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = {
     theNode.setNewLink(url,text,pushState,children)
+  }
+
+  def setImageViewDescription(view: ImageView, description: String): Unit = {
+    view.setAccessibleRoleDescription(description)
   }
 }

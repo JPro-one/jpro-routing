@@ -1,8 +1,8 @@
-package com.jpro.web.sessionmanager
+package com.jpro.routing.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
-import com.jpro.web.{Result, View, WebApp}
+import com.jpro.routing.{Result, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import javafx.beans.property.{ObjectProperty, Property, SimpleStringProperty, StringProperty}

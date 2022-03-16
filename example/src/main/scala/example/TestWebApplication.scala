@@ -1,10 +1,10 @@
 package example
 
-import com.jpro.web._
+import com.jpro.routing._
 import simplefx.core._
 import simplefx.all._
-import com.jpro.web.Util._
-import com.jpro.web.sessionmanager.SessionManager
+import com.jpro.routing.Util._
+import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.{HTMLView, WebAPI}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import org.controlsfx.control.PopOver
@@ -59,7 +59,12 @@ class Header(view: View, sessionManager: SessionManager) extends HBox {
   this <++ new HeaderLink("leak"    , "/?page=leak" )
   this <++ new HeaderLink("collect"    , "/?page=collect" )
   this <++ new HeaderLink("jmemorybuddy"    , "/?page=jmemorybuddy" )
-  this <++ new HeaderLink("No Link" , "" )
+  this <++ new HeaderLink("No Link" , "" ) {
+    setLink(this, "/?1", Some("/?1"))
+    runLater {
+      setLink(this, null, None)
+    }
+  }
   this <++ new HeaderLink("ManyLinks" , "" ) {
     setLink(this, "/?1", Some("/?1"))
     setLink(this, "/?2", Some("/?2"))
