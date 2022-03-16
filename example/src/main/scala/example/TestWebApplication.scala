@@ -1,10 +1,10 @@
 package example
 
-import com.jpro.web._
+import com.jpro.routing._
 import simplefx.core._
 import simplefx.all._
-import com.jpro.web.Util._
-import com.jpro.web.sessionmanager.SessionManager
+import com.jpro.routing.Util._
+import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.{HTMLView, WebAPI}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import org.controlsfx.control.PopOver
