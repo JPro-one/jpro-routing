@@ -1,6 +1,7 @@
 package com.jpro.web.crawl
 
 import com.jpro.web._
+import com.jpro.web.sessionmanager.DummySessionManager
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
@@ -85,7 +86,10 @@ object AppCrawler {
       }
     }
 
-    new Scene(page.realContent.asInstanceOf[Parent])
+    val scene = new Scene(new Group())
+    val content = page.realContent.asInstanceOf[Parent]
+    SessionManagerContext.setContext(content, new DummySessionManager)
+    scene.setRoot(content)
     page.realContent.applyCss()
     crawlNode(page.realContent)
 

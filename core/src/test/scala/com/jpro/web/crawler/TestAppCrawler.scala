@@ -110,4 +110,20 @@ class TestAppCrawler {
     assert(!r.pictures.isEmpty)
   }
 
+  @Test
+  def testAccessingSessionManager (): Unit = inFX {
+    val view = new View {
+      override def title: String = ""
+      override def description: String = ""
+      val content: Node = new Region() {
+        this.sceneProperty.addListener((p,o,n) =>{
+          if(n != null) {
+            Util.getSessionManager(this)
+          }
+        })
+      }
+    }
+    val r = AppCrawler.crawlPage(view)
+  }
+
 }
