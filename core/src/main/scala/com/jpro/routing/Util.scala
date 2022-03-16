@@ -1,4 +1,4 @@
-package com.jpro.web
+package com.jpro.routing
 
 import com.jpro.webapi.{HTMLView, WebAPI}
 import simplefx.core._
@@ -8,7 +8,7 @@ import simplefx.util.ReflectionUtil._
 import simplefx.util.Predef._
 import java.net.URLEncoder
 
-import com.jpro.web.sessionmanager.SessionManager
+import com.jpro.routing.sessionmanager.SessionManager
 import javafx.collections.ObservableList
 
 object Util {

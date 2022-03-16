@@ -1,8 +1,8 @@
-package com.jpro.web.crawler
+package com.jpro.routing.crawler
 
-import com.jpro.web.WebApp
-import com.jpro.web.crawl.{AppCrawler, MemoryTester}
-import com.jpro.web.crawler.TestUtils.{Page1, Page2}
+import com.jpro.routing.WebApp
+import com.jpro.routing.crawl.{AppCrawler, MemoryTester}
+import com.jpro.routing.crawler.TestUtils.{Page1, Page2}
 import org.junit.Test
 import simplefx.cores.default.inFX
 import simplefx.util.Predef.intercept

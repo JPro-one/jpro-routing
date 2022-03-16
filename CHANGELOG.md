@@ -1,3 +1,5 @@
+## 0.10.0
+* Renamed the project from jpro-web to jpro-routing
 ## 0.9.8
 * Added Option, to crawl the whole App, which allows to check for leaks, create sitemap or to check for deadlinks.
 * It's now possible to unset Links, by calling `Util.setLink` with the link "null".

@@ -1,5 +1,5 @@
-package com.jpro.web.sessionmanager
-import com.jpro.web.{Result, WebApp}
+package com.jpro.routing.sessionmanager
+import com.jpro.routing.{Result, WebApp}
 
 class DummySessionManager extends SessionManager {
   override def webApp: WebApp = null

@@ -1,6 +1,6 @@
-package com.jpro.web
+package com.jpro.routing
 
-import com.jpro.web.sessionmanager.SessionManager
+import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.core._
 import simplefx.all._

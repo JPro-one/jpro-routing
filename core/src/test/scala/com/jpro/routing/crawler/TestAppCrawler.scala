@@ -1,8 +1,8 @@
-package com.jpro.web.crawler
+package com.jpro.routing.crawler
 
-import com.jpro.web.crawl.AppCrawler
-import com.jpro.web.crawl.AppCrawler._
-import com.jpro.web.{Util, View, WebApp}
+import com.jpro.routing.crawl.AppCrawler
+import com.jpro.routing.crawl.AppCrawler._
+import com.jpro.routing.{Util, View, WebApp}
 import org.junit.Test
 import simplefx.all._
 import simplefx.core._

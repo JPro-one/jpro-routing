@@ -1,6 +1,6 @@
-package com.jpro.web.crawler
+package com.jpro.routing.crawler
 
-import com.jpro.web.{Util, View}
+import com.jpro.routing.{Util, View}
 import simplefx.all._
 
 object TestUtils {

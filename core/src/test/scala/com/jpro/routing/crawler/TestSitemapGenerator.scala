@@ -1,9 +1,9 @@
-package com.jpro.web.crawler
+package com.jpro.routing.crawler
 
-import com.jpro.web.{Redirect, WebApp}
+import com.jpro.routing.{Redirect, WebApp}
 import org.junit.Test
 import TestUtils._
-import com.jpro.web.crawl.{AppCrawler, SitemapGenerator}
+import com.jpro.routing.crawl.{AppCrawler, SitemapGenerator}
 import simplefx.core._
 
 class TestSitemapGenerator {

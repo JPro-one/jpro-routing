@@ -1,7 +1,7 @@
-package com.jpro.web.crawl
+package com.jpro.routing.crawl
 
-import com.jpro.web._
-import com.jpro.web.sessionmanager.DummySessionManager
+import com.jpro.routing._
+import com.jpro.routing.sessionmanager.DummySessionManager
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._

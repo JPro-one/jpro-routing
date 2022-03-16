@@ -1,7 +1,7 @@
-package com.jpro.web.crawl
+package com.jpro.routing.crawl
 
-import com.jpro.web.WebApp
-import com.jpro.web.crawl.AppCrawler.CrawlReportApp
+import com.jpro.routing.WebApp
+import com.jpro.routing.crawl.AppCrawler.CrawlReportApp
 import de.sandec.jmemorybuddy.JMemoryBuddy
 import simplefx.cores.default.inFX
 
