@@ -97,4 +97,17 @@ class TestAppCrawler {
     assert(r.links.contains(LinkInfo("/scrollpane","")))
   }
 
+  @Test
+  def testImageInStyle (): Unit = inFX {
+    val view = new View {
+      override def title: String = ""
+      override def description: String = ""
+      val content: Node = new Region() {
+        style = ("-fx-background-image: url('/testfiles/test.jpg');")
+      }
+    }
+    val r = AppCrawler.crawlPage(view)
+    assert(!r.pictures.isEmpty)
+  }
+
 }

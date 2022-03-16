@@ -82,6 +82,7 @@ object AppCrawler {
       }
     }
 
+    new Scene(page.realContent.asInstanceOf[Parent])
     page.realContent.applyCss()
     crawlNode(page.realContent)
 
