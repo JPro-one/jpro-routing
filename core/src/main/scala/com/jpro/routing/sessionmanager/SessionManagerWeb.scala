@@ -3,7 +3,7 @@ package com.jpro.routing.sessionmanager
 import java.net.URL
 import java.net.URLDecoder
 
-import com.jpro.routing.{Redirect, Result, View, WebApp}
+import com.jpro.routing.{Redirect, Response, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import simplefx.all._
 import simplefx.core._
@@ -12,7 +12,7 @@ import simplefx.experimental._
 
 class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManager { THIS =>
 
-  override def getView(url: String): FXFuture[Result] = {
+  override def getView(url: String): FXFuture[Response] = {
     println("getting: " + url)
     val view = webApp.route(url)
     view
@@ -35,7 +35,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
     markViewCollectable(THIS.view)
   })
 
-  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
+  def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
       case Redirect(url) => gotoURL(url)

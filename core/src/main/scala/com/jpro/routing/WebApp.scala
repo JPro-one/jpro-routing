@@ -21,27 +21,41 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
 
-  var route: PartialFunction[String, FXFuture[Result]] = PartialFunction.empty
-  def addRouteFuture(fun: PartialFunction[String, FXFuture[Result]]): Unit = {
-    route = route orElse fun
+  def setRoute(x: Route) = newRoute = x
+  var newRoute: Route = (r) => null
+
+  def route = {
+    Function.unlift((s: String) => Option(newRoute(Request.fromString(s))))
   }
-  def addRoute(fun: PartialFunction[String, Result]): Unit = {
-    route = route orElse fun.andThen(x => FXFuture(x))
-  }
-  def addRouteJava(fun: java.util.function.Function[String,Result]) = {
-    class Extractor[A, B](val f: A => Option[B]) {
-      def unapply(a: A) = f(a)
+  def addRouteFuture(fun: PartialFunction[String, FXFuture[Response]]): Unit = {
+    val oldRoute = newRoute
+    newRoute = (r) => {
+      val res = oldRoute(r)
+      if(res != null) res
+      else fun.lift(r.path).getOrElse(null)
     }
-
-    def unlift[A, B](f: A => Option[B]): PartialFunction[A, B] = {
-      val LocalExtractor = new Extractor(f)
-
-      // Create the PartialFunction from a partial function literal
-      { case LocalExtractor(b) => b }
-    }
-
-    addRoute(unlift((x: String) => Option(fun(x))))
   }
+  def addRoute(fun: PartialFunction[String, Response]): Unit = {
+    val oldRoute = newRoute
+    newRoute = (r) => {
+      val res = oldRoute(r)
+      if(res != null) res
+      else fun.lift(r.path).map(x => FXFuture(x)).getOrElse(null)
+    }
+  }
+  def addRouteJava(fun: java.util.function.Function[String,Response]) = {
+    val oldRoute = newRoute
+    newRoute = (r) => {
+      val res = oldRoute(r)
+      if(res != null) res
+      else {
+        val res2 = fun(r.path)
+        if(res2 == null) null
+        else FXFuture(res2)
+      }
+    }
+  }
+
 
   var transitionRoute: PartialFunction[(View,View,Boolean), PageTransition] = PartialFunction.empty
   var defaultTransition: PageTransition = PageTransition.InstantTransition

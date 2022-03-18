@@ -2,7 +2,7 @@ package com.jpro.routing.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
-import com.jpro.routing.{Result, View, WebApp}
+import com.jpro.routing.{Response, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import javafx.beans.property.{ObjectProperty, Property, SimpleStringProperty, StringProperty}
@@ -44,9 +44,9 @@ trait SessionManager {
     }
   }
 
-  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit
+  def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit
 
-  def getView(url: String): FXFuture[Result]
+  def getView(url: String): FXFuture[Response]
 
   def start(): Unit
 
