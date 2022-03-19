@@ -8,6 +8,7 @@ import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.{HTMLView, WebAPI}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import org.controlsfx.control.PopOver
+import com.jpro.routing.RouteUtils._
 
 import scala.collection.JavaConverters.asScalaBufferConverter
 
@@ -15,13 +16,20 @@ class MyApp(stage: Stage) extends WebApp(stage) {
 
   stylesheets ::= "test.css"
 
+  setRoute(
+    EmptyRoute
+      .andThen(get("", () => new MainView))
+      .andThen(get("/", () => new MainView))
+      .andThen(get("/?page=main", () => new MainView))
+      .andThen(get("/?page=green", () => new GreenView))
+      .andThen(get("/?page=orange", () => new OrangeView))
+  )
 
-
-  addRoute { case ""                => new MainView()}
-  addRoute { case "/"                => new MainView()}
-  addRoute { case "/?page=main"      => new MainView()}
-  addRoute { case "/?page=green"      => new GreenView()}
-  addRoute { case "/?page=orange"      => new OrangeView()}
+  //addRoute { case ""                => new MainView()}
+  //addRoute { case "/"                => new MainView()}
+  //addRoute { case "/?page=main"      => new MainView()}
+  //addRoute { case "/?page=green"      => new GreenView()}
+  //addRoute { case "/?page=orange"      => new OrangeView()}
   addRoute { case "/?page=sub"       => new SubView()}
   addRoute { case "/?page=redirect"  => Redirect("/?page=sub")}
   addRoute { case "/?page=paralax"   => new ParalaxPage()}

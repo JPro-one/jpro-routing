@@ -14,7 +14,7 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
 
   override def getView(url: String): FXFuture[Response] = {
     println("getting: " + url)
-    val view = webApp.route(url)
+    val view = webApp.route(url, if(this.view == null) null else this.view.realContent)
     view
   }
 

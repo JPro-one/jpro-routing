@@ -30,6 +30,8 @@ abstract class View extends Response { THIS =>
 
     lazy val cachedContent = f(THIS.content)
     override def content: all.Node = cachedContent
+
+    override def fullscreen: Boolean = THIS.fullscreen
   }
 }
 

@@ -109,7 +109,9 @@ object AppCrawler {
       toIndex -= crawlNext
       indexed += crawlNext
       val result = inFX {
-        createApp.get().route.lift(crawlNext).getOrElse(FXFuture(null))
+        val r = createApp.get().route(crawlNext)
+        if(r == null) FXFuture.unit(null)
+        else r
       }.await
       result match {
         case Redirect(url) =>

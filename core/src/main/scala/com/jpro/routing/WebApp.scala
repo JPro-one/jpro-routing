@@ -21,11 +21,14 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
 
-  def setRoute(x: Route) = newRoute = x
-  var newRoute: Route = (r) => null
+  def setRoute(x: Route): Unit = newRoute = x
+  var newRoute: Route = _
 
+  def route(s: String, oldView: Node) = {
+    newRoute(Request.fromString(s).copy(oldContent = oldView, origOldContent = oldView))
+  }
   def route = {
-    Function.unlift((s: String) => Option(newRoute(Request.fromString(s))))
+    (s: String) => newRoute(Request.fromString(s))
   }
   def addRouteFuture(fun: PartialFunction[String, FXFuture[Response]]): Unit = {
     val oldRoute = newRoute
