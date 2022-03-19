@@ -33,9 +33,6 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
       .andThen(getNode("/yellow", gen("Yellow", "/red", Color.YELLOW)))
       .filter(Filters.FullscreenFilter(true))
       .filter(RouteUtils.transitionFilter(1))
-      .filter(RouteUtils.SimpleLogin("username","password"))
-      .filter(CreateHeader())
-    //.filter(GoogleOAuthFilter)
   )
 }
 
