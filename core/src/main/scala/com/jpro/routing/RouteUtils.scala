@@ -45,6 +45,35 @@ object RouteUtils {
       case x => x
     }
   }}
+  def sideTransitionFilter(seconds: Double): Route => Route = route => { request => {
+    route.apply(request).map{
+      case x: View =>
+        val oldNode = request.oldContent
+        val newNode = x.content
+        val t = (seconds s)
+        if(oldNode == null) {
+          x
+        } else {
+          val startTime: Time = systemTime
+          def timeLeft: Time = (startTime + (seconds * second)) - time
+          def progress: Double = 1.0 - (timeLeft / (seconds * second))
+          val res = new StackPane(oldNode,newNode)
+          val finishedB: B[Boolean] = Bindable(false)
+          when(!finishedB && timeLeft > (0 s)) ==> {
+            oldNode.translateX <-- (-progress * res.width)
+            newNode.translateX <-- ((1 - progress) * res.width)
+          }
+          onceWhen(timeLeft <= (0. s)) --> {
+            oldNode.translateX = 0
+            newNode.translateX = 0
+            finishedB := true
+          }
+          in(t) --> {res.children = List(newNode)}
+          x.mapContent(x => res)
+        }
+      case x => x
+    }
+  }}
 
   def mapViewFilter(request: Request, f: Node => Node): View = ???
 
