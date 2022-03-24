@@ -9,7 +9,9 @@ case class Request (
   queryParameters: Map[String,String],
   origOldContent: Node,
   oldContent: Node
-)
+) {
+  def mapContent(f: Node => Node) = this.copy(oldContent = f(oldContent))
+}
 object Request {
   def fromString(x: String) = Request("",x,x,Map(),null,null)
 }

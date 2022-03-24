@@ -82,4 +82,36 @@ object RouteUtils {
     override def description: String = ""
     override def content: all.Node = x
   }
+
+  def containerFilter[A <: javafx.scene.Node](containerLogic: ContainerFactory): Route => Route = route => request => {
+    var container: Node = null
+    val request2: Request = if(containerLogic.isContainer(request.oldContent)) {
+      container = request.oldContent
+      request.mapContent(x => containerLogic.getContent(container))
+    } else {
+      request
+    }
+    route(request2).map{
+      case view: View =>
+        if(container == null) {
+          container = containerLogic.createContainer()
+        }
+        view.mapContent(x => {
+          containerLogic.setRequest(container, request)
+          containerLogic.setContent(container, view.content)
+          container
+        })
+      case x => x
+    }
+  }
+
+
+
+  abstract class SFXContainerFactory[Node] extends ContainerFactory {
+
+    trait Container { x: Node =>
+      @Bind var request: Request
+    }
+
+  }
 }
