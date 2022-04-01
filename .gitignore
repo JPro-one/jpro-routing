@@ -4,3 +4,8 @@ out/
 */build/
 */out/
 /.idea/
+.metals
+.vscode
+**/bin
+.history
+.bloop

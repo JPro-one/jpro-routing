@@ -3,9 +3,9 @@ package com.jpro.routing.crawler
 import com.jpro.routing.WebApp
 import com.jpro.routing.crawl.{AppCrawler, MemoryTester}
 import com.jpro.routing.crawler.TestUtils.{Page1, Page2}
-import org.junit.Test
 import simplefx.cores.default.inFX
 import simplefx.util.Predef.intercept
+import org.junit.jupiter.api.Test
 
 class TestMemoryTest {
 

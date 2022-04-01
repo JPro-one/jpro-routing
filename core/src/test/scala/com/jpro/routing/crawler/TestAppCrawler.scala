@@ -3,11 +3,11 @@ package com.jpro.routing.crawler
 import com.jpro.routing.crawl.AppCrawler
 import com.jpro.routing.crawl.AppCrawler._
 import com.jpro.routing.{Util, View, WebApp}
-import org.junit.Test
 import simplefx.all._
 import simplefx.core._
 import TestUtils._
 import simplefx.all
+import org.junit.jupiter.api.Test
 
 class TestAppCrawler {
 

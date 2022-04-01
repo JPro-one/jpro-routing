@@ -1,10 +1,11 @@
 package com.jpro.routing.crawler
 
 import com.jpro.routing.{Redirect, WebApp}
-import org.junit.Test
+
 import TestUtils._
 import com.jpro.routing.crawl.{AppCrawler, SitemapGenerator}
 import simplefx.core._
+import org.junit.jupiter.api.Test
 
 class TestSitemapGenerator {
   @Test
