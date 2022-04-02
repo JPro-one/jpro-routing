@@ -12,9 +12,9 @@ class TestMemoryTest {
   @Test
   def simpleTest(): Unit = {
     def app = new WebApp(null) {
-      addRoute { case "/" => new Page1}
-      addRoute { case "/page2" => new Page2}
-      addRoute { case "/page4" => new Page2}
+      addRouteScala { case "/" => new Page1}
+      addRouteScala { case "/page2" => new Page2}
+      addRouteScala { case "/page4" => new Page2}
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
     MemoryTester.testForLeaks(result, () => app)
@@ -24,9 +24,9 @@ class TestMemoryTest {
   def simpleTestfail(): Unit = {
     val page2 = new Page2
     def app = new WebApp(null) {
-      addRoute { case "/" => new Page1}
-      addRoute { case "/page2" => page2}
-      addRoute { case "/page4" => new Page2}
+      addRouteScala { case "/" => new Page1}
+      addRouteScala { case "/page2" => page2}
+      addRouteScala { case "/page4" => new Page2}
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
     intercept[Throwable](MemoryTester.testForLeaks(result, () => app))
@@ -35,9 +35,9 @@ class TestMemoryTest {
   @Test
   def simpleTestfail2(): Unit = {
     val app = inFX(new WebApp(null) {
-      addRoute { case "/" => new Page1}
-      addRoute { case "/page2" => new Page2}
-      addRoute { case "/page4" => new Page2}
+      addRouteScala { case "/" => new Page1}
+      addRouteScala { case "/page2" => new Page2}
+      addRouteScala { case "/page4" => new Page2}
     })
     val result = AppCrawler.crawlApp("http://localhost", () => app)
     intercept[Throwable](MemoryTester.testForLeaks(result, () => app)) // fails because the webapp is not collectable

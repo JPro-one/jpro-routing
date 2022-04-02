@@ -30,7 +30,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
   def route = {
     (s: String) => newRoute(Request.fromString(s))
   }
-  def addRouteFuture(fun: PartialFunction[String, FXFuture[Response]]): Unit = {
+  def addRouteScalaFuture(fun: PartialFunction[String, FXFuture[Response]]): Unit = {
     val oldRoute = newRoute
     newRoute = (r) => {
       val res = oldRoute(r)
@@ -38,7 +38,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
       else fun.lift(r.path).getOrElse(null)
     }
   }
-  def addRoute(fun: PartialFunction[String, Response]): Unit = {
+  def addRouteScala(fun: PartialFunction[String, Response]): Unit = {
     val oldRoute = newRoute
     newRoute = (r) => {
       val res = oldRoute(r)
@@ -46,7 +46,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
       else fun.lift(r.path).map(x => FXFuture(x)).getOrElse(null)
     }
   }
-  def addRouteJava(fun: java.util.function.Function[String,Response]) = {
+  def addRoute(fun: java.util.function.Function[String,Response]) = {
     val oldRoute = newRoute
     newRoute = (r) => {
       val res = oldRoute(r)

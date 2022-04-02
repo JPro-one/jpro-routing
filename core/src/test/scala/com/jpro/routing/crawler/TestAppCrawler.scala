@@ -35,8 +35,8 @@ class TestAppCrawler {
   @Test
   def testCrawlApp(): Unit = {
     def app = new WebApp(null) {
-      addRoute { case "/" => new Page1}
-      addRoute { case "/page2" => new Page2}
+      addRouteScala { case "/" => new Page1}
+      addRouteScala { case "/page2" => new Page2}
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
 
@@ -49,7 +49,7 @@ class TestAppCrawler {
   @Test
   def testEmptyImage(): Unit = {
     def app = new WebApp(null) {
-      addRoute { case "/" => new View {
+      addRouteScala { case "/" => new View {
         override def title: String = ""
 
         override def description: String = ""

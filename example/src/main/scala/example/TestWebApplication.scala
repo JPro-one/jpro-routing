@@ -25,20 +25,20 @@ class MyApp(stage: Stage) extends WebApp(stage) {
       .andThen(get("/?page=orange", () => new OrangeView))
   )
 
-  //addRoute { case ""                => new MainView()}
-  //addRoute { case "/"                => new MainView()}
-  //addRoute { case "/?page=main"      => new MainView()}
-  //addRoute { case "/?page=green"      => new GreenView()}
-  //addRoute { case "/?page=orange"      => new OrangeView()}
-  addRoute { case "/?page=sub"       => new SubView()}
-  addRoute { case "/?page=redirect"  => Redirect("/?page=sub")}
-  addRoute { case "/?page=paralax"   => new ParalaxPage()}
-  addRoute { case "/?page=pdf"       => new PDFTest()}
-  addRoute { case "/?page=leak"       => new LeakingPage()}
-  addRoute { case "/?page=collect"       => new CollectingPage()}
-  addRoute { case "/?page=jmemorybuddy"       => new JMemoryBuddyPage()}
-  addRoute { case "/?page=it's\" tricky" => new MainView()}
-  addRoute { case x                  => new UnknownPage(x)}
+  //addRouteScala { case ""                => new MainView()}
+  //addRouteScala { case "/"                => new MainView()}
+  //addRouteScala { case "/?page=main"      => new MainView()}
+  //addRouteScala { case "/?page=green"      => new GreenView()}
+  //addRouteScala { case "/?page=orange"      => new OrangeView()}
+  addRouteScala { case "/?page=sub"       => new SubView()}
+  addRouteScala { case "/?page=redirect"  => Redirect("/?page=sub")}
+  addRouteScala { case "/?page=paralax"   => new ParalaxPage()}
+  addRouteScala { case "/?page=pdf"       => new PDFTest()}
+  addRouteScala { case "/?page=leak"       => new LeakingPage()}
+  addRouteScala { case "/?page=collect"       => new CollectingPage()}
+  addRouteScala { case "/?page=jmemorybuddy"       => new JMemoryBuddyPage()}
+  addRouteScala { case "/?page=it's\" tricky" => new MainView()}
+  addRouteScala { case x                  => new UnknownPage(x)}
 
  // addTransition{ case (null,view2,true ) => PageTransition.InstantTransition }
  // addTransition{ case (view,view2,true ) => PageTransition.MoveDown }
