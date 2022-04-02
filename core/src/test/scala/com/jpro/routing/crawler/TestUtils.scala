@@ -1,6 +1,6 @@
 package com.jpro.routing.crawler
 
-import com.jpro.routing.{Util, View}
+import com.jpro.routing.{LinkUtil, View}
 import simplefx.all._
 
 object TestUtils {
@@ -10,7 +10,7 @@ object TestUtils {
     override def content: Node = new HBox {
       links.map { link =>
         this <++ new Label("Asdf") {
-          Util.setLink(this,link, "desc1")
+          LinkUtil.setLink(this,link, "desc1")
         }
       }
     }
@@ -21,13 +21,13 @@ object TestUtils {
 
     override def content: Node = new HBox {
       this <++ new Label("Asdf") {
-        Util.setLink(this,"/page2", "desc1")
+        LinkUtil.setLink(this,"/page2", "desc1")
       }
       this <++ new Label("222") {
-        Util.setLink(this,"/page2")
+        LinkUtil.setLink(this,"/page2")
       }
       this <++ new Label("mail") {
-        Util.setLink(this,"mailto:a@b.com")
+        LinkUtil.setLink(this,"mailto:a@b.com")
       }
       this <++ new ImageView() {
         image = new Image("/testfiles/test.jpg")
@@ -41,16 +41,16 @@ object TestUtils {
 
     override def content: Node = new HBox {
       this <++ new Label("Asdf") {
-        Util.setLink(this,"/page2", "desc1")
+        LinkUtil.setLink(this,"/page2", "desc1")
       }
       this <++ new Label("222") {
-        Util.setLink(this,"/page3", "desc2")
+        LinkUtil.setLink(this,"/page3", "desc2")
       }
       this <++ new Label("222") {
-        Util.setLink(this,"http://localhost/page4", "desc2")
+        LinkUtil.setLink(this,"http://localhost/page4", "desc2")
       }
       this <++ new Label("222") {
-        Util.setLink(this,"http://external/link", "desc2")
+        LinkUtil.setLink(this,"http://external/link", "desc2")
       }
     }
   }

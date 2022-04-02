@@ -21,7 +21,7 @@ class TestMemoryTest {
   }
 
   @Test
-  def simpleTestfail(): Unit = {
+  def simpleFailingTest(): Unit = {
     val page2 = new Page2
     def app = new WebApp(null) {
       addRouteScala { case "/" => new Page1}
@@ -33,7 +33,7 @@ class TestMemoryTest {
   }
 
   @Test
-  def simpleTestfail2(): Unit = {
+  def simpleFailingTest2(): Unit = {
     val app = inFX(new WebApp(null) {
       addRouteScala { case "/" => new Page1}
       addRouteScala { case "/page2" => new Page2}

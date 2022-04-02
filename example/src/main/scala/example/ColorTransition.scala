@@ -1,7 +1,7 @@
 package example
 
 import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode}
-import com.jpro.routing.{ContainerFactory, Filters, Redirect, Request, RouteUtils, Util, WebApp}
+import com.jpro.routing.{ContainerFactory, Filters, Redirect, Request, RouteUtils, LinkUtil, WebApp}
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.all._
@@ -38,7 +38,7 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
   }
   def toHexString(value: Color): String = "#" + (format(value.getRed) + format(value.getGreen) + format(value.getBlue) + format(value.getOpacity)).toUpperCase
   def gen(x: String, next: String, color: Color): Supplier[Node] = () => new StackPane {
-    Util.setLink(this,next)
+    LinkUtil.setLink(this,next)
     this <++ new Label(x) {
       style = "-fx-font-size: 36px;"
     }

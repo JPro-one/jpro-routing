@@ -3,7 +3,7 @@ package example
 import com.jpro.routing._
 import simplefx.core._
 import simplefx.all._
-import com.jpro.routing.Util._
+import com.jpro.routing.LinkUtil._
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.{HTMLView, WebAPI}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
@@ -105,7 +105,7 @@ class Footer(sessionManager: SessionManager) extends HBox {
   this <++ new Label("url: " + sessionManager.url)
   this <++ new Button("refresh") {
     onAction --> {
-      Util.refresh(this)
+      LinkUtil.refresh(this)
     }
   }
 }
