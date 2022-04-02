@@ -9,16 +9,9 @@ import simplefx.core._
 
 import java.util.function.Supplier
 
-object HeaderFactory extends ContainerFactory {
-  override def isContainer(x: Node): Boolean = x.isInstanceOf[Container]
-  override def createContainer(): Node = new Container
-  override def setContent(c: Node, x: Node): Unit = c.asInstanceOf[Container].content = x
-  override def getContent(c: Node): Node = c.asInstanceOf[Container].content
-  override def setRequest(c: Node, r: Request): Unit = c.asInstanceOf[Container].request = r
-
-  class Container extends VBox {
-    @Bind var request: Request = null
-    @Bind var content: Node = null
+object HeaderFactory extends RouteUtils.SFXContainerFactory {
+  override def createContainer() = new MyContainer
+  class MyContainer extends VBox with Container {
 
     this <++ new Label {
       text <-- (if(request != null) request.origPath else "---")
@@ -53,7 +46,7 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
       .andThen(getNode("/blue", gen("Blue", "/yellow", Color.BLUE)))
       .andThen(getNode("/yellow", gen("Yellow", "/red", Color.YELLOW)))
       .filter(Filters.FullscreenFilter(true))
-      .filter(RouteUtils.sideTransitionFilter(1))
+      //.filter(RouteUtils.sideTransitionFilter(1))
       .filter(RouteUtils.containerFilter(HeaderFactory))
       .filter(RouteUtils.containerFilter(HeaderFactory))
       .filter(RouteUtils.containerFilter(HeaderFactory))

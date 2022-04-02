@@ -107,10 +107,16 @@ object RouteUtils {
 
 
 
-  abstract class SFXContainerFactory[Node] extends ContainerFactory {
+  abstract class SFXContainerFactory extends ContainerFactory {
+    override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
+    override def setContent(c: Node, x: Node): Unit = c.asInstanceOf[MyContainer].content = x
+    override def getContent(c: Node): Node = c.asInstanceOf[MyContainer].content
+    override def setRequest(c: Node, r: Request): Unit = c.asInstanceOf[MyContainer].request = r
 
+    type MyContainer <: Container with Node
     trait Container { x: Node =>
-      @Bind var request: Request
+      @Bind var request: Request = null
+      @Bind var content: Node = null
     }
 
   }
