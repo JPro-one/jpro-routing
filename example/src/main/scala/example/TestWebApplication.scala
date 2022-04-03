@@ -18,11 +18,11 @@ class MyApp(stage: Stage) extends WebApp(stage) {
 
   setRoute(
     EmptyRoute
-      .andThen(get("", () => new MainView))
-      .andThen(get("/", () => new MainView))
-      .andThen(get("/?page=main", () => new MainView))
-      .andThen(get("/?page=green", () => new GreenView))
-      .andThen(get("/?page=orange", () => new OrangeView))
+      .and(get("", () => new MainView))
+      .and(get("/", () => new MainView))
+      .and(get("/?page=main", () => new MainView))
+      .and(get("/?page=green", () => new GreenView))
+      .and(get("/?page=orange", () => new OrangeView))
   )
 
   //addRouteScala { case ""                => new MainView()}

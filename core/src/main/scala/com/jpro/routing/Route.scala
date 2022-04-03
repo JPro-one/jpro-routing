@@ -6,7 +6,7 @@ import simplefx.experimental._
 trait Route {
   def apply(r: Request): FXFuture[Response]
 
-  def andThen(x: Route): Route = { request =>
+  def and(x: Route): Route = { request =>
     val r = apply(request)
     if(r == null) {
       x.apply(request)

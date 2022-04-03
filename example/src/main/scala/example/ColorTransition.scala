@@ -40,11 +40,11 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
   /* Util rename into LinkUtil */
   setRoute(
     EmptyRoute /* StartRoute? */
-      .andThen(get("/", () => Redirect("/green")))
-      .andThen(getNode("/green", gen("Green","/red", Color.GREEN)))
-      .andThen(getNode("/red", gen("Red", "/blue", Color.RED)))
-      .andThen(getNode("/blue", gen("Blue", "/yellow", Color.BLUE)))
-      .andThen(getNode("/yellow", gen("Yellow", "/red", Color.YELLOW)))
+      .and(get("/", () => Redirect("/green")))
+      .and(getNode("/green", gen("Green","/red", Color.GREEN)))
+      .and(getNode("/red", gen("Red", "/blue", Color.RED)))
+      .and(getNode("/blue", gen("Blue", "/yellow", Color.BLUE)))
+      .and(getNode("/yellow", gen("Yellow", "/red", Color.YELLOW)))
       .filter(Filters.FullscreenFilter(true))
       //.filter(RouteUtils.sideTransitionFilter(1))
       .filter(RouteUtils.containerFilter(HeaderFactory))
