@@ -46,7 +46,9 @@ trait SessionManager {
 
   def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit
 
-  def getView(url: String): FXFuture[Response]
+  def getView(url: String): FXFuture[Response] = {
+    webApp.route(url)
+  }
 
   def start(): Unit
 

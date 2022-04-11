@@ -12,12 +12,6 @@ import simplefx.experimental._
 
 class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManager { THIS =>
 
-  override def getView(url: String): FXFuture[Response] = {
-    println("getting: " + url)
-    val view = webApp.route(url)
-    view
-  }
-
 
   def goBack(): Unit = {
     webAPI.executeScript("history.go(-1);")
