@@ -155,8 +155,8 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
                            |  jpro.popstatejava(location.href);
                            |});""".stripMargin)
     webAPI.executeScript(
+      // Back off, browser, I got this...
       """if ('scrollRestoration' in history) {
-        |  // Back off, browser, I got this...
         |  history.scrollRestoration = 'manual';
         |}
       """.stripMargin)
