@@ -9,3 +9,4 @@ out/
 **/bin
 .history
 .bloop
+example/logs/*
