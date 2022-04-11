@@ -96,8 +96,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
   }
 
   def gotoFullEncodedURL(x: String, pushState: Boolean = true, track: Boolean = true): Unit = {
-    val url = new URL(x)
-    gotoURL(URLDecoder.decode(url.getFile(),"UTF-8"), pushState, track)
+    gotoURL(URLDecoder.decode(x,"UTF-8"), pushState, track)
   }
 
   def start() = {

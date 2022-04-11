@@ -10,9 +10,10 @@ import javafx.collections.{FXCollections, ObservableList}
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
+import java.net.URI
 
 
-trait SessionManager {
+trait SessionManager { THIS =>
 
   def webApp: WebApp
 
@@ -35,12 +36,13 @@ trait SessionManager {
   def goForward(): Unit
   def gotoURL(url: String): Unit = gotoURL(url,true,true)
   def gotoURL(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
+    val url2 = SessionManager.mergeURLs(THIS.url, url)
     println(s"goto: $url")
     val newView = if(view != null && view.handleURL(url)) FXFuture(view) else {
-      getView(url)
+      getView(url2)
     }
     newView.map { view =>
-      gotoURL(url, view, pushState, track)
+      gotoURL(url2, view, pushState, track)
     }
   }
 
@@ -61,5 +63,10 @@ object SessionManager {
   def getDefault(app: WebApp, stage: Stage): SessionManager = {
     if(WebAPI.isBrowser) new SessionManagerWeb(app, WebAPI.getWebAPI(stage))
     else new SessionManagerDesktop(app)
+  }
+
+  def mergeURLs(orig: String, next: String): String = {
+    if(orig == null) next
+    else new URI(orig).resolve(next).toString
   }
 }
