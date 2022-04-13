@@ -11,6 +11,8 @@ object RouteUtils {
 
   val EmptyRoute: Route = (x) => null
 
+  def redirect(path: String, to: String): Route = get("/", () => Redirect(to))
+
   def get(path: String, f: Supplier[Response]): Route = (request: Request) => if(request.path == path) FXFuture.unit(f.get()) else null
   def getNode(path: String, node: Supplier[Node]): Route = (request: Request) => if(request.path == path) FXFuture.unit(viewFromNode(node.get())) else null
 

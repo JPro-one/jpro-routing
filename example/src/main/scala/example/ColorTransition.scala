@@ -1,6 +1,6 @@
 package example
 
-import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode}
+import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode, redirect}
 import com.jpro.routing.{ContainerFactory, Filters, Redirect, Request, RouteUtils, LinkUtil, WebApp}
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
@@ -40,11 +40,13 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
   /* Util rename into LinkUtil */
   setRoute(
     EmptyRoute /* StartRoute? */
-      .and(get("/", () => Redirect("/green")))
+      .and(redirect("/", "/green"))
       .and(getNode("/green", gen("Green","/red", Color.GREEN)))
       .and(getNode("/red", gen("Red", "/blue", Color.RED)))
       .and(getNode("/blue", gen("Blue", "/yellow", Color.BLUE)))
       .and(getNode("/yellow", gen("Yellow", "/red", Color.YELLOW)))
+
+      // Alternative names: with, apply, map
       .filter(Filters.FullscreenFilter(true))
       //.filter(RouteUtils.sideTransitionFilter(1))
       .filter(RouteUtils.containerFilter(HeaderFactory))
