@@ -45,8 +45,13 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
       .and(getNode("/red", gen("Red", "/blue", Color.RED)))
       .and(getNode("/blue", gen("Blue", "/yellow", Color.BLUE)))
       .and(getNode("/yellow", gen("Yellow", "/red", Color.YELLOW)))
-
-      // Alternative names: with, apply, map
+      .path("/colors", 
+        EmptyRoute
+          .and(getNode("/green", gen("Green","./red", Color.GREEN)))
+          .and(getNode("/red", gen("Red", "./green", Color.RED)))
+      )
+      // Alternative names: with, apply, map, use, modify, wrap, transform
+      // enhancer, operations
       .filter(Filters.FullscreenFilter(true))
       //.filter(RouteUtils.sideTransitionFilter(1))
       .filter(RouteUtils.containerFilter(HeaderFactory))

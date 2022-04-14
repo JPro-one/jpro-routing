@@ -10,3 +10,4 @@ out/
 .history
 .bloop
 example/logs/*
+example/RUNNING_PID

@@ -31,7 +31,9 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
   def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
-      case Redirect(url) => gotoURL(url)
+      case Redirect(url) => 
+        println(s"redirect: ${_url} -> $url")
+        gotoURL(url)
       case view: View =>
         val oldView = this.view
         this.view = view
