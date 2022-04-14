@@ -2,7 +2,7 @@ package com.jpro.routing
 import simplefx.all
 
 object Filters {
-  def FullscreenFilter(fullscreenValue: Boolean): Route => Route = { route => { request =>
+  def FullscreenFilter(fullscreenValue: Boolean): Filter = { route => { request =>
       route.apply(request).map {
         case x: View =>
           new View {

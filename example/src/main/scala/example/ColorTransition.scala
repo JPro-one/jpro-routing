@@ -54,8 +54,7 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
       // enhancer, operations
       .filter(Filters.FullscreenFilter(true))
       //.filter(RouteUtils.sideTransitionFilter(1))
-      .filter(RouteUtils.containerFilter(HeaderFactory))
-      .filter(RouteUtils.containerFilter(HeaderFactory))
+      .filter(RouteUtils.containerFilter(HeaderFactory) compose RouteUtils.containerFilter(HeaderFactory))
       .filter(RouteUtils.containerFilter(HeaderFactory))
   )
 }

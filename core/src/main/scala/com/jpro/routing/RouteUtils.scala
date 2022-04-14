@@ -85,7 +85,7 @@ object RouteUtils {
     override def content: all.Node = x
   }
 
-  def containerFilter[A <: javafx.scene.Node](containerLogic: ContainerFactory): Route => Route = route => request => {
+  def containerFilter[A <: javafx.scene.Node](containerLogic: ContainerFactory): Filter = route => request => {
     var container: Node = null
     val request2: Request = if(containerLogic.isContainer(request.oldContent)) {
       container = request.oldContent

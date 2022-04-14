@@ -26,5 +26,5 @@ trait Route {
       FXFuture.unit(null)
     }
   })
-  def filter(filter: Route=>Route): Route = filter(this)
+  def filter(filter: Filter): Route = filter(this)
 }
