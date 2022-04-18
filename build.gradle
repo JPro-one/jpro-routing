@@ -27,9 +27,23 @@ configure([project(':core'),project(':example')]) {
   apply plugin: 'de.sandec.simplefx'
   apply plugin: 'org.openjfx.javafxplugin'
 
+  compileScala {
+    targetCompatibility = "1.8"
+  }
+
   javafx {
     version = "$JAVAFX_VERSION"
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
+  }
+
+  test {
+    useJUnitPlatform()
+
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    testLogging.showExceptions true
+    testLogging.showCauses true
+    testLogging.showStackTraces true
   }
 }
 
@@ -46,22 +60,9 @@ configure([project(':core')]) {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
   }
 
-  compileScala {
-    targetCompatibility = "1.8"
-  }
 
   group = 'com.sandec.jpro'
   version = "$JPRO_WEB_VERSION"
-
-  test {
-    useJUnitPlatform()
-
-    testLogging.showStandardStreams = true
-    testLogging.exceptionFormat org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-    testLogging.showExceptions true
-    testLogging.showCauses true
-    testLogging.showStackTraces true
-  }
 
   publishing {
     publications {
@@ -91,8 +92,8 @@ configure([project(':core')]) {
 
 configure([project(':example')]) {
   apply plugin: 'com.sandec.jpro'
-  //mainClassName = "example.TestWebApplication"
-  mainClassName = "example.ColorTransitionApp"
+  mainClassName = "example.TestWebApplication"
+  //mainClassName = "example.ColorTransitionApp"
   dependencies {
     implementation project(':core')
     implementation 'org.controlsfx:controlsfx:11.1.1'
