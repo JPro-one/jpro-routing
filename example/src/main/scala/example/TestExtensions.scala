@@ -7,13 +7,16 @@ import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.all._
 import simplefx.core._
+import simplefx.experimental._
 
 import java.util.function.Supplier
 import com.jpro.routing.extensions.linkheader.LinkHeaderFilter
 import com.jpro.routing.extensions.linkheader.LinkHeaderFilter.Link
+import fr.brouillard.oss.cssfx.CSSFX
 
 
 class TestExtensionsApp(stage: Stage) extends WebApp(stage) {
+  stylesheets <++ "/com/jpro/routing/extensions/linkheader/css/linkheader.css"
   
   setRoute(
     EmptyRoute /* StartRoute? */
@@ -22,6 +25,8 @@ class TestExtensionsApp(stage: Stage) extends WebApp(stage) {
       .and(getNode("/secret", () => new Label("SECRET")))
       .filter(LinkHeaderFilter.create(Link("HOME","/home"), Link("SECRET","/secret")))
   )
+
+  CSSFX.start()
 }
 
 

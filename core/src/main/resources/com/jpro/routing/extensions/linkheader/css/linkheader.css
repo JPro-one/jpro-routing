@@ -1,0 +1,12 @@
+
+.linkheader-link-hbox {
+  -fx-alignment: center;
+  -fx-padding: 16px;
+  -fx-spacing: 24px;
+}
+.linkheader-link {
+  -fx-font-size: 30;
+}
+.linkheader-link.selected {
+  -fx-underline: true;
+}

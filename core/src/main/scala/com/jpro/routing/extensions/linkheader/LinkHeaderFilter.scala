@@ -21,8 +21,10 @@ object LinkHeaderFilter {
     class MyContainer extends VBox with Container {
   
       this <++  new HBox {
+        styleClass ::= "linkheader-link-hbox"
         x.map { link =>        
           this <++ new Label {
+            styleClass ::= "linkheader-link"
             text <-- link.name
             when (request != null && request.path.startsWith(link.prefix)) ==> {
               styleClass ::= "selected"
