@@ -27,6 +27,7 @@ configure([project(':core'),project(':example')]) {
   apply plugin: 'de.sandec.simplefx'
   apply plugin: 'org.openjfx.javafxplugin'
 
+  targetCompatibility = "11"
   compileScala {
     targetCompatibility = "1.8"
   }
