@@ -21,8 +21,8 @@ class TestExtensionsApp(stage: Stage) extends WebApp(stage) {
   setRoute(
     EmptyRoute /* StartRoute? */
       .and(redirect("/", "/home"))
-      .and(getNode("/home", () => new Label("HOME")))
-      .and(getNode("/secret", () => new Label("SECRET")))
+      .and(getNode("/home", (r) => new Label("HOME")))
+      .and(getNode("/secret", (r) => new Label("SECRET")))
       .filter(LinkHeaderFilter.create(Link("HOME","/home"), Link("SECRET","/secret")))
   )
 

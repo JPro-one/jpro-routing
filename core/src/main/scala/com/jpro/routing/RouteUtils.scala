@@ -11,10 +11,10 @@ object RouteUtils {
 
   val EmptyRoute: Route = (x) => null
 
-  def redirect(path: String, to: String): Route = get("/", () => Redirect(to))
+  def redirect(path: String, to: String): Route = get("/", (r) => Redirect(to))
 
-  def get(path: String, f: Supplier[Response]): Route = (request: Request) => if(request.path == path) FXFuture.unit(f.get()) else null
-  def getNode(path: String, node: Supplier[Node]): Route = (request: Request) => if(request.path == path) FXFuture.unit(viewFromNode(node.get())) else null
+  def get(path: String, f: Function[Request,Response]): Route = (request: Request) => if(request.path == path) FXFuture.unit(f.apply(request)) else null
+  def getNode(path: String, node: Function[Request,Node]): Route = (request: Request) => if(request.path == path) FXFuture.unit(viewFromNode(node.apply(request))) else null
 
   implicit def toRoute(f: Response => FXFuture[Request]): Route = new Route {
     override def apply(r: Request): FXFuture[Response] = f(r)

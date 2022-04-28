@@ -18,11 +18,11 @@ class MyApp(stage: Stage) extends WebApp(stage) {
 
   setRoute(
     EmptyRoute
-      .and(get("", () => new MainView))
-      .and(get("/", () => new MainView))
-      .and(get("/?page=main", () => new MainView))
-      .and(get("/?page=green", () => new GreenView))
-      .and(get("/?page=orange", () => new OrangeView))
+      .and(get("", (r) => new MainView))
+      .and(get("/", (r) => new MainView))
+      .and(get("/?page=main", (r) => new MainView))
+      .and(get("/?page=green", (r) => new GreenView))
+      .and(get("/?page=orange", (r) => new OrangeView))
   )
 
   //addRouteScala { case ""                => new MainView()}
@@ -37,7 +37,7 @@ class MyApp(stage: Stage) extends WebApp(stage) {
   addRouteScala { case "/?page=leak"       => new LeakingPage()}
   addRouteScala { case "/?page=collect"       => new CollectingPage()}
   addRouteScala { case "/?page=jmemorybuddy"       => new JMemoryBuddyPage()}
-  addRouteScala { case "/?page=it's\" tricky" => new MainView()}
+  addRouteScala { case "/it's\" tricky" => new MainView()}
   addRouteScala { case x                  => new UnknownPage(x)}
 
  // addTransition{ case (null,view2,true ) => PageTransition.InstantTransition }
@@ -57,7 +57,7 @@ class Header(view: View, sessionManager: SessionManager) extends HBox {
   this <++ new HeaderLink("main"    , "/?page=main")
   this <++ new HeaderLink("subpage" , "/?page=sub" )
   this <++ new HeaderLink("redirect", "/?page=redirect" )
-  this <++ new HeaderLink("tricky!" , "/?page=it's\" tricky" )
+  this <++ new HeaderLink("tricky!" , "/it's\" tricky" )
   this <++ new HeaderLink("google"  , "http://google.com" )
   this <++ new HeaderLink("paralax" , "/?page=paralax" )
   this <++ new HeaderLink("dead"    , "/?page=as df" )

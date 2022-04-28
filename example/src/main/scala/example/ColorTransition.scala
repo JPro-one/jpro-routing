@@ -30,7 +30,7 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
     else in
   }
   def toHexString(value: Color): String = "#" + (format(value.getRed) + format(value.getGreen) + format(value.getBlue) + format(value.getOpacity)).toUpperCase
-  def gen(x: String, next: String, color: Color): Supplier[Node] = () => new StackPane {
+  def gen(x: String, next: String, color: Color): Function[Request,Node] = (r) => new StackPane {
     LinkUtil.setLink(this,next)
     this <++ new Label(x) {
       style = "-fx-font-size: 36px;"
