@@ -42,7 +42,7 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
         view.url = url
 
         isFullscreen = view.fullscreen
-        webApp.getTransition((THIS.view,view,!pushState)).doTransition(container,oldView,view)
+        container.children = List(view.realContent)
         if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null

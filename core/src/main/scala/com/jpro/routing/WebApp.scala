@@ -60,16 +60,6 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
   }
 
 
-  var transitionRoute: PartialFunction[(View,View,Boolean), PageTransition] = PartialFunction.empty
-  var defaultTransition: PageTransition = PageTransition.InstantTransition
-  def addTransition(fun: PartialFunction[(View,View,Boolean), PageTransition]): Unit = {
-    transitionRoute = transitionRoute orElse fun
-  }
-  def getTransition(x: (View,View,Boolean)): PageTransition = transitionRoute.lift(x).getOrElse(defaultTransition)
-
-  //def changeContent(parent: StackPane, oldNode: Node, newContent: Node)
-  //children <-- List(sessionManager.page)
-
   def start(sessionManager: SessionManager) = {
     SessionManagerContext.setContext(this, sessionManager)
     sessionManager.start()

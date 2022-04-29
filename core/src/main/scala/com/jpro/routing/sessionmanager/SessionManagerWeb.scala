@@ -40,8 +40,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
 
         view.isMobile = webAPI.isMobile
 
-        //setView() ???
-        webApp.getTransition((THIS.view,view,!pushState)).doTransition(webApp,THIS.view,view)
+        webApp.children = List(view.realContent)
         if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null

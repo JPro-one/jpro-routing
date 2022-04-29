@@ -47,10 +47,8 @@ object RouteUtils {
         val newNode = x.content
         val t = (seconds s)
         if(oldNode == null) {
-          println("AAA")
           x
         } else {
-          println("BBB")
           val startTime: Time = systemTime
           def timeLeft: Time = (startTime + (seconds * second)) - time
           def progress: Double = 1.0 - (timeLeft / (seconds * second))
