@@ -16,7 +16,7 @@ buildscript {
   }
 }
 
-configure([project(':core'),project(':example')]) {
+configure([project(':core'),project(':example'), project(':dev')]) {
   repositories {
     jcenter()
     maven {
@@ -48,7 +48,7 @@ configure([project(':core'),project(':example')]) {
   }
 }
 
-configure([project(':core')]) {
+configure([project(':core'),project(':dev')]) {
   apply plugin: 'java'
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
@@ -89,15 +89,22 @@ configure([project(':core')]) {
 
 }
 
-
+configure([project(':dev')]) {
+  dependencies {
+    implementation project(':core')
+    implementation "fr.brouillard.oss:cssfx:11.5.0"
+    implementation 'net.raumzeitfalle.fx:scenic-view:11.0.2'
+  }
+}
 
 configure([project(':example')]) {
   apply plugin: 'com.sandec.jpro'
   //mainClassName = "example.TestWebApplication"
-  mainClassName = "example.TestExtensions"
-  //mainClassName = "example.ColorTransitionApp"
+  //mainClassName = "example.TestExtensions"
+  mainClassName = "example.ColorTransitionApp"
   dependencies {
     implementation project(':core')
+    implementation project(':dev')
     implementation 'org.controlsfx:controlsfx:11.1.1'
     implementation "fr.brouillard.oss:cssfx:11.5.0"
   }

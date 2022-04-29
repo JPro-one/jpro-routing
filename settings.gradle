@@ -1,2 +1,3 @@
 include "core"
 include "example"
+include "dev"

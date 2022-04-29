@@ -6,8 +6,9 @@ import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.all._
 import simplefx.core._
-
+//import com.jpro.routing
 import java.util.function.Supplier
+import com.jpro.routing.dev.DevFilter
 
 object HeaderFactory extends RouteUtils.SFXContainerFactory {
   override def createContainer() = new MyContainer
@@ -54,7 +55,8 @@ class ColorTransition(stage: Stage) extends WebApp(stage) {
       // enhancer, operations
       .filter(Filters.FullscreenFilter(true))
       //.filter(RouteUtils.sideTransitionFilter(1))
-      .filter(RouteUtils.containerFilter(HeaderFactory) compose RouteUtils.containerFilter(HeaderFactory))
+      .filter(DevFilter.createDevFilter())
+      //.filter(RouteUtils.containerFilter(HeaderFactory) compose RouteUtils.containerFilter(HeaderFactory))
       .filter(RouteUtils.containerFilter(HeaderFactory))
   )
 }
