@@ -20,14 +20,7 @@ object RouteUtils {
     override def apply(r: Request): FXFuture[Response] = f(r)
   }
 
-  def withStackpane: Route => Route = (route: Route) => { request: Request => {
-    route.apply(request).map {
-      case x: View => x.mapContent(n => new StackPane(n))
-      case x => x
-    }
-  }}
-
-  def transitionFilter(seconds: Double): Route => Route = route => { request => {
+  def transitionFilter(seconds: Double): Filter = route => { request => {
     route.apply(request).map{
       case x: View =>
         val oldNode = request.oldContent
@@ -47,15 +40,17 @@ object RouteUtils {
       case x => x
     }
   }}
-  def sideTransitionFilter(seconds: Double): Route => Route = route => { request => {
+  def sideTransitionFilter(seconds: Double): Filter = route => { request => {
     route.apply(request).map{
       case x: View =>
         val oldNode = request.oldContent
         val newNode = x.content
         val t = (seconds s)
         if(oldNode == null) {
+          println("AAA")
           x
         } else {
+          println("BBB")
           val startTime: Time = systemTime
           def timeLeft: Time = (startTime + (seconds * second)) - time
           def progress: Double = 1.0 - (timeLeft / (seconds * second))

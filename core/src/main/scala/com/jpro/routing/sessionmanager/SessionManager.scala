@@ -49,7 +49,8 @@ trait SessionManager { THIS =>
   def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit
 
   def getView(url: String): FXFuture[Response] = {
-    webApp.route(url)
+    val node = if(view == null) null else view.realContent
+    webApp.route(url, node)
   }
 
   def start(): Unit
