@@ -2,17 +2,28 @@ package  com.jpro.routing.dev
 
 import simplefx.core._
 import simplefx.all._
+import simplefx.experimental._
 import org.scenicview.ScenicView
 import com.jpro.routing.RouteUtils
 import com.jpro.routing.Filter
 import fr.brouillard.oss.cssfx.CSSFX
 import com.jpro.routing.LinkUtil
+import de.sandec.jmemorybuddy.JMemoryBuddyLive
 
 object DevFilter {
 
   object DevFilterContainerFactory extends RouteUtils.SFXContainerFactory {
     override def createContainer() = new MyContainer
     class MyContainer extends VBox with Container {
+      @Bind var report:JMemoryBuddyLive.Report = <-- {
+        request;
+
+      }
+      request --> updateReport
+      def updateReport(): Unit = {
+        System.gc()
+        JMemoryBuddyLive.getReport()
+      }
   
       this <++ new HBox {
         this <++ new Button("<") {
@@ -37,6 +48,19 @@ object DevFilter {
             onAction --> {
                 ScenicView.show(this)
             }
+        }
+        this <++ new Label {
+          text <-- ("Pages uncollected: " + report.uncollectedEntries.size())
+          onClick --> {e => ???}
+        }
+        this <++ new Button() {
+          onAction --> {
+            updateReport()
+            in(1 s) --> updateReport()
+          }
+        }
+        this <++ new Label() {
+          text <-- ("request: " + request)
         }
       }
       this <++ new StackPane {

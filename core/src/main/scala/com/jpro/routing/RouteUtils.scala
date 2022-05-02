@@ -47,7 +47,7 @@ object RouteUtils {
         val newNode = x.content
         val t = (seconds s)
         if(oldNode == null) {
-          x
+          x.mapContent(x => x)
         } else {
           val startTime: Time = systemTime
           def timeLeft: Time = (startTime + (seconds * second)) - time

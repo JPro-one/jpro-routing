@@ -16,6 +16,7 @@ abstract class View extends Response { THIS =>
   def saveScrollPosition = true
   def fullscreen = false
   def onClose(): Unit = {}
+  def subView(): View = null
 
   /**
    * Only overwrite this method, if you handle the url-change by yourself.
@@ -32,6 +33,8 @@ abstract class View extends Response { THIS =>
     override def content: all.Node = cachedContent
 
     override def fullscreen: Boolean = THIS.fullscreen
+
+    override def subView(): View = THIS
   }
 }
 

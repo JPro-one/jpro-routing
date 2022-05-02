@@ -43,10 +43,10 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
 
         isFullscreen = view.fullscreen
         container.children = List(view.realContent)
-        if(THIS.view != null && THIS.view != view) {
-          THIS.view.onClose()
-          THIS.view.sessionManager = null
-          markViewCollectable(THIS.view)
+        if(oldView != null && oldView != view) {
+          oldView.onClose()
+          oldView.sessionManager = null
+          markViewCollectable(oldView, view)
         }
         THIS.view = view
 

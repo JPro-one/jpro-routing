@@ -58,6 +58,19 @@ trait SessionManager { THIS =>
   def markViewCollectable(view: View): Unit = {
     JMemoryBuddyLive.markCollectable(s"Page url: ${view.url} title: ${view.title}", view.realContent)
   }
+  def markViewCollectable(oldView: View, newView: View): Unit = {
+    //println("depths: " + viewDepth(oldView) + " - " + viewDepth(newView))
+    if(oldView.realContent != newView.realContent) {
+      //println("nodes: " + oldView.realContent + " - " + newView.realContent)
+      JMemoryBuddyLive.markCollectable(s"Page url: ${oldView.url} title: ${oldView.title}", oldView.realContent)
+    }
+    if(oldView.subView() != null && newView.subView != null) {
+      markViewCollectable(oldView.subView(), newView.subView())
+    }
+  }
+  def viewDepth(x: View): Int = {
+    if(x.subView() == null) 1 else 1 + viewDepth(x.subView())
+  }
 }
 
 object SessionManager {

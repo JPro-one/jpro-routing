@@ -44,7 +44,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
         if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null
-          markViewCollectable(THIS.view)
+          markViewCollectable(THIS.view, view)
         }
         THIS.view = view
 
