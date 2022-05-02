@@ -15,14 +15,12 @@ object DevFilter {
   object DevFilterContainerFactory extends RouteUtils.SFXContainerFactory {
     override def createContainer() = new MyContainer
     class MyContainer extends VBox with Container {
-      @Bind var report:JMemoryBuddyLive.Report = <-- {
-        request;
-
-      }
+      @Bind var report:JMemoryBuddyLive.Report = JMemoryBuddyLive.getReport()
       request --> updateReport
       def updateReport(): Unit = {
+        println("Calling GC (DevFilter)")
         System.gc()
-        JMemoryBuddyLive.getReport()
+        report = JMemoryBuddyLive.getReport()
       }
   
       this <++ new HBox {
