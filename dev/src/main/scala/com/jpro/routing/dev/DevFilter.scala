@@ -58,7 +58,7 @@ object DevFilter {
           }
         }
         this <++ new Label() {
-          text <-- ("request: " + request)
+          text <-- (if(request == null) "-" else "request: " + request)
         }
       }
       this <++ new StackPane {
