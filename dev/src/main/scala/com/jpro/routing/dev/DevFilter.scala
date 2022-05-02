@@ -36,7 +36,9 @@ object DevFilter {
         }
         this <++ new TextField {
           request --> {
-            this.text = request.path
+            if(request != null) {
+              this.text = request.path
+            }
           }
           onAction --> {
             LinkUtil.gotoPage(this,getText())
