@@ -46,7 +46,7 @@ object DevFilter {
         }
         this <++ new Button("Scenic View") {
             onAction --> {
-                ScenicView.show(this)
+                ScenicView.show(this.scene)
             }
         }
         this <++ new Label {
@@ -59,9 +59,9 @@ object DevFilter {
             in(1 s) --> updateReport()
           }
         }
-        this <++ new Label() {
-          text <-- (if(request == null) "-" else "request: " + request)
-        }
+        //this <++ new Label() {
+        //  text <-- (if(request == null) "-" else "request: " + request)
+        //}
       }
       this <++ new StackPane {
         javafx.scene.layout.VBox.setVgrow(this, Priority.ALWAYS)
