@@ -5,6 +5,7 @@ import collection.JavaConverters._
 import com.jpro.routing.RouteUtils
 import simplefx.core._
 import simplefx.all._
+import simplefx.experimental._
 import com.jpro.routing.LinkUtil
 
 object LinkHeaderFilter {
@@ -27,7 +28,7 @@ object LinkHeaderFilter {
             styleClass ::= "linkheader-link"
             text <-- link.name
             when (request != null && request.path.startsWith(link.prefix)) ==> {
-              styleClass ::= "selected"
+              styleClass <++ "selected"
             }
             LinkUtil.setLink(this, link.prefix, link.name)
           }
