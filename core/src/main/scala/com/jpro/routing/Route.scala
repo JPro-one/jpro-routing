@@ -1,6 +1,7 @@
 package com.jpro.routing
 
 import simplefx.experimental._
+import java.util.function.Predicate
 
 @FunctionalInterface
 trait Route {
@@ -27,4 +28,7 @@ trait Route {
     }
   })
   def filter(filter: Filter): Route = filter(this)
+  def when(cond: Predicate[Request], _then: Route, _else: Route): Route = r => {
+    if(cond.test(r)) _then(r) else _else(r)
+  }
 }
