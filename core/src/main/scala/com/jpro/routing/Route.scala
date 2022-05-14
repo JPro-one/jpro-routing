@@ -24,14 +24,14 @@ trait Route {
       val r2 = r.copy(path = r.path.drop(path.length))
       route.apply(r2)
     } else {
-      FXFuture.unit(null)
+      null
     }
   })
   def filter(filter: Filter): Route = filter(this)
-  def when(cond: Predicate[Request], _then: Route): Route = r => {
-    if(cond.test(r)) _then(r) else FXFuture.unit(null)
-  }
-  def when(cond: Predicate[Request], _then: Route, _else: Route): Route = r => {
+  def when(cond: Predicate[Request], _then: Route): Route = and(r => {
+    if(cond.test(r)) _then(r) else null
+  })
+  def when(cond: Predicate[Request], _then: Route, _else: Route): Route = and(r => {
     if(cond.test(r)) _then(r) else _else(r)
-  }
+  })
 }

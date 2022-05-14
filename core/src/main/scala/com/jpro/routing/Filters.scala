@@ -3,7 +3,9 @@ import simplefx.all
 
 object Filters {
   def FullscreenFilter(fullscreenValue: Boolean): Filter = { route => { request =>
-      route.apply(request).map {
+      val r = route.apply(request)
+      if(r == null) null
+      else route.apply(request).map {
         case x: View =>
           new View {
             override def title: String = x.title

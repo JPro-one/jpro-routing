@@ -86,7 +86,9 @@ object RouteUtils {
     } else {
       request
     }
-    route(request2).map{
+    val r = route(request2)
+    if(r == null) null
+    else r.map{
       case view: View =>
         if(container == null) {
           container = containerLogic.createContainer()

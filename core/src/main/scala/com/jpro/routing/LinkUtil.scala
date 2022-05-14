@@ -61,6 +61,7 @@ object LinkUtil {
   }
   def refresh(node: Node): Unit = {
     val man = LinkUtil.getSessionManager(node)
+    assert(man.url != null)
     man.gotoURL(man.url)
   }
 
