@@ -5,7 +5,7 @@ object Filters {
   def FullscreenFilter(fullscreenValue: Boolean): Filter = { route => { request =>
       val r = route.apply(request)
       if(r == null) null
-      else route.apply(request).map {
+      else r.map {
         case x: View =>
           new View {
             override def title: String = x.title
