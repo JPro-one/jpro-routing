@@ -13,6 +13,8 @@ import de.sandec.jmemorybuddy.JMemoryBuddyLive
 object DevFilter {
 
   object DevFilterContainerFactory extends RouteUtils.SFXContainerFactory {
+
+    override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
     override def createContainer() = new MyContainer
     class MyContainer extends VBox with Container {
       @Bind var report:JMemoryBuddyLive.Report = JMemoryBuddyLive.getReport()

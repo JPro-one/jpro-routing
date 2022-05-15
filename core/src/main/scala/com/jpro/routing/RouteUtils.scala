@@ -105,9 +105,11 @@ object RouteUtils {
 
 
   abstract class SFXContainerFactory extends ContainerFactory {
-    override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
+    def isContainer(x: Node): Boolean
     override def setContent(c: Node, x: Node): Unit = c.asInstanceOf[MyContainer].content = x
-    override def getContent(c: Node): Node = c.asInstanceOf[MyContainer].content
+    override def getContent(c: Node): Node = {
+      c.asInstanceOf[MyContainer].content
+    }
     override def setRequest(c: Node, r: Request): Unit = c.asInstanceOf[MyContainer].request = r
 
     type MyContainer <: Container with Node

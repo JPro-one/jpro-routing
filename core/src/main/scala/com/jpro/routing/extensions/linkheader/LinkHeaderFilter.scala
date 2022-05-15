@@ -18,6 +18,7 @@ object LinkHeaderFilter {
     RouteUtils.containerFilter(new LinkHeaderFilter.LinkHeaderContainer(x))
   }
   private class LinkHeaderContainer(x: List[Link]) extends RouteUtils.SFXContainerFactory {
+    override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
     override def createContainer() = new MyContainer
     class MyContainer extends VBox with Container {
   
