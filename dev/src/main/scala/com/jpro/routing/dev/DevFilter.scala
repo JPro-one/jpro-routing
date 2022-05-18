@@ -17,6 +17,8 @@ object DevFilter {
     override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
     override def createContainer() = new MyContainer
     class MyContainer extends VBox with Container {
+      override def toString(): String = s"DevFilter(content=$content)"
+
       @Bind var report:JMemoryBuddyLive.Report = JMemoryBuddyLive.getReport()
       request --> updateReport
       def updateReport(): Unit = {

@@ -28,8 +28,19 @@ trait Route {
     }
   })
   def filter(filter: Filter): Route = filter(this)
+  def filterWhen(cond: Predicate[Request], filter: Filter): Route = { r =>
+    if(cond.test(r)) {
+      filter(this).apply(r)
+    } else {
+      this.apply(r)
+    }
+  }
   def when(cond: Predicate[Request], _then: Route): Route = and(r => {
-    if(cond.test(r)) _then(r) else null
+    val condResult = cond.test(r)
+    val r2: FXFuture[Response] = if(condResult) _then(r) else null
+    println("got condResult: " + condResult)
+    println("got R: " + r2)
+    r2
   })
   def when(cond: Predicate[Request], _then: Route, _else: Route): Route = and(r => {
     if(cond.test(r)) _then(r) else _else(r)

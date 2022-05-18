@@ -11,6 +11,8 @@ import java.util.function.Supplier
 import com.jpro.routing.dev.DevFilter
 
 object HeaderFactory extends RouteUtils.SFXContainerFactory {
+
+  override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
   override def createContainer() = new MyContainer
   class MyContainer extends VBox with Container {
 
