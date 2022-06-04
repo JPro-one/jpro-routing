@@ -18,6 +18,8 @@ abstract class View extends Response { THIS =>
   def onClose(): Unit = {}
   def subView(): View = null
 
+  override def toString(): String = s"View($realContent, $title)"
+
   /**
    * Only overwrite this method, if you handle the url-change by yourself.
    * @param the path

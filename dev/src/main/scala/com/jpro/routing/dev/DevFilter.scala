@@ -57,7 +57,7 @@ object DevFilter {
           text <-- ("Pages uncollected: " + report.uncollectedEntries.size())
           onClick --> {e => ???}
         }
-        this <++ new Button() {
+        this <++ new Button("Force GC") {
           onAction --> {
             updateReport()
             in(1 s) --> updateReport()
@@ -68,6 +68,7 @@ object DevFilter {
         //}
       }
       this <++ new StackPane {
+        pickOnBounds = false
         javafx.scene.layout.VBox.setVgrow(this, Priority.ALWAYS)
         children <-- (if(content != null) List(content) else Nil)
       }
