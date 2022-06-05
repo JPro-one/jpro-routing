@@ -17,6 +17,9 @@ object DevFilter {
     override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
     override def createContainer() = new MyContainer
     class MyContainer extends VBox with Container {
+      stylesheets <++ "/com/jpro/routing/dev/devfilter.css"
+
+      styleClass <++ "devfilter-vbox"
       override def toString(): String = s"DevFilter(content=$content)"
 
       @Bind var report:JMemoryBuddyLive.Report = JMemoryBuddyLive.getReport()
@@ -28,12 +31,15 @@ object DevFilter {
       }
   
       this <++ new HBox {
+        styleClass <++ "devfilter-hbox"
         this <++ new Button("<") {
+          styleClass ::= "devfilter-icon-button"
           onAction --> {
             LinkUtil.goBack(this)
           }
         }
         this <++ new Button(">") {
+          styleClass ::= "devfilter-icon-button"
           onAction --> {
             LinkUtil.goForward(this)
           }
