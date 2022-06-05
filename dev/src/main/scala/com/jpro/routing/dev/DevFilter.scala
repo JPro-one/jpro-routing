@@ -44,6 +44,13 @@ object DevFilter {
             LinkUtil.goForward(this)
           }
         }
+        this <++ new Button("↻") {
+          styleClass ::= "devfilter-icon-button"
+          onAction --> {
+            LinkUtil.refresh(this)
+          }
+        }
+        
         this <++ new TextField {
           request --> {
             if(request != null) {
