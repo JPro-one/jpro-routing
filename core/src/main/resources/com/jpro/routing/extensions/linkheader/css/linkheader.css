@@ -5,7 +5,7 @@
   -fx-spacing: 24px;
 }
 .linkheader-link {
-  -fx-font-size: 30;
+  -fx-font-size: 24;
 }
 .linkheader-link.selected {
   -fx-underline: true;
