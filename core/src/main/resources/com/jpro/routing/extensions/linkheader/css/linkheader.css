@@ -1,8 +1,8 @@
 
 .linkheader-link-hbox {
   -fx-alignment: center;
-  -fx-padding: 16px;
-  -fx-spacing: 24px;
+  -fx-padding: 12px;
+  -fx-spacing: 20px;
 }
 .linkheader-link {
   -fx-font-size: 24;
