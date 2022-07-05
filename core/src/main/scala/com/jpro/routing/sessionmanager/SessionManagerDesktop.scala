@@ -64,7 +64,8 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     fitToWidth = true
     content <-- container
     fitToHeight <-- isFullscreen
-    padding = Insets(0)
+    //this.padding = Insets(0)
+    style = "-fx-padding: 0;"
     background = Background.EMPTY
     vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.ALWAYS)
   }
