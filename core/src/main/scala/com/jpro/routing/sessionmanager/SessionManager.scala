@@ -11,6 +11,8 @@ import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
 import java.net.URI
+import java.util.function.Consumer
+import java.awt.Desktop
 
 
 trait SessionManager { THIS =>
@@ -34,7 +36,14 @@ trait SessionManager { THIS =>
 
   def goBack(): Unit
   def goForward(): Unit
-  def gotoURL(url: String): Unit = gotoURL(url,true,true)
+  def isExternal(x: String): Boolean = url.contains("http")
+  def gotoURL(url: String): Unit = {
+    if(isExternal(url)) {
+      SessionManager.externalLinkImpl.accept(url)
+    } else {
+      gotoURL(url,true,true)
+    }
+  }
   def gotoURL(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     val url2 = SessionManager.mergeURLs(THIS.url, url)
     println(s"goto: $url")
@@ -82,5 +91,15 @@ object SessionManager {
   def mergeURLs(orig: String, next: String): String = {
     if(orig == null) next
     else new URI(orig).resolve(next).toString
+  }
+
+  def setExternalLinkImpl(f: Consumer[String]) = externalLinkImpl = f
+  var externalLinkImpl: Consumer[String] = { url =>
+    // Opens link in the default browser
+    if (Desktop.isDesktopSupported) {
+      Desktop.getDesktop.browse(URI.create(url))
+    } else {
+      println("Desktop is not supported")
+    }
   }
 }
