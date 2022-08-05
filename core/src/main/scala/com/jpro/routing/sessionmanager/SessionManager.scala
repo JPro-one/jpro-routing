@@ -36,7 +36,7 @@ trait SessionManager { THIS =>
 
   def goBack(): Unit
   def goForward(): Unit
-  def isExternal(x: String): Boolean = url.contains("http")
+  def isExternal(x: String): Boolean = x.startsWith("http")
   def gotoURL(url: String): Unit = {
     if(isExternal(url)) {
       SessionManager.externalLinkImpl.accept(url)
