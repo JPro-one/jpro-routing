@@ -28,6 +28,7 @@ configure([project(':core'),project(':example'), project(':dev')]) {
   apply plugin: 'org.openjfx.javafxplugin'
 
   targetCompatibility = "11"
+  sourceCompatibility = "11"
   compileScala {
     targetCompatibility = "1.8"
   }
@@ -101,7 +102,8 @@ configure([project(':example')]) {
   apply plugin: 'com.sandec.jpro'
   //mainClassName = "example.scala.TestWebApplication"
   //mainClassName = "example.scala.TestExtensions"
-  mainClassName = "example.scala.ColorTransitionApp"
+  //mainClassName = "example.scala.ColorTransitionApp"
+  mainClassName = "example.colors.Starter"
   dependencies {
     implementation project(':core')
     implementation project(':dev')
