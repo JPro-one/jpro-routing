@@ -1,4 +1,4 @@
-package example
+package example.scala
 
 
 import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode, redirect}

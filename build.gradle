@@ -99,13 +99,13 @@ configure([project(':dev')]) {
 
 configure([project(':example')]) {
   apply plugin: 'com.sandec.jpro'
-  //mainClassName = "example.TestWebApplication"
-  //mainClassName = "example.TestExtensions"
-  mainClassName = "example.ColorTransitionApp"
+  //mainClassName = "example.scala.TestWebApplication"
+  //mainClassName = "example.scala.TestExtensions"
+  mainClassName = "example.scala.ColorTransitionApp"
   dependencies {
     implementation project(':core')
     implementation project(':dev')
-    implementation 'org.controlsfx:controlsfx:11.1.1'
+    implementation 'org.controlsfx:controlsfx:11.1.2'
     implementation "fr.brouillard.oss:cssfx:11.5.0"
   }
 

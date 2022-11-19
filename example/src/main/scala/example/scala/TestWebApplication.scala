@@ -1,4 +1,4 @@
-package example
+package example.scala
 
 import com.jpro.routing._
 import simplefx.core._
