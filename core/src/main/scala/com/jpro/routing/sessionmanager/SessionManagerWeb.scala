@@ -3,7 +3,7 @@ package com.jpro.routing.sessionmanager
 import java.net.URL
 import java.net.URLDecoder
 
-import com.jpro.routing.{Redirect, Result, View, WebApp}
+import com.jpro.routing.{Redirect, Response, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import simplefx.all._
 import simplefx.core._
@@ -11,12 +11,6 @@ import simplefx.experimental._
 
 
 class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManager { THIS =>
-
-  override def getView(url: String): FXFuture[Result] = {
-    println("getting: " + url)
-    val view = webApp.route(url)
-    view
-  }
 
 
   def goBack(): Unit = {
@@ -35,7 +29,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
     markViewCollectable(THIS.view)
   })
 
-  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
+  def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
       case Redirect(url) => gotoURL(url)
@@ -46,12 +40,11 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
 
         view.isMobile = webAPI.isMobile
 
-        //setView() ???
-        webApp.getTransition((THIS.view,view,!pushState)).doTransition(webApp,THIS.view,view)
+        webApp.children = List(view.realContent)
         if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null
-          markViewCollectable(THIS.view)
+          markViewCollectable(THIS.view, view)
         }
         THIS.view = view
 
@@ -102,8 +95,7 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
   }
 
   def gotoFullEncodedURL(x: String, pushState: Boolean = true, track: Boolean = true): Unit = {
-    val url = new URL(x)
-    gotoURL(URLDecoder.decode(url.getFile(),"UTF-8"), pushState, track)
+    gotoURL(URLDecoder.decode(x,"UTF-8"), pushState, track)
   }
 
   def start() = {
@@ -161,8 +153,8 @@ class SessionManagerWeb(val webApp: WebApp, webAPI: WebAPI) extends SessionManag
                            |  jpro.popstatejava(location.href);
                            |});""".stripMargin)
     webAPI.executeScript(
+      // Back off, browser, I got this...
       """if ('scrollRestoration' in history) {
-        |  // Back off, browser, I got this...
         |  history.scrollRestoration = 'manual';
         |}
       """.stripMargin)

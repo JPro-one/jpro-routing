@@ -1,10 +1,11 @@
 package com.jpro.routing
 
 import com.jpro.routing.sessionmanager.SessionManager
+import simplefx.all
 import simplefx.core._
 import simplefx.all._
 
-abstract class View extends Result {
+abstract class View extends Response { THIS =>
   def title: String
   def description: String
   var url: String = null
@@ -15,6 +16,9 @@ abstract class View extends Result {
   def saveScrollPosition = true
   def fullscreen = false
   def onClose(): Unit = {}
+  def subView(): View = null
+
+  override def toString(): String = s"View($realContent, $title)"
 
   /**
    * Only overwrite this method, if you handle the url-change by yourself.
@@ -22,5 +26,17 @@ abstract class View extends Result {
    * @return whether the view handles the url change
    */
   def handleURL(x: String): Boolean = false
+  def mapContent(f: Node => Node): View = new View {
+    override def title: String = THIS.title
+
+    override def description: String = THIS.description
+
+    lazy val cachedContent = f(THIS.content)
+    override def content: all.Node = cachedContent
+
+    override def fullscreen: Boolean = THIS.fullscreen
+
+    override def subView(): View = THIS
+  }
 }
 

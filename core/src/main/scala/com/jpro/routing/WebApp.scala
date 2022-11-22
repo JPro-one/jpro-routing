@@ -12,7 +12,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   override def layoutChildren(): Unit = {
     if ((this.scene ne null) && WebAPI.isBrowser) {
-      webAPI.requestLayout(this.scene)
+      webAPI.layoutRoot(this.scene)
       super.layoutChildren()
     } else {
       super.layoutChildren()
@@ -21,37 +21,44 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
 
-  var route: PartialFunction[String, FXFuture[Result]] = PartialFunction.empty
-  def addRouteFuture(fun: PartialFunction[String, FXFuture[Result]]): Unit = {
-    route = route orElse fun
+  def setRoute(x: Route): Unit = newRoute = x
+  var newRoute: Route = RouteUtils.EmptyRoute
+
+  def route(s: String, oldView: Node) = {
+    newRoute(Request.fromString(s).copy(oldContent = oldView, origOldContent = oldView))
   }
-  def addRoute(fun: PartialFunction[String, Result]): Unit = {
-    route = route orElse fun.andThen(x => FXFuture(x))
+  def route = {
+    (s: String) => newRoute(Request.fromString(s))
   }
-  def addRouteJava(fun: java.util.function.Function[String,Result]) = {
-    class Extractor[A, B](val f: A => Option[B]) {
-      def unapply(a: A) = f(a)
+  def addRouteScalaFuture(fun: PartialFunction[String, FXFuture[Response]]): Unit = {
+    val oldRoute = newRoute
+    newRoute = (r) => {
+      val res = oldRoute(r)
+      if(res != null) res
+      else fun.lift(r.path).getOrElse(null)
     }
-
-    def unlift[A, B](f: A => Option[B]): PartialFunction[A, B] = {
-      val LocalExtractor = new Extractor(f)
-
-      // Create the PartialFunction from a partial function literal
-      { case LocalExtractor(b) => b }
+  }
+  def addRouteScala(fun: PartialFunction[String, Response]): Unit = {
+    val oldRoute = newRoute
+    newRoute = (r) => {
+      val res = oldRoute(r)
+      if(res != null) res
+      else fun.lift(r.path).map(x => FXFuture(x)).getOrElse(null)
     }
-
-    addRoute(unlift((x: String) => Option(fun(x))))
+  }
+  def addRoute(fun: java.util.function.Function[String,Response]) = {
+    val oldRoute = newRoute
+    newRoute = (r) => {
+      val res = oldRoute(r)
+      if(res != null) res
+      else {
+        val res2 = fun(r.path)
+        if(res2 == null) null
+        else FXFuture(res2)
+      }
+    }
   }
 
-  var transitionRoute: PartialFunction[(View,View,Boolean), PageTransition] = PartialFunction.empty
-  var defaultTransition: PageTransition = PageTransition.InstantTransition
-  def addTransition(fun: PartialFunction[(View,View,Boolean), PageTransition]): Unit = {
-    transitionRoute = transitionRoute orElse fun
-  }
-  def getTransition(x: (View,View,Boolean)): PageTransition = transitionRoute.lift(x).getOrElse(defaultTransition)
-
-  //def changeContent(parent: StackPane, oldNode: Node, newContent: Node)
-  //children <-- List(sessionManager.page)
 
   def start(sessionManager: SessionManager) = {
     SessionManagerContext.setContext(this, sessionManager)

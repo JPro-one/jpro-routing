@@ -3,7 +3,7 @@ package com.jpro.routing.sessionmanager
 import java.net.URL
 import java.net.URLDecoder
 
-import com.jpro.routing.{Redirect, Result, View, WebApp}
+import com.jpro.routing.{Redirect, Response, View, WebApp}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import simplefx.all._
 import simplefx.core._
@@ -12,11 +12,6 @@ import simplefx.experimental._
 
 class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
 
-  override def getView(url: String): FXFuture[Result] = {
-    println("getting: " + url)
-    val view = webApp.route(url)
-    view
-  }
 
   def goBack(): Unit = {
     historyForward = historyCurrent :: historyForward
@@ -33,10 +28,12 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     gotoURL(historyCurrent, false, true)
   }
 
-  def gotoURL(_url: String, x: Result, pushState: Boolean, track: Boolean): Unit = {
+  def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit = {
     val url = URLDecoder.decode(_url,"UTF-8")
     x match {
-      case Redirect(url) => gotoURL(url)
+      case Redirect(url) => 
+        println(s"redirect: ${_url} -> $url")
+        gotoURL(url)
       case view: View =>
         val oldView = this.view
         this.view = view
@@ -45,11 +42,11 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
         view.url = url
 
         isFullscreen = view.fullscreen
-        webApp.getTransition((THIS.view,view,!pushState)).doTransition(container,oldView,view)
-        if(THIS.view != null && THIS.view != view) {
-          THIS.view.onClose()
-          THIS.view.sessionManager = null
-          markViewCollectable(THIS.view)
+        container.children = List(view.realContent)
+        if(oldView != null && oldView != view) {
+          oldView.onClose()
+          oldView.sessionManager = null
+          markViewCollectable(oldView, view)
         }
         THIS.view = view
 
@@ -67,6 +64,9 @@ class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
     fitToWidth = true
     content <-- container
     fitToHeight <-- isFullscreen
+    //this.padding = Insets(0)
+    style = "-fx-padding: 0;"
+    background = Background.EMPTY
     vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.ALWAYS)
   }
   webApp <++ scrollpane

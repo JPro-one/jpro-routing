@@ -1,13 +1,14 @@
-package example
+package example.scala
 
 import com.jpro.routing._
 import simplefx.core._
 import simplefx.all._
-import com.jpro.routing.Util._
+import com.jpro.routing.LinkUtil._
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.{HTMLView, WebAPI}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import org.controlsfx.control.PopOver
+import com.jpro.routing.RouteUtils._
 
 import scala.collection.JavaConverters.asScalaBufferConverter
 
@@ -15,22 +16,29 @@ class MyApp(stage: Stage) extends WebApp(stage) {
 
   stylesheets ::= "test.css"
 
+  setRoute(
+    EmptyRoute
+      .and(get("", (r) => new MainView))
+      .and(get("/", (r) => new MainView))
+      .and(get("/?page=main", (r) => new MainView))
+      .and(get("/?page=green", (r) => new GreenView))
+      .and(get("/?page=orange", (r) => new OrangeView))
+  )
 
-
-  addRoute { case ""                => new MainView()}
-  addRoute { case "/"                => new MainView()}
-  addRoute { case "/?page=main"      => new MainView()}
-  addRoute { case "/?page=green"      => new GreenView()}
-  addRoute { case "/?page=orange"      => new OrangeView()}
-  addRoute { case "/?page=sub"       => new SubView()}
-  addRoute { case "/?page=redirect"  => Redirect("/?page=sub")}
-  addRoute { case "/?page=paralax"   => new ParalaxPage()}
-  addRoute { case "/?page=pdf"       => new PDFTest()}
-  addRoute { case "/?page=leak"       => new LeakingPage()}
-  addRoute { case "/?page=collect"       => new CollectingPage()}
-  addRoute { case "/?page=jmemorybuddy"       => new JMemoryBuddyPage()}
-  addRoute { case "/?page=it's\" tricky" => new MainView()}
-  addRoute { case x                  => new UnknownPage(x)}
+  //addRouteScala { case ""                => new MainView()}
+  //addRouteScala { case "/"                => new MainView()}
+  //addRouteScala { case "/?page=main"      => new MainView()}
+  //addRouteScala { case "/?page=green"      => new GreenView()}
+  //addRouteScala { case "/?page=orange"      => new OrangeView()}
+  addRouteScala { case "/?page=sub"       => new SubView()}
+  addRouteScala { case "/?page=redirect"  => Redirect("/?page=sub")}
+  addRouteScala { case "/?page=paralax"   => new ParalaxPage()}
+  addRouteScala { case "/?page=pdf"       => new PDFTest()}
+  addRouteScala { case "/?page=leak"       => new LeakingPage()}
+  addRouteScala { case "/?page=collect"       => new CollectingPage()}
+  addRouteScala { case "/?page=jmemorybuddy"       => new JMemoryBuddyPage()}
+  addRouteScala { case "/it's\" tricky" => new MainView()}
+  addRouteScala { case x                  => new UnknownPage(x)}
 
  // addTransition{ case (null,view2,true ) => PageTransition.InstantTransition }
  // addTransition{ case (view,view2,true ) => PageTransition.MoveDown }
@@ -49,7 +57,7 @@ class Header(view: View, sessionManager: SessionManager) extends HBox {
   this <++ new HeaderLink("main"    , "/?page=main")
   this <++ new HeaderLink("subpage" , "/?page=sub" )
   this <++ new HeaderLink("redirect", "/?page=redirect" )
-  this <++ new HeaderLink("tricky!" , "/?page=it's\" tricky" )
+  this <++ new HeaderLink("tricky!" , "/it's\" tricky" )
   this <++ new HeaderLink("google"  , "http://google.com" )
   this <++ new HeaderLink("paralax" , "/?page=paralax" )
   this <++ new HeaderLink("dead"    , "/?page=as df" )
@@ -97,7 +105,7 @@ class Footer(sessionManager: SessionManager) extends HBox {
   this <++ new Label("url: " + sessionManager.url)
   this <++ new Button("refresh") {
     onAction --> {
-      Util.refresh(this)
+      LinkUtil.refresh(this)
     }
   }
 }

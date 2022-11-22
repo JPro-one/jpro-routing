@@ -2,12 +2,12 @@ package com.jpro.routing.crawler
 
 import com.jpro.routing.crawl.AppCrawler
 import com.jpro.routing.crawl.AppCrawler._
-import com.jpro.routing.{Util, View, WebApp}
-import org.junit.Test
+import com.jpro.routing.{LinkUtil, View, WebApp}
 import simplefx.all._
 import simplefx.core._
 import TestUtils._
 import simplefx.all
+import org.junit.jupiter.api.Test
 
 class TestAppCrawler {
 
@@ -35,8 +35,8 @@ class TestAppCrawler {
   @Test
   def testCrawlApp(): Unit = {
     def app = new WebApp(null) {
-      addRoute { case "/" => new Page1}
-      addRoute { case "/page2" => new Page2}
+      addRouteScala { case "/" => new Page1}
+      addRouteScala { case "/page2" => new Page2}
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
 
@@ -49,7 +49,7 @@ class TestAppCrawler {
   @Test
   def testEmptyImage(): Unit = {
     def app = new WebApp(null) {
-      addRoute { case "/" => new View {
+      addRouteScala { case "/" => new View {
         override def title: String = ""
 
         override def description: String = ""
@@ -70,7 +70,7 @@ class TestAppCrawler {
         class MyListCell extends ListCell[String] { listCell =>
           listCell.setGraphic(new Label("123") {
             listCell.itemProperty().addListener((p,o,n) => {
-              Util.setLink(this, "/list" + n)
+              LinkUtil.setLink(this, "/list" + n)
             })
           })
         }
@@ -89,7 +89,7 @@ class TestAppCrawler {
       override def description: String = ""
       val content: all.Node = new ScrollPane {
         this.content = new Label() {
-          Util.setLink(this, "/scrollpane")
+          LinkUtil.setLink(this, "/scrollpane")
         }
       }
     }
@@ -118,7 +118,7 @@ class TestAppCrawler {
       val content: Node = new Region() {
         this.sceneProperty.addListener((p,o,n) =>{
           if(n != null) {
-            Util.getSessionManager(this)
+            LinkUtil.getSessionManager(this)
           }
         })
       }

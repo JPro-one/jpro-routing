@@ -11,7 +11,7 @@ import java.net.URLEncoder
 import com.jpro.routing.sessionmanager.SessionManager
 import javafx.collections.ObservableList
 
-object Util {
+object LinkUtil {
 
   def getSessionManager(node: Node): SessionManager = {
     SessionManagerContext.getContext(node)
@@ -54,13 +54,14 @@ object Util {
     SessionManagerContext.getContext(node).goForward()
   }
   def gotoPage(node: Node, url: String) = {
-    Util.getSessionManager(node).gotoURL(url)
+    LinkUtil.getSessionManager(node).gotoURL(url)
   }
   def getCurrentPage(node: Node): String = {
-    Util.getSessionManager(node).url
+    LinkUtil.getSessionManager(node).url
   }
   def refresh(node: Node): Unit = {
-    val man = Util.getSessionManager(node)
+    val man = LinkUtil.getSessionManager(node)
+    assert(man.url != null, "current url was null")
     man.gotoURL(man.url)
   }
 
@@ -110,7 +111,7 @@ object Util {
     }
     if(!WebAPI.isBrowser) {
       node.onMouseClicked --> { e =>
-        if(e.isStillSincePress) Util.getSessionManager(node).gotoURL(link)
+        if(e.isStillSincePress) LinkUtil.getSessionManager(node).gotoURL(link)
       }
     } else {
       var currentParent: ObservableList[Node] = null

@@ -1,3 +1,3 @@
 package com.jpro.routing
 
-trait Result
+trait Response

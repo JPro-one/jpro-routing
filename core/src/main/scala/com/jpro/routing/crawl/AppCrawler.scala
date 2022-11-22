@@ -109,7 +109,9 @@ object AppCrawler {
       toIndex -= crawlNext
       indexed += crawlNext
       val result = inFX {
-        createApp.get().route.lift(crawlNext).getOrElse(FXFuture(null))
+        val r = createApp.get().route(crawlNext)
+        if(r == null) FXFuture.unit(null)
+        else r
       }.await
       result match {
         case Redirect(url) =>
@@ -149,7 +151,7 @@ object AppCrawler {
 
   def getImageURL(x: Image): String = {
     if(x.getUrl == null) return null;
-    val url = simplifyURL(x.getUrl())
+    val url = simplifyAndEncode(x.getUrl())
     if(url.startsWith("http")) {
       url
     } else {
@@ -168,7 +170,18 @@ object AppCrawler {
     home -> "home://",
     "jar:" + fixFile(home) -> "jar:home://",
   )
-  def simplifyURL(x: String): String = {
+  def simplifyAndEncode(x: String) = encodeSlashes(simplifyURL(x))
+  def encodeSlashes(x: String): String = {
+    x.replaceAllLiterally("/1", "/11")
+      .replaceRepeatedly("//", "/1/")
+  }
+  implicit class ExtStr(val x: String) extends AnyVal {
+    def replaceRepeatedly(oldString: String, newString: String): String = {
+      val r = x.replaceAllLiterally(oldString,newString)
+      if(r != x) r.replaceRepeatedly(oldString,newString) else r
+    }
+  }
+  private def simplifyURL(x: String): String = {
     cpTriggers.collectFirst{
       Function.unlift{ (cpTrigger: String) =>
         val split = x.split(cpTrigger)

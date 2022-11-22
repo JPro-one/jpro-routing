@@ -19,7 +19,7 @@ repositories {
     }
 }
 dependencies {
-    implementation "com.sandec.jpro:jpro-web-core:0.9.7"
+    implementation "com.sandec.jpro:jpro-routing-core:0.11.0"
 }
 ```
 ### Maven
@@ -34,7 +34,7 @@ dependencies {
 dependency>
         <groupId>com.sandec.jpro</groupId>
         <artifactId>jpro-web-core</artifactId>
-        <version>0.9.7</version>
+        <version>0.11.0</version>
         <scope>compile</scope>
 </dependency>
 ```
@@ -56,15 +56,15 @@ dependency>
 ### publishing
 local:
 ```gradle
-./gradlew :core:publishToMavenLocal
+./gradlew :core:publishToMavenLocal :dev:publishToMavenLocal
 ```
 
 internal:
 ```gradle
-./gradlew :core:publish
+./gradlew :core:publish :dev:publish
 ```
 
 ### clear cache:
 ```
-find ~/.m2 ~/.gradle | grep jpro-web | grep 0.9.1 | xargs rm -r
+find ~/.m2 ~/.gradle | grep jpro-web | grep <version> | xargs rm -r
 ```

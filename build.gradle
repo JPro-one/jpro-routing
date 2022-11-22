@@ -16,7 +16,7 @@ buildscript {
   }
 }
 
-configure([project(':core'),project(':example')]) {
+configure([project(':core'),project(':example'), project(':dev')]) {
   repositories {
     jcenter()
     maven {
@@ -27,13 +27,29 @@ configure([project(':core'),project(':example')]) {
   apply plugin: 'de.sandec.simplefx'
   apply plugin: 'org.openjfx.javafxplugin'
 
+  targetCompatibility = "11"
+  sourceCompatibility = "11"
+  compileScala {
+    targetCompatibility = "1.8"
+  }
+
   javafx {
     version = "$JAVAFX_VERSION"
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
   }
+
+  test {
+    useJUnitPlatform()
+
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    testLogging.showExceptions true
+    testLogging.showCauses true
+    testLogging.showStackTraces true
+  }
 }
 
-configure([project(':core')]) {
+configure([project(':core'),project(':dev')]) {
   apply plugin: 'java'
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
@@ -42,23 +58,13 @@ configure([project(':core')]) {
     api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     api "SANDEC:jnodes:$JNODES_VERSION"
     api "de.sandec:JMemoryBuddy:0.5.1"
-    testImplementation "junit:junit:4.13"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
   }
 
-  compileScala {
-    targetCompatibility = "1.8"
-  }
 
   group = 'com.sandec.jpro'
   version = "$JPRO_WEB_VERSION"
-
-  test {
-    testLogging.showStandardStreams = true
-    testLogging.exceptionFormat org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-    testLogging.showExceptions true
-    testLogging.showCauses true
-    testLogging.showStackTraces true
-  }
 
   publishing {
     publications {
@@ -84,14 +90,25 @@ configure([project(':core')]) {
 
 }
 
-
+configure([project(':dev')]) {
+  dependencies {
+    implementation project(':core')
+    implementation "fr.brouillard.oss:cssfx:11.5.0"
+    implementation 'net.raumzeitfalle.fx:scenic-view:11.0.2'
+  }
+}
 
 configure([project(':example')]) {
   apply plugin: 'com.sandec.jpro'
-  mainClassName = "example.TestWebApplication"
+  //mainClassName = "example.scala.TestWebApplication"
+  //mainClassName = "example.scala.TestExtensions"
+  //mainClassName = "example.scala.ColorTransitionApp"
+  mainClassName = "example.colors.Starter"
   dependencies {
     implementation project(':core')
-    implementation 'org.controlsfx:controlsfx:11.1.1'
+    implementation project(':dev')
+    implementation 'org.controlsfx:controlsfx:11.1.2'
+    implementation "fr.brouillard.oss:cssfx:11.5.0"
   }
 
   jpro {

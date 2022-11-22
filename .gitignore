@@ -4,3 +4,12 @@ out/
 */build/
 */out/
 /.idea/
+.metals
+.vscode
+**/bin
+.history
+.bloop
+example/logs/*
+example/RUNNING_PID
+.DS_STORE
+scenicView.properties

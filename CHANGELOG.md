@@ -1,3 +1,6 @@
+## 0.11.0
+* Big rewrite
+
 ## 0.10.0
 * Renamed the project from jpro-web to jpro-routing
 ## 0.9.8
