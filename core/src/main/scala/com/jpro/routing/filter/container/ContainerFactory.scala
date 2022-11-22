@@ -1,5 +1,6 @@
-package com.jpro.routing
+package com.jpro.routing.filter.container
 
+import com.jpro.routing.Request
 import javafx.scene.Node
 
 trait ContainerFactory {
@@ -13,4 +14,3 @@ trait ContainerFactory {
 
   def setRequest(c: Node, r: Request): Unit
 }
-

@@ -12,7 +12,7 @@ class WebApp(stage: Stage) extends StackPane { THIS =>
 
   override def layoutChildren(): Unit = {
     if ((this.scene ne null) && WebAPI.isBrowser) {
-      webAPI.requestLayout(this.scene)
+      webAPI.layoutRoot(this.scene)
       super.layoutChildren()
     } else {
       super.layoutChildren()

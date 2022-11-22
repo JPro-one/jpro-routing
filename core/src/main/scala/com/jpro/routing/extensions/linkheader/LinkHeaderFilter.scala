@@ -1,12 +1,14 @@
 package com.jpro.routing.extensions.linkheader
 
 import com.jpro.routing.Filter
+
 import collection.JavaConverters._
 import com.jpro.routing.RouteUtils
 import simplefx.core._
 import simplefx.all._
 import simplefx.experimental._
 import com.jpro.routing.LinkUtil
+import com.jpro.routing.filter.container.ContainerFilter
 
 object LinkHeaderFilter {
   case class Link(name: String, prefix: String)
@@ -15,7 +17,7 @@ object LinkHeaderFilter {
   def create(x: Link*): Filter = create(x.toList)
   def create(x: java.util.List[Link]): Filter = create(x.asScala.toList)
   def create(x: List[Link]): Filter = {
-    RouteUtils.containerFilter(new LinkHeaderFilter.LinkHeaderContainer(x))
+    ContainerFilter.create(new LinkHeaderFilter.LinkHeaderContainer(x))
   }
   private class LinkHeaderContainer(x: List[Link]) extends RouteUtils.SFXContainerFactory {
     override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]

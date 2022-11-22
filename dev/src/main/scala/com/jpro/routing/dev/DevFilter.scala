@@ -8,6 +8,7 @@ import com.jpro.routing.RouteUtils
 import com.jpro.routing.Filter
 import fr.brouillard.oss.cssfx.CSSFX
 import com.jpro.routing.LinkUtil
+import com.jpro.routing.filter.container.ContainerFilter
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 
 object DevFilter {
@@ -90,6 +91,6 @@ object DevFilter {
 
   def createDevFilter(): Filter = {
     CSSFX.start()
-    RouteUtils.containerFilter(DevFilterContainerFactory)
+    ContainerFilter.create(DevFilterContainerFactory)
   }
 }

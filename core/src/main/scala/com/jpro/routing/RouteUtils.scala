@@ -1,5 +1,6 @@
 package com.jpro.routing
 
+import com.jpro.routing.filter.container.ContainerFactory
 import simplefx.all
 import simplefx.all._
 import simplefx.core._
@@ -78,29 +79,6 @@ object RouteUtils {
     override def content: all.Node = x
   }
 
-  def containerFilter[A <: javafx.scene.Node](containerLogic: ContainerFactory): Filter = route => request => {
-    var container: Node = null
-    val request2: Request = if(containerLogic.isContainer(request.oldContent)) {
-      container = request.oldContent
-      request.mapContent(x => containerLogic.getContent(container))
-    } else {
-      request
-    }
-    val r = route(request2)
-    if(r == null) null
-    else r.map{
-      case view: View =>
-        if(container == null) {
-          container = containerLogic.createContainer()
-        }
-        view.mapContent(x => {
-          containerLogic.setRequest(container, request)
-          containerLogic.setContent(container, view.content)
-          container
-        })
-      case x => x
-    }
-  }
 
 
 
