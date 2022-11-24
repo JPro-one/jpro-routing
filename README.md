@@ -66,5 +66,5 @@ internal:
 
 ### clear cache:
 ```
-find ~/.m2 ~/.gradle | grep jpro-web | grep <version> | xargs rm -r
+find ~/.m2 ~/.gradle | grep jpro-routing | grep <version> | xargs rm -r
 ```
