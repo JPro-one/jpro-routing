@@ -5,6 +5,7 @@ import simplefx.all
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
+import java.util.function.Function
 
 import java.util.function.Supplier
 
