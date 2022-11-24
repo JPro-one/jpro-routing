@@ -60,8 +60,8 @@ configure([project(':core'), project(':dev')]) {
     api "SANDEC:jnodes:$JNODES_VERSION"
     api "de.sandec:JMemoryBuddy:0.5.1"
     api "org.scala-lang:scala-library:2.12.10"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 
     // https://mvnrepository.com/artifact/commons-validator/commons-validator
     api group: 'commons-validator', name: 'commons-validator', version: '1.7'
