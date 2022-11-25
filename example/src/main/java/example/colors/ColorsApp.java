@@ -23,7 +23,7 @@ public class ColorsApp extends RouteApp {
     launch(args);
   }
 
-  public Route getRoute() {
+  public Route createRoute() {
     return EmptyRoute()
             .and(redirect("/", "/green"))
             //.and(CreateMDPages("/documentation1", "resources/something.md"))
