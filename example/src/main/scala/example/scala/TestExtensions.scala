@@ -2,7 +2,7 @@ package example.scala
 
 
 import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode, redirect}
-import com.jpro.routing.{Filters, Redirect, Request, RouteUtils, LinkUtil, WebApp}
+import com.jpro.routing.{Filters, Redirect, Request, RouteUtils, LinkUtil, RouteNode}
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.all._
@@ -16,7 +16,7 @@ import com.jpro.routing.filter.container.ContainerFactory
 import fr.brouillard.oss.cssfx.CSSFX
 
 
-class TestExtensionsApp(stage: Stage) extends WebApp(stage) {
+class TestExtensionsApp(stage: Stage) extends RouteNode(stage) {
   stylesheets <++ "/com/jpro/routing/extensions/linkheader/css/linkheader.css"
   
   setRoute(

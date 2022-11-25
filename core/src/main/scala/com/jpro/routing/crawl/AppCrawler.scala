@@ -96,7 +96,7 @@ object AppCrawler {
     CrawlReportPage(page.url, foundLinks.reverse, images.reverse, page.title, page.description)
   }
 
-  def crawlApp(prefix: String, createApp: Supplier[WebApp]): CrawlReportApp = {
+  def crawlApp(prefix: String, createApp: Supplier[RouteNode]): CrawlReportApp = {
     var toIndex = Set[String]("/")
     var indexed = Set[String]()
     var redirects = Set[String]()

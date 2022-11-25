@@ -23,22 +23,16 @@ class MyApp(stage: Stage) extends WebApp(stage) {
       .and(get("/?page=main", (r) => new MainView))
       .and(get("/?page=green", (r) => new GreenView))
       .and(get("/?page=orange", (r) => new OrangeView))
+      .and(get("/?page=sub", (r) => new SubView))
+      .and(get("/?page=redirect", (r) => Redirect("/?page=sub")))
+      .and(get("/?page=paralax", (r) => new ParalaxPage))
+      .and(get("/?page=pdf", (r) => new PDFTest))
+      .and(get("/?page=leak", (r) => new LeakingPage))
+      .and(get("/?page=collect", (r) => new CollectingPage))
+      .and(get("/?page=jmemorybuddy", (r) => new JMemoryBuddyPage))
+      .and(get("/it's\" tricky", (r) => new MainView))
+      .and(get("/it's\" tricky", (r) => new MainView))
   )
-
-  //addRouteScala { case ""                => new MainView()}
-  //addRouteScala { case "/"                => new MainView()}
-  //addRouteScala { case "/?page=main"      => new MainView()}
-  //addRouteScala { case "/?page=green"      => new GreenView()}
-  //addRouteScala { case "/?page=orange"      => new OrangeView()}
-  addRouteScala { case "/?page=sub"       => new SubView()}
-  addRouteScala { case "/?page=redirect"  => Redirect("/?page=sub")}
-  addRouteScala { case "/?page=paralax"   => new ParalaxPage()}
-  addRouteScala { case "/?page=pdf"       => new PDFTest()}
-  addRouteScala { case "/?page=leak"       => new LeakingPage()}
-  addRouteScala { case "/?page=collect"       => new CollectingPage()}
-  addRouteScala { case "/?page=jmemorybuddy"       => new JMemoryBuddyPage()}
-  addRouteScala { case "/it's\" tricky" => new MainView()}
-  addRouteScala { case x                  => new UnknownPage(x)}
 
  // addTransition{ case (null,view2,true ) => PageTransition.InstantTransition }
  // addTransition{ case (view,view2,true ) => PageTransition.MoveDown }

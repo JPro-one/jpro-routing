@@ -1,8 +1,8 @@
 package com.jpro.routing.sessionmanager
-import com.jpro.routing.{Response, WebApp}
+import com.jpro.routing.{Response, RouteNode}
 
 class DummySessionManager extends SessionManager {
-  override def webApp: WebApp = null
+  override def webApp: RouteNode = null
 
   override def goBack(): Unit = ()
 

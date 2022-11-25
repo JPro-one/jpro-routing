@@ -2,7 +2,7 @@ package com.jpro.routing.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
-import com.jpro.routing.{Response, View, WebApp}
+import com.jpro.routing.{Response, View, RouteNode}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import javafx.beans.property.{ObjectProperty, Property, SimpleStringProperty, StringProperty}
@@ -17,7 +17,7 @@ import java.awt.Desktop
 
 trait SessionManager { THIS =>
 
-  def webApp: WebApp
+  def webApp: RouteNode
 
   var ganalytics = false
   var gtags = false
@@ -83,7 +83,7 @@ trait SessionManager { THIS =>
 }
 
 object SessionManager {
-  def getDefault(app: WebApp, stage: Stage): SessionManager = {
+  def getDefault(app: RouteNode, stage: Stage): SessionManager = {
     if(WebAPI.isBrowser) new SessionManagerWeb(app, WebAPI.getWebAPI(stage))
     else new SessionManagerDesktop(app)
   }

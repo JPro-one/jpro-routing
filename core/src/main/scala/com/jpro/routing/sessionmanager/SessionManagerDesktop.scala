@@ -3,14 +3,14 @@ package com.jpro.routing.sessionmanager
 import java.net.URL
 import java.net.URLDecoder
 
-import com.jpro.routing.{Redirect, Response, View, WebApp}
+import com.jpro.routing.{Redirect, Response, View, RouteNode}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
 
 
-class SessionManagerDesktop(val webApp: WebApp) extends SessionManager { THIS =>
+class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS =>
 
 
   def goBack(): Unit = {

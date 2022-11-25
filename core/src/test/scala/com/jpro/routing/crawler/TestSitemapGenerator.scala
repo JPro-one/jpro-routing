@@ -1,6 +1,6 @@
 package com.jpro.routing.crawler
 
-import com.jpro.routing.{Redirect, WebApp}
+import com.jpro.routing.{Redirect, RouteNode}
 
 import TestUtils._
 import com.jpro.routing.crawl.{AppCrawler, SitemapGenerator}
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class TestSitemapGenerator {
   @Test
   def test(): Unit = {
-    def app = new WebApp(null) {
+    def app = new RouteNode(null) {
       addRouteScala { case "/" => new Page1}
       addRouteScala { case "/page2" => new Page2}
       addRouteScala { case "/page4" => new Page2}
@@ -26,7 +26,7 @@ class TestSitemapGenerator {
 
   @Test
   def testMailToRedirect(): Unit = {
-    def app = new WebApp(null) {
+    def app = new RouteNode(null) {
       addRouteScala { case "/" => pageWithLink(List("/page2", "/page3", "mailto:something"))}
       addRouteScala { case "/page2" => new Redirect("mailto:something-2")}
     }
