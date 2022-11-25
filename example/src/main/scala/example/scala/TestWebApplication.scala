@@ -12,7 +12,7 @@ import com.jpro.routing.RouteUtils._
 
 import scala.collection.JavaConverters.asScalaBufferConverter
 
-class MyApp(stage: Stage) extends WebApp(stage) {
+class MyApp(stage: Stage) extends RouteNode(stage) {
 
   stylesheets ::= "test.css"
 
