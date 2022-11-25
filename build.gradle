@@ -104,7 +104,7 @@ configure([project(':example')]) {
   //mainClassName = "example.scala.TestWebApplication"
   //mainClassName = "example.scala.TestExtensions"
   //mainClassName = "example.scala.ColorTransitionApp"
-  mainClassName = "example.colors.Starter"
+  mainClassName = "example.colors.ColorsApp"
   dependencies {
     implementation project(':core')
     implementation project(':dev')

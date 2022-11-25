@@ -1,7 +1,7 @@
 package example.scala
 
 import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode, redirect}
-import com.jpro.routing.{Filters, Redirect, Request, RouteUtils, LinkUtil, WebApp}
+import com.jpro.routing.{Filters, Redirect, Request, RouteUtils, LinkUtil, RouteNode}
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.all._
@@ -26,7 +26,7 @@ object HeaderFactory extends RouteUtils.SFXContainerFactory {
   }
 }
 
-class ColorTransition(stage: Stage) extends WebApp(stage) {
+class ColorTransition(stage: Stage) extends RouteNode(stage) {
   private def format(v: Double) = {
     val in = Integer.toHexString((v * 255).round.toInt)
     if (in.length == 1) "0" + in

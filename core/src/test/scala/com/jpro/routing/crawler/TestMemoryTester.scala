@@ -1,6 +1,6 @@
 package com.jpro.routing.crawler
 
-import com.jpro.routing.WebApp
+import com.jpro.routing.RouteNode
 import com.jpro.routing.crawl.{AppCrawler, MemoryTester}
 import com.jpro.routing.crawler.TestUtils.{Page1, Page2}
 import simplefx.cores.default.inFX
@@ -11,7 +11,7 @@ class TestMemoryTest {
 
   @Test
   def simpleTest(): Unit = {
-    def app = new WebApp(null) {
+    def app = new RouteNode(null) {
       addRouteScala { case "/" => new Page1}
       addRouteScala { case "/page2" => new Page2}
       addRouteScala { case "/page4" => new Page2}
@@ -23,7 +23,7 @@ class TestMemoryTest {
   @Test
   def simpleFailingTest(): Unit = {
     val page2 = new Page2
-    def app = new WebApp(null) {
+    def app = new RouteNode(null) {
       addRouteScala { case "/" => new Page1}
       addRouteScala { case "/page2" => page2}
       addRouteScala { case "/page4" => new Page2}
@@ -34,7 +34,7 @@ class TestMemoryTest {
 
   @Test
   def simpleFailingTest2(): Unit = {
-    val app = inFX(new WebApp(null) {
+    val app = inFX(new RouteNode(null) {
       addRouteScala { case "/" => new Page1}
       addRouteScala { case "/page2" => new Page2}
       addRouteScala { case "/page4" => new Page2}
