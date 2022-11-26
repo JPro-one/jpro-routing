@@ -6,12 +6,22 @@ import simplefx.all._
 import simplefx.experimental._
 import simplefx.util.ReflectionUtil._
 import simplefx.util.Predef._
-import java.net.URLEncoder
 
+import java.net.URLEncoder
 import com.jpro.routing.sessionmanager.SessionManager
 import javafx.collections.ObservableList
+import org.apache.commons.validator.routines.UrlValidator
 
 object LinkUtil {
+
+  private val urlValidator = new UrlValidator()
+  private[routing] def isValidLink(x: String): Boolean = {
+    if(x.startsWith("http")) {
+      urlValidator.isValid(x)
+    } else {
+      urlValidator.isValid("http://a.com"+x)
+    }
+  }
 
   def getSessionManager(node: Node): SessionManager = {
     SessionManagerContext.getContext(node)
@@ -70,6 +80,9 @@ object LinkUtil {
     var children: ObservableList[Node] = null
 
     def setNewLink(link: String, text: Option[String], pushState: Boolean, children: ObservableList[Node]): Unit = {
+      if (link != null && !isValidLink(link)) {
+        println("Warning, link is not valid: " + link)
+      }
       this.children = children
       this.pushState = pushState
       this.link = link
