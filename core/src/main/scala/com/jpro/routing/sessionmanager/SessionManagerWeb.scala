@@ -95,7 +95,9 @@ class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionMa
   }
 
   def gotoFullEncodedURL(x: String, pushState: Boolean = true, track: Boolean = true): Unit = {
-    gotoURL(URLDecoder.decode(x,"UTF-8"), pushState, track)
+    // We no longer decode - we should only process proper URLs
+    // If the URL is not proper, we will get a warning when creating the Request.
+    gotoURL(x, pushState, track)
   }
 
   def start() = {

@@ -1,7 +1,9 @@
 package com.jpro.routing
 
+import com.jpro.routing.LinkUtil.isValidLink
 import javafx.scene.Node
-import java.net.URI
+
+import java.net.{URI, URLEncoder}
 
 case class Request (
   url: String,
@@ -16,6 +18,9 @@ case class Request (
 }
 object Request {
   def fromString(x: String): Request = {
+    if(!isValidLink(x)) {
+      println("Warning - Invalid Link: " + x)
+    }
     val uri = new URI(x)
     val query: Map[String,String] = if(uri.getQuery == null) Map() else uri.getQuery.split("&").map(x => {
       val Array(a,b) = x.split("=")
