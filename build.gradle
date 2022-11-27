@@ -108,8 +108,10 @@ configure([project(':example')]) {
   //mainClassName = "example.scala.TestWebApplication"
   //mainClassName = "example.scala.TestExtensions"
   //mainClassName = "example.scala.ColorTransitionApp"
-  mainClassName = "example.colors.ColorsApp"
+//  mainClassName = "example.colors.ColorsApp"
+  mainClassName = "example.login.LoginApp"
   dependencies {
+    implementation project(":auth")
     implementation project(':core')
     implementation project(':dev')
     implementation 'org.controlsfx:controlsfx:11.1.2'
