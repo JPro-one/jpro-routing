@@ -1,20 +1,22 @@
 package com.jpro.routing.crawler
 
 import com.jpro.routing.{Redirect, RouteNode}
-
 import TestUtils._
+import com.jpro.routing.RouteUtils._
 import com.jpro.routing.crawl.{AppCrawler, SitemapGenerator}
 import simplefx.core._
 import org.junit.jupiter.api.Test
+import simplefx.experimental._
 
 class TestSitemapGenerator {
   @Test
   def test(): Unit = {
     def app = new RouteNode(null) {
-      addRouteScala { case "/" => new Page1}
-      addRouteScala { case "/page2" => new Page2}
-      addRouteScala { case "/page4" => new Page2}
-      addRouteScala { case _ => new Page1} // as error page
+      setRoute(EmptyRoute
+        .and(get("/", r => new Page1))
+        .and(get("/page2", r => new Page2))
+        .and(get("/page4", r => new Page2))
+        .and(r => FXFuture.unit(new Page1)))
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
     val sm = SitemapGenerator.createSitemap("http://localhost", result)
@@ -27,8 +29,9 @@ class TestSitemapGenerator {
   @Test
   def testMailToRedirect(): Unit = {
     def app = new RouteNode(null) {
-      addRouteScala { case "/" => pageWithLink(List("/page2", "/page3", "mailto:something"))}
-      addRouteScala { case "/page2" => new Redirect("mailto:something-2")}
+      setRoute(EmptyRoute
+        .and(get("/", r => pageWithLink(List("/page2", "/page3", "mailto:something"))))
+        .and(get("/page2", r => new Redirect("mailto:something-2"))))
     }
     val result = AppCrawler.crawlApp("http://localhost", () => app)
     println("got result: " + result)
