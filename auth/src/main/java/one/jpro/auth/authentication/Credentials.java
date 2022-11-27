@@ -17,4 +17,15 @@ public interface Credentials {
      */
     default <V> void validate(V arg) throws CredentialValidationException {
     }
+
+    /**
+     * Encodes this credential as an HTTP Authorization
+     * <a href="https://tools.ietf.org/html/rfc7235">https://tools.ietf.org/html/rfc7235</a>.
+     *
+     * @throws UnsupportedOperationException when the credential object cannot be converted to an HTTP Authorization.
+     * @return HTTP header including scheme.
+     */
+    default String toHttpAuthorization() {
+        throw new UnsupportedOperationException(getClass().getName() + " cannot be converted to HTTP Authorization");
+    }
 }

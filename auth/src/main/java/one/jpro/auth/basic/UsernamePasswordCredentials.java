@@ -1,8 +1,12 @@
-package one.jpro.auth.authentication;
+package one.jpro.auth.basic;
 
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotBlank;
+import one.jpro.auth.authentication.CredentialValidationException;
+import one.jpro.auth.authentication.Credentials;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -10,7 +14,9 @@ import java.util.Objects;
  *
  * @author Besmir Beqiri
  */
-public class UsernamePasswordCredentials implements Credentials, AuthenticationRequest<String, String> {
+public class UsernamePasswordCredentials implements Credentials {
+
+    private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
     @Nonnull
     @NotBlank
@@ -54,16 +60,6 @@ public class UsernamePasswordCredentials implements Credentials, AuthenticationR
     }
 
     @Override
-    public String getIdentity() {
-        return getUsername();
-    }
-
-    @Override
-    public String getSecret() {
-        return getPassword();
-    }
-
-    @Override
     public <V> void validate(V arg) throws CredentialValidationException {
         if (username == null) {
             throw new CredentialValidationException("username cannot be null");
@@ -86,5 +82,26 @@ public class UsernamePasswordCredentials implements Credentials, AuthenticationR
     @Override
     public int hashCode() {
         return Objects.hash(username, password);
+    }
+
+    @Override
+    public String toHttpAuthorization() {
+        final var result = new StringBuilder();
+
+        if (username != null) {
+            // RFC check
+            if (username.indexOf(':') != -1) {
+                throw new IllegalArgumentException("Username cannot contain ':'");
+            }
+            result.append(username);
+        }
+
+        result.append(':');
+
+        if (password != null) {
+            result.append(password);
+        }
+
+        return "Basic " + BASE64_ENCODER.encodeToString(result.toString().getBytes(StandardCharsets.UTF_8));
     }
 }

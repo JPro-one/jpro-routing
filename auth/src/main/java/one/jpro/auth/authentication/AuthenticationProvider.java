@@ -1,13 +1,14 @@
 package one.jpro.auth.authentication;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Defines an authentication provider
+ * Defines an authentication provider.
  *
  * @author Besmir Beqiri
  */
-public interface AuthenticationProvider {
+@FunctionalInterface
+public interface AuthenticationProvider<T extends Credentials> {
 
-    Future<AuthenticationResponse> authenticate(AuthenticationRequest<?, ?> authenticationRequest);
+    CompletableFuture<Authentication> authenticate(T credentials);
 }

@@ -1,6 +1,7 @@
 package one.jpro.auth.authentication;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.*;
@@ -31,9 +32,9 @@ public class ServerAuthentication implements Authentication {
      * @param roles Roles of the authenticated user
      * @param attributes Attributes of the authenticated user
      */
-    public ServerAuthentication(String name,
-                                Collection<String> roles,
-                                Map<String, Object> attributes) {
+    public ServerAuthentication(@Nonnull String name,
+                                @Nullable Collection<String> roles,
+                                @Nullable Map<String, Object> attributes) {
         this.name = name;
         this.roles = (roles == null || roles.isEmpty()) ? new ArrayList<>() : roles;
         this.attributes = attributes == null ? Collections.emptyMap() : attributes;
@@ -41,6 +42,7 @@ public class ServerAuthentication implements Authentication {
 
     @Override
     @Nonnull
+    @NotBlank
     public String getName() {
         return name;
     }
