@@ -26,6 +26,11 @@ dependencies {
     api 'jakarta.inject:jakarta.inject-api:2.0.1'
     api 'jakarta.validation:jakarta.validation-api:3.0.2'
 
+    implementation 'org.slf4j:slf4j-api:2.0.4'
+    implementation 'org.json:json:20220924'
+    implementation 'com.auth0:java-jwt:4.2.1'
+    implementation 'com.auth0:jwks-rsa:0.21.2'
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
