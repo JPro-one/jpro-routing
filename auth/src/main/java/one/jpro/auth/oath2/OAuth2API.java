@@ -81,10 +81,8 @@ public class OAuth2API {
             }
         }
 
-        final String path = options.getAuthorizationPath();
-        final String url = path.charAt(0) == '/' ? options.getSite() + path : path;
 
-        return url + '?' + jsonToQuery(query);
+        return options.getAuthorizationPath() + '?' + jsonToQuery(query);
     }
 
     /**

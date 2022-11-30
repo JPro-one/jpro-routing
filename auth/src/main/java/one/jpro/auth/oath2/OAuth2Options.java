@@ -88,7 +88,7 @@ public class OAuth2Options {
     }
 
     public String getAuthorizationPath() {
-        return authorizationPath;
+        return getCompletePath(authorizationPath);
     }
 
     public OAuth2Options setAuthorizationPath(String authorizationPath) {
@@ -97,7 +97,7 @@ public class OAuth2Options {
     }
 
     public String getTokenPath() {
-        return tokenPath;
+        return getCompletePath(tokenPath);
     }
 
     public OAuth2Options setTokenPath(String tokenPath) {
@@ -106,7 +106,7 @@ public class OAuth2Options {
     }
 
     public String getRevocationPath() {
-        return revocationPath;
+        return getCompletePath(revocationPath);
     }
 
     public OAuth2Options setRevocationPath(String revocationPath) {
@@ -142,7 +142,7 @@ public class OAuth2Options {
     }
 
     public String getUserInfoPath() {
-        return userInfoPath;
+        return getCompletePath(userInfoPath);
     }
 
     public OAuth2Options setUserInfoPath(String userInfoPath) {
@@ -160,7 +160,7 @@ public class OAuth2Options {
     }
 
     public String getIntrospectionPath() {
-        return introspectionPath;
+        return getCompletePath(introspectionPath);
     }
 
     public OAuth2Options setIntrospectionPath(String introspectionPath) {
@@ -169,7 +169,7 @@ public class OAuth2Options {
     }
 
     public String getJwkPath() {
-        return jwkPath;
+        return getCompletePath(jwkPath);
     }
 
     public OAuth2Options setJwkPath(String jwkPath) {
@@ -283,5 +283,19 @@ public class OAuth2Options {
     public OAuth2Options setExtraParams(JSONObject extraParams) {
         this.extraParams = extraParams;
         return this;
+    }
+
+    private String getCompletePath(String path) {
+        if (path.charAt(0) == '/') {
+            if (site != null && site.contains("{tenant}")) {
+                if (tenant != null && !tenant.isBlank()) {
+                    site = site.replace("{tenant}", tenant);
+                } else {
+                    throw new IllegalStateException("The tenant value is not null or blank.");
+                }
+            }
+            return site + path;
+        }
+        return path;
     }
 }
