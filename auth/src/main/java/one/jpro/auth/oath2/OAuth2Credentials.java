@@ -14,15 +14,15 @@ import java.util.List;
 public class OAuth2Credentials implements Credentials {
 
     private String code;            // swap code for token
-    private String redirectUri;
     private String codeVerifier;
+    private String redirectUri;
     private JSONObject jwt;         // jwt-bearer tokens can include other kind of generic data
     private String assertion;       // or contain an assertion
     private String password;        // password credentials
     private String username;
-
     private List<String> scopes;    // control state
     private OAuth2Flow flow;
+    private String nonce;
 
     /**
      * Default constructor.
@@ -39,21 +39,21 @@ public class OAuth2Credentials implements Credentials {
         return this;
     }
 
-    public String getRedirectUri() {
-        return redirectUri;
-    }
-
-    public OAuth2Credentials redirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
-        return this;
-    }
-
     public String getCodeVerifier() {
         return codeVerifier;
     }
 
     public OAuth2Credentials codeVerifier(String codeVerifier) {
         this.codeVerifier = codeVerifier;
+        return this;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public OAuth2Credentials redirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
         return this;
     }
 
@@ -108,6 +108,15 @@ public class OAuth2Credentials implements Credentials {
 
     public OAuth2Credentials flow(OAuth2Flow flow) {
         this.flow = flow;
+        return this;
+    }
+
+    public String getNonce() {
+        return nonce;
+    }
+
+    public OAuth2Credentials nonce(String nonce) {
+        this.nonce = nonce;
         return this;
     }
 
