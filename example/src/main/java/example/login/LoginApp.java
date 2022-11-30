@@ -16,6 +16,8 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
+import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
+import simplefx.experimental.parts.FXFuture;
 
 import java.util.Arrays;
 
@@ -32,9 +34,9 @@ public class LoginApp extends RouteApp {
     private static final String GOOGLE_CLIENT_ID = System.getenv("GOOGLE_TEST_CLIENT_ID");
     private static final String GOOGLE_CLIENT_SECRET = System.getenv("GOOGLE_TEST_CLIENT_SECRET");
 
-//    private static final String AZURE_CLIENT_ID = System.getenv("AZURE_TEST_CLIENT_ID");
-//    private static final String AZURE_CLIENT_SECRET = System.getenv("AZURE_TEST_CLIENT_SECRET");
-//    private static final String AZURE_TAUNT = "consumers";
+    private static final String AZURE_CLIENT_ID = System.getenv("AZURE_TEST_CLIENT_ID");
+    private static final String AZURE_CLIENT_SECRET = System.getenv("AZURE_TEST_CLIENT_SECRET");
+    private static final String AZURE_TENANT = System.getenv("AZURE_TEST_CLIENT_TENANT");
 
     private final StringProperty nameProperty = new SimpleStringProperty(this, "name");
     private final StringProperty attributesProperty = new SimpleStringProperty(this, "attributes");
@@ -52,38 +54,47 @@ public class LoginApp extends RouteApp {
                 .nonce("0394852-3190485-2490358");
 
         // Microsoft Auth provider
-//        final var microsoftAuth = new MicrosoftAuthenticationProvider(AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TAUNT);
-//        final var microsoftCredentials = new OAuth2Credentials()
-//                .scopes(Arrays.asList("openid", "email"))
-//                .redirectUri("http://localhost:8080/");
+        System.out.println("AZURE_CLIENT_ID: " + AZURE_CLIENT_ID);
+        System.out.println("AZURE_CLIENT_SECRET: " + AZURE_CLIENT_SECRET);
+        final var microsoftAuth = new MicrosoftAuthenticationProvider(AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, "common");
+        final var microsoftCredentials = new OAuth2Credentials()
+                .scopes(Arrays.asList("openid", "email"))
+                .redirectUri("http://localhost:8080/");
 
         return EmptyRoute()
                 .and(getNode("/", (r) -> {
                     var queryParam = r.queryParameters();
                     if (queryParam.isDefinedAt("code")) {
-                        googleCredentials.code(queryParam.apply("code"));
-//                        Async.FXFuture.fromJava(googleAuth.authenticate(googleCredentials))
+                        microsoftCredentials.code(queryParam.apply("code"));
+//                        FXFuture.fromJava(googleAuth.authenticate(googleCredentials))
 //                                        .map(authentication -> {
-//                                            emailProperty.set("email: " + googleCredentials.getUsername());
-//                                            dataProperty.set("scopes: " + googleCredentials.getScopes());
+//                                    nameProperty.set("name: " + googleCredentials.getUsername());
+//                                    attributesProperty.set("attributes: " + authentication.getAttributes());
 //                                            return authentication;
 //                                        });
-                        googleAuth.authenticate(googleCredentials).thenAccept(authentication ->
+                         var authFuture = microsoftAuth.authenticate(microsoftCredentials).thenAccept(authentication ->
                                 Platform.runLater(() -> {
-                                    nameProperty.set("name: " + googleCredentials.getUsername());
+                                    nameProperty.set("name: " + microsoftCredentials.getUsername());
                                     attributesProperty.set("attributes: " + authentication.getAttributes());
                                 }));
+
+                         authFuture.exceptionally(ex -> {
+                             System.out.println("LoginApp: " + ex.getMessage());
+                            ex.printStackTrace();
+                            return null;
+                        });
                         return loginDataView();
                     } else {
                         final var googleAuthUrl = googleAuth.authorizeUrl(googleCredentials);
-//                        final var microsoftAuthUrl = microsoftAuth.authorizeUrl(microsoftCredentials);
-                        return initView(googleAuthUrl);
+                        final var microsoftAuthUrl = microsoftAuth.authorizeUrl(microsoftCredentials);
+                        System.out.println("microsoftAuthUrl: " + microsoftAuthUrl);
+                        return initView(googleAuthUrl, microsoftAuthUrl);
                     }
                 }));
 
     }
 
-    public Node initView(String googleAuthUrl) {
+    public Node initView(String googleAuthUrl, String microsoftAuthUrl) {
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setHgap(12.0);
@@ -134,11 +145,11 @@ public class LoginApp extends RouteApp {
         GridPane.setHalignment(googleLoginButton, HPos.CENTER);
         googleLoginButton.setOnAction(event -> getWebAPI().openURL(googleAuthUrl));
 
-//        Button microsoftLoginButton = new Button("Login with Microsoft");
-//        gridPane.add(microsoftLoginButton, 0, 6, 2, 1);
-//        GridPane.setMargin(microsoftLoginButton, new Insets(12, 0, 12, 0));
-//        GridPane.setHalignment(microsoftLoginButton, HPos.CENTER);
-//        microsoftLoginButton.setOnAction(event -> getWebAPI().openURL(microsoftAuthUrl));
+        Button microsoftLoginButton = new Button("Login with Microsoft");
+        gridPane.add(microsoftLoginButton, 0, 6, 2, 1);
+        GridPane.setMargin(microsoftLoginButton, new Insets(12, 0, 12, 0));
+        GridPane.setHalignment(microsoftLoginButton, HPos.CENTER);
+        microsoftLoginButton.setOnAction(event -> getWebAPI().openURL(microsoftAuthUrl));
 
         return new StackPane(gridPane);
     }
