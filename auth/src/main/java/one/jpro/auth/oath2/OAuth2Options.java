@@ -73,7 +73,7 @@ public class OAuth2Options {
         return flow;
     }
 
-    public OAuth2Options flow(OAuth2Flow flow) {
+    public OAuth2Options setFlow(OAuth2Flow flow) {
         this.flow = flow;
         return this;
     }
@@ -82,7 +82,7 @@ public class OAuth2Options {
         return supportedGrantTypes;
     }
 
-    public OAuth2Options supportedGrantTypes(List<String> supportedGrantTypes) {
+    public OAuth2Options setSupportedGrantTypes(List<String> supportedGrantTypes) {
         this.supportedGrantTypes = supportedGrantTypes;
         return this;
     }
@@ -91,7 +91,7 @@ public class OAuth2Options {
         return authorizationPath;
     }
 
-    public OAuth2Options authorizationPath(String authorizationPath) {
+    public OAuth2Options setAuthorizationPath(String authorizationPath) {
         this.authorizationPath = authorizationPath;
         return this;
     }
@@ -100,7 +100,7 @@ public class OAuth2Options {
         return tokenPath;
     }
 
-    public OAuth2Options tokenPath(String tokenPath) {
+    public OAuth2Options setTokenPath(String tokenPath) {
         this.tokenPath = tokenPath;
         return this;
     }
@@ -109,7 +109,7 @@ public class OAuth2Options {
         return revocationPath;
     }
 
-    public OAuth2Options revocationPath(String revocationPath) {
+    public OAuth2Options setRevocationPath(String revocationPath) {
         this.revocationPath = revocationPath;
         return this;
     }
@@ -118,7 +118,7 @@ public class OAuth2Options {
         return scopeSeparator;
     }
 
-    public OAuth2Options scopeSeparator(String scopeSeparator) {
+    public OAuth2Options setScopeSeparator(String scopeSeparator) {
         this.scopeSeparator = scopeSeparator;
         return this;
     }
@@ -127,7 +127,7 @@ public class OAuth2Options {
         return validateIssuer;
     }
 
-    public OAuth2Options validateIssuer(boolean validateIssuer) {
+    public OAuth2Options setValidateIssuer(boolean validateIssuer) {
         this.validateIssuer = validateIssuer;
         return this;
     }
@@ -136,7 +136,7 @@ public class OAuth2Options {
         return logoutPath;
     }
 
-    public OAuth2Options logoutPath(String logoutPath) {
+    public OAuth2Options setLogoutPath(String logoutPath) {
         this.logoutPath = logoutPath;
         return this;
     }
@@ -145,7 +145,7 @@ public class OAuth2Options {
         return userInfoPath;
     }
 
-    public OAuth2Options userInfoPath(String userInfoPath) {
+    public OAuth2Options setUserInfoPath(String userInfoPath) {
         this.userInfoPath = userInfoPath;
         return this;
     }
@@ -154,7 +154,7 @@ public class OAuth2Options {
         return userInfoParams;
     }
 
-    public OAuth2Options userInfoParams(JSONObject userInfoParams) {
+    public OAuth2Options setUserInfoParams(JSONObject userInfoParams) {
         this.userInfoParams = userInfoParams;
         return this;
     }
@@ -163,7 +163,7 @@ public class OAuth2Options {
         return introspectionPath;
     }
 
-    public OAuth2Options introspectionPath(String introspectionPath) {
+    public OAuth2Options setIntrospectionPath(String introspectionPath) {
         this.introspectionPath = introspectionPath;
         return this;
     }
@@ -172,7 +172,7 @@ public class OAuth2Options {
         return jwkPath;
     }
 
-    public OAuth2Options jwkPath(String jwkPath) {
+    public OAuth2Options setJwkPath(String jwkPath) {
         this.jwkPath = jwkPath;
         return this;
     }
@@ -181,7 +181,7 @@ public class OAuth2Options {
         return jwkMaxAge;
     }
 
-    public OAuth2Options jwkMaxAge(long jwkMaxAge) {
+    public OAuth2Options setJwkMaxAge(long jwkMaxAge) {
         this.jwkMaxAge = jwkMaxAge;
         return this;
     }
@@ -190,7 +190,7 @@ public class OAuth2Options {
         return tenant;
     }
 
-    public OAuth2Options tenant(String tenant) {
+    public OAuth2Options setTenant(String tenant) {
         this.tenant = tenant;
         return this;
     }
@@ -199,7 +199,7 @@ public class OAuth2Options {
         return site;
     }
 
-    public OAuth2Options site(String site) {
+    public OAuth2Options setSite(String site) {
         this.site = site;
         return this;
     }
@@ -208,7 +208,7 @@ public class OAuth2Options {
         return clientId;
     }
 
-    public OAuth2Options clientId(String clientId) {
+    public OAuth2Options setClientId(String clientId) {
         this.clientId = clientId;
         return this;
     }
@@ -217,7 +217,7 @@ public class OAuth2Options {
         return clientSecret;
     }
 
-    public OAuth2Options clientSecret(String clientSecret) {
+    public OAuth2Options setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
         return this;
     }
@@ -226,7 +226,7 @@ public class OAuth2Options {
         return clientAssertionType;
     }
 
-    public OAuth2Options clientAssertionType(String clientAssertionType) {
+    public OAuth2Options setClientAssertionType(String clientAssertionType) {
         this.clientAssertionType = clientAssertionType;
         return this;
     }
@@ -235,7 +235,7 @@ public class OAuth2Options {
         return clientAssertion;
     }
 
-    public OAuth2Options clientAssertion(String clientAssertion) {
+    public OAuth2Options setClientAssertion(String clientAssertion) {
         this.clientAssertion = clientAssertion;
         return this;
     }
@@ -244,7 +244,7 @@ public class OAuth2Options {
         return userAgent;
     }
 
-    public OAuth2Options userAgent(String userAgent) {
+    public OAuth2Options setUserAgent(String userAgent) {
         this.userAgent = userAgent;
         return this;
     }
@@ -253,7 +253,7 @@ public class OAuth2Options {
         return headers;
     }
 
-    public OAuth2Options headers(JSONObject headers) {
+    public OAuth2Options setHeaders(JSONObject headers) {
         this.headers = headers;
         return this;
     }
@@ -262,7 +262,7 @@ public class OAuth2Options {
         return pubSecKeys;
     }
 
-    public OAuth2Options pubSecKeys(List<PubSecKeyOptions> pubSecKeys) {
+    public OAuth2Options setPubSecKeys(List<PubSecKeyOptions> pubSecKeys) {
         this.pubSecKeys = pubSecKeys;
         return this;
     }
@@ -271,7 +271,7 @@ public class OAuth2Options {
         return jwtOptions;
     }
 
-    public OAuth2Options jwtOptions(JWTOptions jwtOptions) {
+    public OAuth2Options setJwtOptions(JWTOptions jwtOptions) {
         this.jwtOptions = jwtOptions;
         return this;
     }
@@ -280,7 +280,7 @@ public class OAuth2Options {
         return extraParams;
     }
 
-    public OAuth2Options extraParams(JSONObject extraParams) {
+    public OAuth2Options setExtraParams(JSONObject extraParams) {
         this.extraParams = extraParams;
         return this;
     }
