@@ -1,25 +1,22 @@
 package one.jpro.auth.oath2;
 
-import com.jpro.webapi.WebAPI;
 import one.jpro.auth.utils.HttpMethod;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,15 +33,12 @@ public class OAuth2API {
     private static final String CACHE_CONTROL = "cache-control";
     private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
-    private final WebAPI webAPI;
     private final OAuth2Options options;
     private final HttpClient httpClient;
 
-    public OAuth2API(WebAPI webAPI, OAuth2Options options) {
-        this.webAPI = webAPI;
+    public OAuth2API(OAuth2Options options) {
         this.options = options;
-
-        httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newHttpClient();
     }
 
     /**
@@ -53,12 +47,12 @@ public class OAuth2API {
      * <p>
      * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
-    public String authorizeURL(JSONObject params) {
-        final JSONObject query = new JSONObject(params);
+    public String authorizeURL(OAuth2Credentials credentials) {
+        final JSONObject query = credentials.toJSON();
 
         final OAuth2Flow flow;
-        if (params.getString("flow") != null && !params.getString("flow").isEmpty()) {
-            flow = OAuth2Flow.getFlow(params.getString("flow"));
+        if (query.has("flow") && !query.getString("flow").isBlank()) {
+            flow = OAuth2Flow.getFlow(query.getString("flow"));
         } else {
             flow = options.getFlow();
         }
@@ -69,14 +63,13 @@ public class OAuth2API {
 
         if (query.has("scopes")) {
             // scopes have been passed as a list so the provider must generate the correct string for it
-            final var scopes = query.getJSONArray("scopes").toList()
-                    .stream().map(Object::toString).collect(Collectors.toList());
-            query.put("scope", String.join(options.getScopeSeparator(), scopes));
+            query.put("scope", query.getJSONArray("scopes").join(options.getScopeSeparator())
+                    .replace("\"", ""));
             query.remove("scopes");
         }
 
         query.put("response_type", "code");
-        String clientId = options.getClientId();
+        final String clientId = options.getClientId();
         if (clientId != null) {
             query.put("client_id", clientId);
         } else {
@@ -116,7 +109,7 @@ public class OAuth2API {
         }
 
         // Send authorization params in the body
-        final JSONObject form = new JSONObject(params, JSONObject.getNames(params));
+        final JSONObject form = new JSONObject(params.toString());
         if (options.getExtraParams() != null) {
             for(String key : JSONObject.getNames(options.getExtraParams())){
                 form.put(key, options.getExtraParams().get(key));
@@ -126,7 +119,7 @@ public class OAuth2API {
         form.put("grant_type", grantType);
 
         if (!confidentialClient) {
-            String clientId = options.getClientId();
+            final String clientId = options.getClientId();
             if (clientId != null) {
                 form.put("client_id", clientId);
             } else {
@@ -140,7 +133,7 @@ public class OAuth2API {
         }
 
         headers.put("Content-Type", "application/x-www-form-urlencoded");
-        final ByteBuffer payload = jsonToQuery(form);
+        final String payload = jsonToQuery(form);
 
         // specify preferred accepted content type
         headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
@@ -152,35 +145,24 @@ public class OAuth2API {
                     }
 
                     JSONObject json;
-                    final var headerMap = response.headers().map();
-                    if (headerMap.containsValue("application/json")) {
-                        try {
-                            json = new JSONObject(response.body());
-                        } catch (RuntimeException ex) {
-                            return CompletableFuture.failedFuture(ex);
-                        }
-                    } else if (headerMap.containsValue("application/x-www-form-urlencoded")
-                            || headerMap.containsValue("text/plain")) {
-                        try {
-                            json = queryToJson(response.body());
-                        } catch (RuntimeException ex) {
-                            return CompletableFuture.failedFuture(ex);
-                        }
+                    final var header = response.headers();
+                    if (containsValue(header,"application/json")) {
+                        json = new JSONObject(response.body());
+                    } else if (containsValue(header,"application/x-www-form-urlencoded")
+                            || containsValue(header,"text/plain")) {
+                        json = queryToJson(response.body());
                     } else {
                         return CompletableFuture.failedFuture(
-                                new RuntimeException("Cannot handle content type: " + headerMap.get("Content-Type")));
+                                new RuntimeException("Cannot handle content type: "
+                                        + header.map().get("Content-Type")));
                     }
 
-                    try {
-                        if (json == null || json.has("error")) {
-                            return CompletableFuture.failedFuture(
-                                    new RuntimeException(extractErrorDescription(json)));
-                        } else {
-                            processNonStandardHeaders(json, response, options.getScopeSeparator());
-                            return CompletableFuture.completedFuture(json);
-                        }
-                    } catch (RuntimeException ex) {
-                        return CompletableFuture.failedFuture(ex);
+                    if (json == null || json.has("error")) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException(extractErrorDescription(json)));
+                    } else {
+                        processNonStandardHeaders(json, response, options.getScopeSeparator());
+                        return CompletableFuture.completedFuture(json);
                     }
                 });
     }
@@ -206,7 +188,7 @@ public class OAuth2API {
                 .put("token_type_hint", tokenType);
 
         headers.put("Content-Type", "application/x-www-form-urlencoded");
-        final ByteBuffer payload = jsonToQuery(form);
+        final String payload = jsonToQuery(form);
         // specify preferred accepted accessToken type
         headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
 
@@ -218,36 +200,21 @@ public class OAuth2API {
 
                     JSONObject json;
 
-                    final var headerMap = response.headers().map();
-                    if (headerMap.containsValue("application/json")) {
-                        try {
-                            json = new JSONObject(response.body());
-                        } catch (RuntimeException e) {
-                            return CompletableFuture.failedFuture(e);
-                        }
-                    } else if (headerMap.containsValue("application/x-www-form-urlencoded") ||
-                            headerMap.containsValue("text/plain")) {
-                        try {
-                            json = queryToJson(response.body());
-                        } catch (RuntimeException ex) {
-                            return CompletableFuture.failedFuture(ex);
-                        }
-                    } else {
-                        return CompletableFuture.failedFuture(
+                    if (containsValue(response.headers(), "application/json")) {
+                        json = new JSONObject(response.body());
+                    } else if (containsValue(response.headers(), "application/x-www-form-urlencoded") ||
+                            containsValue(response.headers(), "text/plain")) {
+                        json = queryToJson(response.body());
+                    } else return CompletableFuture.failedFuture(
                                 new RuntimeException("Cannot handle accessToken type: "
-                                        + headerMap.get("Content-Type")));
-                    }
+                                        + response.headers().allValues("Content-Type")));
 
-                    try {
-                        if (json == null || json.has("error")) {
-                            return CompletableFuture.failedFuture(
-                                    new RuntimeException(extractErrorDescription(json)));
-                        } else {
-                            processNonStandardHeaders(json, response, options.getScopeSeparator());
-                            return CompletableFuture.completedFuture(json);
-                        }
-                    } catch (RuntimeException e) {
-                        return CompletableFuture.failedFuture(e);
+                    if (json == null || json.has("error")) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException(extractErrorDescription(json)));
+                    } else {
+                        processNonStandardHeaders(json, response, options.getScopeSeparator());
+                        return CompletableFuture.completedFuture(json);
                     }
                 });
     }
@@ -257,7 +224,7 @@ public class OAuth2API {
      * <p>
      * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
-    public Future<Void> tokenRevocation(String tokenType, String token) {
+    public CompletableFuture<Void> tokenRevocation(String tokenType, String token) {
         if (token == null) {
             return CompletableFuture.failedFuture(new RuntimeException("Cannot revoke null token"));
         }
@@ -276,7 +243,7 @@ public class OAuth2API {
         form.put("token", token).put("token_type_hint", tokenType);
 
         headers.put("Content-Type", "application/x-www-form-urlencoded");
-        final ByteBuffer payload = jsonToQuery(form);
+        final String payload = jsonToQuery(form);
         // specify preferred accepted accessToken type
         headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
 
@@ -293,7 +260,7 @@ public class OAuth2API {
     /**
      * Retrieve the public server JSON Web Key (JWK) required to verify the authenticity of issued ID and access tokens.
      */
-    public Future<JSONObject> jwkSet() {
+    public CompletableFuture<JSONObject> jwkSet() {
         final JSONObject headers = new JSONObject();
         // specify preferred accepted content type, according to https://tools.ietf.org/html/rfc7517#section-8.5
         // there's a specific media type for this resource: application/jwk-set+json but we also allow plain application/json
@@ -306,51 +273,41 @@ public class OAuth2API {
                     }
 
                     JSONObject json;
-                    final var headerMap = response.headers().map();
-                    if (headerMap.containsValue("application/jwk-set+json") ||
-                            headerMap.containsValue("application/json")) {
-                        try {
-                            json = new JSONObject(response.body());
-                        } catch (RuntimeException ex) {
-                            return CompletableFuture.failedFuture(ex);
-                        }
-                    } else {
-                        return CompletableFuture.failedFuture(
-                                new RuntimeException("Cannot handle content type: " + headerMap.get("Content-Type")));
-                    }
+                    if (containsValue(response.headers(), "application/jwk-set+json") ||
+                            containsValue(response.headers(), "application/json")) {
+                        json = new JSONObject(response.body());
+                    } else return CompletableFuture.failedFuture(
+                                new RuntimeException("Cannot handle content type: "
+                                        + response.headers().allValues("Content-Type")));
 
-                    try {
-                        if (json.has("error")) {
-                            return CompletableFuture.failedFuture(new RuntimeException(extractErrorDescription(json)));
-                        } else {
-                            // process the cache headers as recommended by: https://openid.net/specs/openid-connect-core-1_0.html#RotateEncKeys
-                            List<String> cacheControl = response.headers().allValues(CACHE_CONTROL);
-                            if (cacheControl != null) {
-                                for (String header : cacheControl) {
-                                    // we need at least "max-age="
-                                    if (header.length() > 8) {
-                                        Matcher match = MAX_AGE.matcher(header);
-                                        if (match.find()) {
-                                            try {
-                                                json.put("maxAge", Long.valueOf(match.group(1)));
-                                                break;
-                                            } catch (RuntimeException e) {
-                                                // ignore bad formed headers
-                                            }
+                    if (json.has("error")) {
+                        return CompletableFuture.failedFuture(new RuntimeException(extractErrorDescription(json)));
+                    } else {
+                        // process the cache headers as recommended by: https://openid.net/specs/openid-connect-core-1_0.html#RotateEncKeys
+                        List<String> cacheControl = response.headers().allValues(CACHE_CONTROL);
+                        if (cacheControl != null) {
+                            for (String header : cacheControl) {
+                                // we need at least "max-age="
+                                if (header.length() > 8) {
+                                    Matcher match = MAX_AGE.matcher(header);
+                                    if (match.find()) {
+                                        try {
+                                            json.put("maxAge", Long.valueOf(match.group(1)));
+                                            break;
+                                        } catch (RuntimeException e) {
+                                            // ignore bad formed headers
                                         }
                                     }
                                 }
                             }
-                            return CompletableFuture.completedFuture(json);
                         }
-                    } catch (RuntimeException ex) {
-                        return CompletableFuture.failedFuture(ex);
+                        return CompletableFuture.completedFuture(json);
                     }
                 });
     }
 
     public CompletableFuture<HttpResponse<String>> fetch(HttpMethod method, String path,
-                                                         JSONObject headers, ByteBuffer payload) {
+                                                         JSONObject headers, String payload) {
 
         if (path == null || path.length() == 0) {
             // and this can happen as it is a config option that is dependent on the provider
@@ -358,27 +315,26 @@ public class OAuth2API {
         }
 
         final String url = path.charAt(0) == '/' ? options.getSite() + path : path;
-        log.debug("Fetching URL: " + url);
 
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder();
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().uri(URI.create(url));
 
         // apply the provider required headers
         JSONObject tmp = options.getHeaders();
         if (tmp != null) {
             for (Map.Entry<String, Object> kv : tmp.toMap().entrySet()) {
-                httpRequestBuilder.header(kv.getKey(), (String) kv.getValue());
+                requestBuilder.header(kv.getKey(), (String) kv.getValue());
             }
         }
 
         if (headers != null) {
             for (Map.Entry<String, Object> kv : headers.toMap().entrySet()) {
-                httpRequestBuilder.header(kv.getKey(), (String) kv.getValue());
+                requestBuilder.header(kv.getKey(), (String) kv.getValue());
             }
         }
 
         // specific UA
         if (options.getUserAgent() != null) {
-            httpRequestBuilder.header("User-Agent", options.getUserAgent());
+            requestBuilder.header("User-Agent", options.getUserAgent());
         }
 
         if (method != HttpMethod.POST && method != HttpMethod.PATCH && method != HttpMethod.PUT) {
@@ -386,63 +342,52 @@ public class OAuth2API {
         }
 
         // create a request
-        return makeRequest(httpRequestBuilder, payload);
+        return makeRequest(requestBuilder, payload);
     }
 
-    private CompletableFuture<HttpResponse<String>> makeRequest(HttpRequest.Builder requestBuilder, ByteBuffer payload) {
+    private CompletableFuture<HttpResponse<String>> makeRequest(HttpRequest.Builder requestBuilder, String payload) {
         // send
         if (payload != null) {
-            requestBuilder.PUT(HttpRequest.BodyPublishers.ofByteArray(payload.array()));
+            requestBuilder.POST(HttpRequest.BodyPublishers.ofByteArray(payload.getBytes()));
         }
 
         return httpClient.sendAsync(requestBuilder.build(), HttpResponse.BodyHandlers.ofString())
-                .thenCompose(oauth2Response -> {
+                .thenCompose(response -> {
                     // read the body regardless
-                    if (oauth2Response.statusCode() < 200 || oauth2Response.statusCode() >= 300) {
-                        if (oauth2Response.body() == null || oauth2Response.body().length() == 0) {
+                    if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                        if (response.body() == null || response.body().length() == 0) {
                             return CompletableFuture.failedFuture(
-                                    new RuntimeException("Status code: " + oauth2Response.statusCode()));
+                                    new RuntimeException("Status code: " + response.statusCode()));
                         } else {
-                            if (oauth2Response.headers().map().containsValue("application/json")) {
+                            if (containsValue(response.headers(), "application/json")) {
                                 // if value is json, extract error, error_descriptions
-                                try {
-                                    JSONObject error = new JSONObject(oauth2Response.body());
-                                    if (!error.optString("error").isEmpty()) {
-                                        if (!error.optString("error_description").isEmpty()) {
-                                            return CompletableFuture.failedFuture(
-                                                    new RuntimeException(error.getString("error") +
-                                                            ": " + error.getString("error_description")));
-                                        } else {
-                                            return CompletableFuture.failedFuture(
-                                                    new RuntimeException(error.getString("error")));
-                                        }
+                                JSONObject error = new JSONObject(response.body());
+                                if (!error.optString("error").isEmpty()) {
+                                    if (!error.optString("error_description").isEmpty()) {
+                                        return CompletableFuture.failedFuture(
+                                                new RuntimeException(error.getString("error") +
+                                                        ": " + error.getString("error_description")));
+                                    } else {
+                                        return CompletableFuture.failedFuture(
+                                                new RuntimeException(error.getString("error")));
                                     }
-                                } catch (RuntimeException ignore) {
                                 }
                             }
                             return CompletableFuture.failedFuture(
-                                    new RuntimeException(oauth2Response.statusCode() + ": " + oauth2Response.body()));
+                                    new RuntimeException(response.statusCode() + ": " + response.body()));
                         }
                     } else {
-                        return CompletableFuture.completedFuture(oauth2Response);
+                        return CompletableFuture.completedFuture(response);
                     }
                 });
     }
 
-    private ByteBuffer jsonToQuery(JSONObject json) {
-        final var sb = new StringBuilder();
-
-        for (Map.Entry<String, ?> entry : json.toMap().entrySet()) {
-            sb.append('&');
-            sb.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
-            sb.append('=');
-            var value = entry.getValue();
-            if (value != null) {
-                sb.append(URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
-            }
-        }
-
-        return ByteBuffer.wrap(sb.toString().getBytes());
+    private String jsonToQuery(JSONObject json) {
+        return json.toMap().entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
+                        URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
     }
 
     private JSONObject queryToJson(String query) {
@@ -475,6 +420,12 @@ public class OAuth2API {
         }
 
         return json;
+    }
+
+    private boolean containsValue(HttpHeaders headers, String value) {
+        return headers.map().entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream())
+                .anyMatch(s -> s.contains(value));
     }
 
     private void processNonStandardHeaders(JSONObject json, HttpResponse<String> response, String scopeSeparator) {
