@@ -1,11 +1,20 @@
 package one.jpro.auth.authentication;
 
+import org.json.JSONObject;
+
 /**
  * Abstract representation of a Credentials object.
  *
  * @author Besmir Beqiri
  */
 public interface Credentials {
+
+    /**
+     * Convert the credential information to JSON format.
+     *
+     * @return a {@link JSONObject} object.
+     */
+    JSONObject toJSON();
 
     /**
      * Implementors should override this method to perform validation.

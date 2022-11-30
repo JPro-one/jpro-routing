@@ -2,9 +2,13 @@ package one.jpro.auth.oath2;
 
 import one.jpro.auth.authentication.CredentialValidationException;
 import one.jpro.auth.authentication.Credentials;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 /**
  * Credentials specific to the {@link OAuth2AuthenticationProvider}.
@@ -145,5 +149,23 @@ public class OAuth2Credentials implements Credentials {
                 }
                 break;
         }
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        Optional.ofNullable(getCode()).ifPresent(code -> json.put("code", code));
+        Optional.ofNullable(getCodeVerifier()).ifPresent(codeVerifier -> json.put("code_verifier", codeVerifier));
+        Optional.ofNullable(getRedirectUri()).ifPresent(redirectUri -> json.put("redirect_uri", redirectUri));
+        Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow));
+        Optional.ofNullable(getJwt()).ifPresent(jwt -> json.put("jwt", jwt));
+        Optional.ofNullable(getAssertion()).ifPresent(assertion -> json.put("assertion", assertion));
+        Optional.ofNullable(getPassword()).ifPresent(password -> json.put("password", password));
+        Optional.ofNullable(getUsername()).ifPresent(username -> json.put("username", username));
+        Optional.ofNullable(Stream.ofNullable(getScopes())
+                .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .ifPresent(jsonArray -> json.put("scopes", jsonArray));
+        Optional.ofNullable(getNonce()).ifPresent(nonce -> json.put("nonce", nonce));
+        return json;
     }
 }
