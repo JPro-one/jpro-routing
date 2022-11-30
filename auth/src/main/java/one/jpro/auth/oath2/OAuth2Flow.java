@@ -8,7 +8,8 @@ package one.jpro.auth.oath2;
 public enum OAuth2Flow {
 
     AUTH_CODE("authorization_code"),
-    PASSWORD("password");
+    PASSWORD("password"),
+    CLIENT("client_credentials");
 
     private final String grantType;
 
