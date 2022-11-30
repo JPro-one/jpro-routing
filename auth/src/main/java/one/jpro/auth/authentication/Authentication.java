@@ -2,11 +2,13 @@ package one.jpro.auth.authentication;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import org.json.JSONObject;
 
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents the state of an authentication.
@@ -38,13 +40,14 @@ public interface Authentication extends Principal {
     }
 
     @Nonnull
-    static Authentication build(@Nonnull String username) {
-        return Authentication.build(username, null, null);
+    static Authentication create(@Nonnull String username) {
+        return Authentication.create(username, null, null);
     }
 
-    static  Authentication build(@Nonnull String username,
-                                 @Nonnull Collection<String> roles) {
-        return new ServerAuthentication(username, roles, null);
+    static  Authentication create(@Nonnull String username,
+                                  @Nonnull Collection<String> roles) {
+        Objects.requireNonNull(roles, "User's roles are null.");
+        return new User(username, roles, null);
     }
 
     /**
@@ -55,9 +58,10 @@ public interface Authentication extends Principal {
      * @return An {@link Authentication} for the user
      */
     @Nonnull
-    static Authentication build(@Nonnull String username,
-                                @Nonnull Map<String, Object> attributes) {
-        return new ServerAuthentication(username, null, attributes);
+    static Authentication create(@Nonnull String username,
+                                 @Nonnull Map<String, Object> attributes) {
+        Objects.requireNonNull(attributes, "User's attributes are null.");
+        return new User(username, null, attributes);
     }
 
     /**
@@ -69,9 +73,20 @@ public interface Authentication extends Principal {
      * @return An {@link Authentication} for the user
      */
     @Nonnull
-    static Authentication build(@Nonnull String username,
-                                @Nullable Collection<String> roles,
-                                @Nullable Map<String, Object> attributes) {
-        return new ServerAuthentication(username, roles, attributes);
+    static Authentication create(@Nonnull String username,
+                                 @Nullable Collection<String> roles,
+                                 @Nullable Map<String, Object> attributes) {
+        return new User(username, roles, attributes);
+    }
+
+    /**
+     * Builds an {@link Authentication} instance for the user from a {@link JSONObject}.
+     *
+     * @param json a {@link JSONObject} containing user's data.
+     * @return An {@link Authentication} for the user
+     */
+    @Nonnull
+    static Authentication create(@Nonnull JSONObject json) {
+        return new User(json);
     }
 }
