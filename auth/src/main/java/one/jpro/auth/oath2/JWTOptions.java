@@ -1,9 +1,6 @@
 package one.jpro.auth.oath2;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -13,94 +10,26 @@ import java.util.List;
  */
 public class JWTOptions {
 
-    private static final JSONObject EMPTY = new JSONObject(Collections.emptyMap());
+    private static final long DEFAULT_LEEWAY = 0;
+    private static final long DEFAULT_CACHE_SIZE = 5;
+    private static final Duration DEFAULT_EXPIRES_IN = Duration.ofHours(8); // 8 hours
 
-    private int leeway = 0;
-    private boolean ignoreExpiration;
-    private String algorithm = "HS256";
-    private JSONObject header = EMPTY;
-    private boolean noTimestamp;
-    private int expires;
-    private List<String> audience;
     private String issuer;
     private String subject;
-    private List<String> permissions;
+    private List<String> audience;
+    private List<String> claims;
+    private long leeway = DEFAULT_LEEWAY;
+    private boolean ignoreIssuedAt;
+
+    private long cacheSize = DEFAULT_CACHE_SIZE;
+    private Duration expiresIn = DEFAULT_EXPIRES_IN;
+
     private String nonceAlgorithm;
 
     /**
      * Default constructor.
      */
     public JWTOptions(){
-    }
-
-    public int getLeeway() {
-        return leeway;
-    }
-
-    public void setLeeway(int leeway) {
-        this.leeway = leeway;
-    }
-
-    public boolean isIgnoreExpiration() {
-        return ignoreExpiration;
-    }
-
-    public void setIgnoreExpiration(boolean ignoreExpiration) {
-        this.ignoreExpiration = ignoreExpiration;
-    }
-
-    public String getAlgorithm() {
-        return algorithm;
-    }
-
-    public void setAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
-    }
-
-    public JSONObject getHeader() {
-        return header;
-    }
-
-    public void setHeader(JSONObject header) {
-        this.header = header;
-    }
-
-    public boolean isNoTimestamp() {
-        return noTimestamp;
-    }
-
-    public void setNoTimestamp(boolean noTimestamp) {
-        this.noTimestamp = noTimestamp;
-    }
-
-    public int getExpiresInSeconds() {
-        return expires;
-    }
-
-    public JWTOptions setExpiresInSeconds(int expires) {
-        this.expires = expires;
-        return this;
-    }
-
-    public JWTOptions setExpiresInMinutes(int expiresInMinutes) {
-        this.expires = expiresInMinutes * 60;
-        return this;
-    }
-
-    public List<String> getAudience() {
-        return audience;
-    }
-
-    public void setAudience(List<String> audience) {
-        this.audience = audience;
-    }
-
-    public JWTOptions addAudience(String audience) {
-        if (this.audience == null) {
-            this.audience = new ArrayList<>();
-        }
-        this.audience.add(audience);
-        return this;
     }
 
     public String getIssuer() {
@@ -119,19 +48,60 @@ public class JWTOptions {
         this.subject = subject;
     }
 
-    public List<String> getPermissions() {
-        return permissions;
+    public List<String> getAudience() {
+        return audience;
     }
 
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
+    public void setAudience(List<String> audience) {
+        this.audience = audience;
+    }
+
+    public List<String> getClaims() {
+        return claims;
+    }
+
+    public void setClaims(List<String> claims) {
+        this.claims = claims;
+    }
+
+    public long getLeeway() {
+        return leeway;
+    }
+
+    public void setLeeway(long leeway) {
+        this.leeway = leeway;
+    }
+
+    public boolean isIgnoreIssuedAt() {
+        return ignoreIssuedAt;
+    }
+
+    public void setIgnoreIssuedAt(boolean ignoreIssuedAt) {
+        this.ignoreIssuedAt = ignoreIssuedAt;
+    }
+
+    public long getCacheSize() {
+        return cacheSize;
+    }
+
+    public void setCacheSize(long cacheSize) {
+        this.cacheSize = cacheSize;
+    }
+
+    public Duration getExpiresIn() {
+        return expiresIn;
+    }
+
+    public void setExpiresIn(Duration expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
     public String getNonceAlgorithm() {
         return nonceAlgorithm;
     }
 
-    public void setNonceAlgorithm(String nonceAlgorithm) {
+    public JWTOptions setNonceAlgorithm(String nonceAlgorithm) {
         this.nonceAlgorithm = nonceAlgorithm;
+        return this;
     }
 }
