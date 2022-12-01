@@ -81,7 +81,6 @@ public class OAuth2API {
             }
         }
 
-
         return options.getAuthorizationPath() + '?' + jsonToQuery(query);
     }
 

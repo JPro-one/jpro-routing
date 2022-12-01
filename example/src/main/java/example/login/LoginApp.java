@@ -1,8 +1,8 @@
 package example.login;
 
+import com.jpro.routing.Filters;
 import com.jpro.routing.Route;
 import com.jpro.routing.RouteApp;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.HPos;
@@ -14,12 +14,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+import one.jpro.auth.AuthAPI;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import simplefx.experimental.parts.FXFuture;
 
-import java.util.Arrays;
+import java.util.List;
 
 import static com.jpro.routing.RouteUtils.EmptyRoute;
 import static com.jpro.routing.RouteUtils.getNode;
@@ -47,54 +48,66 @@ public class LoginApp extends RouteApp {
     @Override
     public Route createRoute() {
         // Google Auth provider
-        final var googleAuth = new GoogleAuthenticationProvider(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET);
+        final var googleAuth = AuthAPI.googleAuth()
+                .webAPI(getWebAPI())
+                .clientId(GOOGLE_CLIENT_ID)
+                .clientSecret(GOOGLE_CLIENT_SECRET)
+                .create();
+
         final var googleCredentials = new OAuth2Credentials()
-                .scopes(Arrays.asList("openid", "email"))
-                .redirectUri("http://localhost:8080/")
+                .scopes(List.of("openid", "email"))
+                .redirectUri("http://localhost:8080/auth/google")
                 .nonce("0394852-3190485-2490358");
 
         // Microsoft Auth provider
-        System.out.println("AZURE_CLIENT_ID: " + AZURE_CLIENT_ID);
-        System.out.println("AZURE_CLIENT_SECRET: " + AZURE_CLIENT_SECRET);
-        final var microsoftAuth = new MicrosoftAuthenticationProvider(AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, "common");
+        final var microsoftAuth = AuthAPI.microsoftAuth()
+                .webAPI(getWebAPI())
+                .clientId(AZURE_CLIENT_ID)
+                .clientSecret(AZURE_CLIENT_SECRET)
+                .tenant("common")
+                .create();
+
         final var microsoftCredentials = new OAuth2Credentials()
-                .scopes(Arrays.asList("openid", "email"))
-                .redirectUri("http://localhost:8080/");
+                .scopes(List.of("openid", "email"))
+                .redirectUri("http://localhost:8080/auth/microsoft");
 
         return EmptyRoute()
-                .and(getNode("/", (r) -> {
-                    var queryParam = r.queryParameters();
-                    if (queryParam.isDefinedAt("code")) {
-                        microsoftCredentials.code(queryParam.apply("code"));
-//                        FXFuture.fromJava(googleAuth.authenticate(googleCredentials))
-//                                        .map(authentication -> {
-//                                    nameProperty.set("name: " + googleCredentials.getUsername());
-//                                    attributesProperty.set("attributes: " + authentication.getAttributes());
-//                                            return authentication;
-//                                        });
-                         var authFuture = microsoftAuth.authenticate(microsoftCredentials).thenAccept(authentication ->
-                                Platform.runLater(() -> {
-                                    nameProperty.set("name: " + microsoftCredentials.getUsername());
-                                    attributesProperty.set("attributes: " + authentication.getAttributes());
-                                }));
+                .and(getNode("/", (r) ->
+                        initView(googleAuth, googleCredentials, microsoftAuth, microsoftCredentials)))
+                .and(getNode("/auth/google", (r) -> {
+                    FXFuture.fromJava(googleAuth.authenticate(googleCredentials))
+                            .map(authentication -> {
+                                nameProperty.set("name: " + googleCredentials.getUsername());
+                                attributesProperty.set("attributes: " + authentication.getAttributes());
+                                return authentication;
+                            }).onFailure(ex -> {
+                                ex.printStackTrace();
+                                return null;
+                            });
 
-                         authFuture.exceptionally(ex -> {
-                             System.out.println("LoginApp: " + ex.getMessage());
-                            ex.printStackTrace();
-                            return null;
-                        });
-                        return loginDataView();
-                    } else {
-                        final var googleAuthUrl = googleAuth.authorizeUrl(googleCredentials);
-                        final var microsoftAuthUrl = microsoftAuth.authorizeUrl(microsoftCredentials);
-                        System.out.println("microsoftAuthUrl: " + microsoftAuthUrl);
-                        return initView(googleAuthUrl, microsoftAuthUrl);
-                    }
-                }));
+                    return loginDataView();
+                }))
+                .and(getNode("/auth/microsoft", (r) -> {
+                    FXFuture.fromJava(microsoftAuth.authenticate(microsoftCredentials))
+                            .map(authentication -> {
+                                nameProperty.set("name: " + microsoftCredentials.getUsername());
+                                attributesProperty.set("attributes: " + authentication.getAttributes());
+                                return authentication;
+                            }).onFailure(ex -> {
+                                ex.printStackTrace();
+                                return null;
+                            });
+
+                    return loginDataView();
+                }))
+                .filter(Filters.FullscreenFilter(true));
 
     }
 
-    public Node initView(String googleAuthUrl, String microsoftAuthUrl) {
+    public Node initView(GoogleAuthenticationProvider googleAuth,
+                         OAuth2Credentials googleCredentials,
+                         MicrosoftAuthenticationProvider microsoftAuth,
+                         OAuth2Credentials microsoftCredentials) {
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setHgap(12.0);
@@ -143,13 +156,15 @@ public class LoginApp extends RouteApp {
         gridPane.add(googleLoginButton, 0, 5, 2, 1);
         GridPane.setMargin(googleLoginButton, new Insets(12, 0, 12, 0));
         GridPane.setHalignment(googleLoginButton, HPos.CENTER);
-        googleLoginButton.setOnAction(event -> getWebAPI().openURL(googleAuthUrl));
+        googleLoginButton.setOnAction(event ->
+                getWebAPI().openURL(googleAuth.authorizeUrl(googleCredentials)));
 
         Button microsoftLoginButton = new Button("Login with Microsoft");
         gridPane.add(microsoftLoginButton, 0, 6, 2, 1);
         GridPane.setMargin(microsoftLoginButton, new Insets(12, 0, 12, 0));
         GridPane.setHalignment(microsoftLoginButton, HPos.CENTER);
-        microsoftLoginButton.setOnAction(event -> getWebAPI().openURL(microsoftAuthUrl));
+        microsoftLoginButton.setOnAction(event ->
+                getWebAPI().openURL(microsoftAuth.authorizeUrl(microsoftCredentials)));
 
         return new StackPane(gridPane);
     }
