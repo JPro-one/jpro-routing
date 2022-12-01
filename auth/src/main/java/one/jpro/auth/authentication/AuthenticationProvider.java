@@ -10,5 +10,5 @@ import java.util.concurrent.CompletableFuture;
 @FunctionalInterface
 public interface AuthenticationProvider<T extends Credentials> {
 
-    CompletableFuture<Authentication> authenticate(T credentials);
+    CompletableFuture<User> authenticate(T credentials);
 }

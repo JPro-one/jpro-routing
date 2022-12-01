@@ -51,7 +51,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     @Override
-    public CompletableFuture<Authentication> authenticate(Credentials credentials) {
+    public CompletableFuture<User> authenticate(Credentials credentials) {
         try {
             if (credentials instanceof UsernamePasswordCredentials) {
                 UsernamePasswordCredentials usernamePasswordCredentials = (UsernamePasswordCredentials) credentials;
@@ -129,8 +129,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             return api.token(flow.getGrantType(), params)
                     .thenCompose(tokenJSON -> {
-                        // attempt to create an authentication from the json object
-                        Authentication authentication = null;
+                        // attempt to create an user from the json object
+                        User user = null;
 
                         if (tokenJSON.has("access_token")) {
                             try {
@@ -139,8 +139,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                                 final DecodedJWT decodedToken = JWT.decode(id_token);
                                 final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
 
-                                // final step, verify if the authentication is not expired
-                                // this may happen if the authentication tokens have been issued for future use for example
+                                // final step, verify if the user is not expired
+                                // this may happen if the user tokens have been issued for future use for example
                                 final Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
                                 final JWTVerifier verifier = JWT.require(algorithm).build();
                                 final DecodedJWT verifiedToken = verifier.verify(id_token);
@@ -158,8 +158,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                                     authJSON.put(Authentication.KEY_ATTRIBUTES, params);
 
                                     // Create authorization instance
-                                    authentication = Authentication.create(authJSON);
-                                    System.out.println("\nAttributes: " + authentication.getAttributes());
+                                    user = Authentication.create(authJSON);
+                                    System.out.println("\nAttributes: " + user.getAttributes());
                                 } else {
                                     return CompletableFuture.failedFuture(new RuntimeException("Authorization is expired"));
                                 }
@@ -171,7 +171,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                         // TODO: handle "id_token"
 
                         // basic validation passed, the token is not expired
-                        return CompletableFuture.completedFuture(authentication);
+                        return CompletableFuture.completedFuture(user);
                     });
 
         } catch (ClassCastException | CredentialValidationException ex) {

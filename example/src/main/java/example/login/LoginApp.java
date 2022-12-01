@@ -76,10 +76,10 @@ public class LoginApp extends RouteApp {
                         initView(googleAuth, googleCredentials, microsoftAuth, microsoftCredentials)))
                 .and(getNode("/auth/google", (r) -> {
                     FXFuture.fromJava(googleAuth.authenticate(googleCredentials))
-                            .map(authentication -> {
+                            .map(user -> {
                                 nameProperty.set("name: " + googleCredentials.getUsername());
-                                attributesProperty.set("attributes: " + authentication.getAttributes());
-                                return authentication;
+                                attributesProperty.set("attributes: " + user.getAttributes());
+                                return user;
                             }).onFailure(ex -> {
                                 ex.printStackTrace();
                                 return null;
@@ -89,10 +89,10 @@ public class LoginApp extends RouteApp {
                 }))
                 .and(getNode("/auth/microsoft", (r) -> {
                     FXFuture.fromJava(microsoftAuth.authenticate(microsoftCredentials))
-                            .map(authentication -> {
+                            .map(user -> {
                                 nameProperty.set("name: " + microsoftCredentials.getUsername());
-                                attributesProperty.set("attributes: " + authentication.getAttributes());
-                                return authentication;
+                                attributesProperty.set("attributes: " + user.getAttributes());
+                                return user;
                             }).onFailure(ex -> {
                                 ex.printStackTrace();
                                 return null;

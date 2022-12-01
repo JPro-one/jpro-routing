@@ -86,7 +86,7 @@ public interface Authentication extends Principal {
      * @return An {@link Authentication} for the user
      */
     @Nonnull
-    static Authentication create(@Nonnull JSONObject json) {
+    static User create(@Nonnull JSONObject json) {
         return new User(json);
     }
 }
