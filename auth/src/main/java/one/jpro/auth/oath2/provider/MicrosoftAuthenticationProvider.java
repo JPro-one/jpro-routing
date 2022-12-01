@@ -1,5 +1,6 @@
 package one.jpro.auth.oath2.provider;
 
+import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationProvider;
 import one.jpro.auth.oath2.JWTOptions;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
@@ -18,8 +19,8 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
      *
      * @param options custom OAuth2 options
      */
-    public MicrosoftAuthenticationProvider(OAuth2Options options) {
-        super(options);
+    public MicrosoftAuthenticationProvider(WebAPI webAPI, OAuth2Options options) {
+        super(webAPI, options);
     }
 
     /**
@@ -29,8 +30,8 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
      * @param clientSecret      the client secret given to you by Google
      * @param tenant            the guid of your application
      */
-    public MicrosoftAuthenticationProvider(String clientId, String clientSecret, String tenant) {
-        super(new OAuth2Options()
+    public MicrosoftAuthenticationProvider(WebAPI webAPI, String clientId, String clientSecret, String tenant) {
+        super(webAPI, new OAuth2Options()
                 .setFlow(OAuth2Flow.AUTH_CODE)
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)

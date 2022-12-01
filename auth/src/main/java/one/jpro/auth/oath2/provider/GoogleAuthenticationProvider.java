@@ -1,5 +1,6 @@
 package one.jpro.auth.oath2.provider;
 
+import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Flow;
@@ -17,8 +18,8 @@ public class GoogleAuthenticationProvider extends OAuth2AuthenticationProvider {
      *
      * @param options custom OAuth2 options
      */
-    public GoogleAuthenticationProvider(OAuth2Options options) {
-        super(options);
+    public GoogleAuthenticationProvider(WebAPI webAPI, OAuth2Options options) {
+        super(webAPI, options);
     }
 
     /**
@@ -27,8 +28,8 @@ public class GoogleAuthenticationProvider extends OAuth2AuthenticationProvider {
      * @param clientId          the client id given to you by Google
      * @param clientSecret      the client secret given to you by Google
      */
-    public GoogleAuthenticationProvider(String clientId, String clientSecret) {
-        super(new OAuth2Options()
+    public GoogleAuthenticationProvider(WebAPI webAPI, String clientId, String clientSecret) {
+        super(webAPI, new OAuth2Options()
                 .setFlow(OAuth2Flow.AUTH_CODE)
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)

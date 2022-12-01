@@ -5,6 +5,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,12 +25,14 @@ import java.util.concurrent.CompletableFuture;
  */
 public class OAuth2AuthenticationProvider implements AuthenticationProvider<Credentials> {
 
+    private final WebAPI webAPI;
     private final OAuth2Options options;
     private final OAuth2API api;
 
     private JwkProvider jwkProvider;
 
-    public OAuth2AuthenticationProvider(OAuth2Options options) {
+    public OAuth2AuthenticationProvider(WebAPI webAPI, OAuth2Options options) {
+        this.webAPI = webAPI;
         this.options = options;
         this.api = new OAuth2API(options);
 
@@ -73,6 +76,13 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 flow = options.getFlow();
             }
 
+            // Retrieve the authorization code
+            oauth2Credentials.code(webAPI.getURLQueryParams().get("code"));
+            if (oauth2Credentials.getCode() == null || oauth2Credentials.getCode().isBlank()) {
+                return CompletableFuture.failedFuture(new RuntimeException("Authorization code is missing"));
+            }
+
+            // Validate credentials
             oauth2Credentials.validate(flow);
 
             if (options.getSupportedGrantTypes() != null && !options.getSupportedGrantTypes().isEmpty() &&
@@ -125,7 +135,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                         if (tokenJSON.has("access_token")) {
                             try {
                                 // attempt to decode tokens if jwt keys are available
-                                final var id_token = tokenJSON.getString("id_token");
+                                final String id_token = tokenJSON.getString("id_token");
                                 final DecodedJWT decodedToken = JWT.decode(id_token);
                                 final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
 
@@ -151,7 +161,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                                     authentication = Authentication.create(authJSON);
                                     System.out.println("\nAttributes: " + authentication.getAttributes());
                                 } else {
-                                    return CompletableFuture.failedFuture(new RuntimeException("Authorization is expired."));
+                                    return CompletableFuture.failedFuture(new RuntimeException("Authorization is expired"));
                                 }
                             } catch (JwkException ex) {
                                 return CompletableFuture.failedFuture(new RuntimeException(ex.getMessage(), ex));
