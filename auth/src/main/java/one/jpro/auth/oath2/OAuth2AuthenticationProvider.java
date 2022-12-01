@@ -47,7 +47,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     public String authorizeUrl(OAuth2Credentials credentials) {
-        return api.authorizeURL(credentials);
+        return api.authorizeURL(credentials.redirectUri(normalizeUri(credentials.getRedirectUri())));
     }
 
     @Override
@@ -97,7 +97,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     params.put("code", oauth2Credentials.getCode());
                     // must be identical to the redirect URI provided in the original link
                     if (oauth2Credentials.getRedirectUri() != null) {
-                        params.put("redirect_uri", oauth2Credentials.getRedirectUri());
+                        params.put("redirect_uri", normalizeUri(oauth2Credentials.getRedirectUri()));
                     }
                     // the plaintext string that was previously hashed to create the code_challenge
                     if (oauth2Credentials.getCodeVerifier() != null) {
@@ -200,5 +200,16 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
             json.put("claims", jsonArray);
         });
         return json;
+    }
+
+    private String normalizeUri(String uri) {
+        // Complete uri if is partial
+        var redirectUri = uri;
+        if (redirectUri != null && !redirectUri.isBlank()) {
+            final var serverUrl = webAPI.getServer().contains("localhost") ?
+                    "http://" + webAPI.getServer()  : "https://" + webAPI.getServer() ;
+            redirectUri = serverUrl + redirectUri;
+        }
+        return redirectUri;
     }
 }

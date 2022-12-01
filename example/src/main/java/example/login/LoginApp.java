@@ -56,7 +56,7 @@ public class LoginApp extends RouteApp {
 
         final var googleCredentials = new OAuth2Credentials()
                 .scopes(List.of("openid", "email"))
-                .redirectUri("http://localhost:8080/auth/google")
+                .redirectUri("/auth/google")
                 .nonce("0394852-3190485-2490358");
 
         // Microsoft Auth provider
@@ -69,7 +69,7 @@ public class LoginApp extends RouteApp {
 
         final var microsoftCredentials = new OAuth2Credentials()
                 .scopes(List.of("openid", "email"))
-                .redirectUri("http://localhost:8080/auth/microsoft");
+                .redirectUri("/auth/microsoft");
 
         return EmptyRoute()
                 .and(getNode("/", (r) ->
