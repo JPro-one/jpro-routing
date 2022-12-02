@@ -14,6 +14,10 @@ import one.jpro.auth.oath2.OAuth2Options;
  */
 public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvider {
 
+    public static final String COMMON_TENANT = "common";
+    public static final String CONSUMERS_TENANT = "consumers";
+    public static final String ORGANIZATIONS_TENANT = "organizations";
+
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Microsoft.
      *
