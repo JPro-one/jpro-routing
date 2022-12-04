@@ -286,7 +286,7 @@ public class OAuth2Options {
     }
 
     private String getCompletePath(String path) {
-        if (path.charAt(0) == '/') {
+        if (path != null && path.charAt(0) == '/') {
             if (site != null && site.contains("{tenant}")) {
                 if (tenant != null && !tenant.isBlank()) {
                     site = site.replace("{tenant}", tenant);
