@@ -30,8 +30,8 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Microsoft.
      *
-     * @param clientId          the client id given to you by Google
-     * @param clientSecret      the client secret given to you by Google
+     * @param clientId          the client id given to you by Microsoft
+     * @param clientSecret      the client secret given to you by Microsoft
      * @param tenant            the guid of your application
      */
     public MicrosoftAuthenticationProvider(WebAPI webAPI, String clientId, String clientSecret, String tenant) {
