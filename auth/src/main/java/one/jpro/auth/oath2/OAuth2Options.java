@@ -291,7 +291,7 @@ public class OAuth2Options {
                 if (tenant != null && !tenant.isBlank()) {
                     site = site.replace("{tenant}", tenant);
                 } else {
-                    throw new IllegalStateException("The tenant value is not null or blank.");
+                    throw new IllegalArgumentException("The tenant value is null or blank.");
                 }
             }
             return site + path;
