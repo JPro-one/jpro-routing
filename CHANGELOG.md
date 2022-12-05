@@ -1,3 +1,6 @@
+## 0.12.0
+* More major rewrites. Added OAuth2 support.
+
 ## 0.11.0
 * Big rewrite
 
