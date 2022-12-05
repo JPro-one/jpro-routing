@@ -16,9 +16,10 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import one.jpro.auth.AuthAPI;
 import one.jpro.auth.oath2.OAuth2Credentials;
+import one.jpro.auth.oath2.provider.GitHubAuthenticationProvider;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
-import simplefx.experimental.parts.FXFuture;
+import one.jpro.auth.utils.AuthFilters;
 
 import java.util.List;
 
@@ -37,7 +38,10 @@ public class LoginApp extends RouteApp {
 
     private static final String AZURE_CLIENT_ID = System.getenv("AZURE_TEST_CLIENT_ID");
     private static final String AZURE_CLIENT_SECRET = System.getenv("AZURE_TEST_CLIENT_SECRET");
-    private static final String AZURE_TENANT = System.getenv("AZURE_TEST_CLIENT_TENANT");
+//    private static final String AZURE_TENANT = System.getenv("AZURE_TEST_CLIENT_TENANT");
+
+    public static final String GITHUB_CLIENT_ID = System.getenv("GITHUB_TEST_CLIENT_ID");
+    public static final String GITHUB_CLIENT_SECRET = System.getenv("GITHUB_TEST_CLIENT_SECRET");
 
     private final StringProperty nameProperty = new SimpleStringProperty(this, "name");
     private final StringProperty attributesProperty = new SimpleStringProperty(this, "attributes");
@@ -71,43 +75,47 @@ public class LoginApp extends RouteApp {
                 .scopes(List.of("openid", "email"))
                 .redirectUri("/auth/microsoft");
 
+        // GitHub Auth provider
+        final var githubAuth = AuthAPI.githubAuth()
+                .webAPI(getWebAPI())
+                .clientId(GITHUB_CLIENT_ID)
+                .clientSecret(GITHUB_CLIENT_SECRET)
+                .create();
+
+        final var githubCredentials = new OAuth2Credentials()
+                .scopes(List.of("openid", "user"))
+                .redirectUri("/auth/github");
+
         return EmptyRoute()
                 .and(getNode("/", (r) ->
-                        initView(googleAuth, googleCredentials, microsoftAuth, microsoftCredentials)))
-                .and(getNode("/auth/google", (r) -> {
-                    FXFuture.fromJava(googleAuth.authenticate(googleCredentials))
-                            .map(user -> {
-                                nameProperty.set("name: " + googleCredentials.getUsername());
-                                attributesProperty.set("attributes: " + user.getAttributes());
-                                return user;
-                            }).onFailure(ex -> {
-                                ex.printStackTrace();
-                                return null;
-                            });
-
-                    return loginDataView();
+                        initView(googleAuth, googleCredentials,
+                                microsoftAuth, microsoftCredentials,
+                                githubAuth, githubCredentials)))
+                .and(getNode("/auth/google", (r) -> loginDataView()))
+                .and(getNode("/auth/microsoft", (r) -> loginDataView()))
+                .and(getNode("/auth/microsoft", (r) -> loginDataView()))
+                .filter(Filters.FullscreenFilter(true))
+                .filter(AuthFilters.create(googleAuth, googleCredentials, user -> {
+                    nameProperty.set("name: " + googleCredentials.getUsername());
+                    attributesProperty.set("attributes: " + user.getAttributes());
                 }))
-                .and(getNode("/auth/microsoft", (r) -> {
-                    FXFuture.fromJava(microsoftAuth.authenticate(microsoftCredentials))
-                            .map(user -> {
-                                nameProperty.set("name: " + microsoftCredentials.getUsername());
-                                attributesProperty.set("attributes: " + user.getAttributes());
-                                return user;
-                            }).onFailure(ex -> {
-                                ex.printStackTrace();
-                                return null;
-                            });
-
-                    return loginDataView();
+                .filter(AuthFilters.create(microsoftAuth, microsoftCredentials, user -> {
+                    nameProperty.set("name: " + microsoftCredentials.getUsername());
+                    attributesProperty.set("attributes: " + user.getAttributes());
                 }))
-                .filter(Filters.FullscreenFilter(true));
+                .filter(AuthFilters.create(githubAuth, githubCredentials, user -> {
+                    nameProperty.set("name: " + githubCredentials.getUsername());
+                    attributesProperty.set("attributes: " + user.getAttributes());
+                }));
 
     }
 
     public Node initView(GoogleAuthenticationProvider googleAuth,
                          OAuth2Credentials googleCredentials,
                          MicrosoftAuthenticationProvider microsoftAuth,
-                         OAuth2Credentials microsoftCredentials) {
+                         OAuth2Credentials microsoftCredentials,
+                         GitHubAuthenticationProvider gitHubAuth,
+                         OAuth2Credentials githubCredentials) {
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setHgap(12.0);
@@ -165,6 +173,13 @@ public class LoginApp extends RouteApp {
         GridPane.setHalignment(microsoftLoginButton, HPos.CENTER);
         microsoftLoginButton.setOnAction(event ->
                 getWebAPI().openURL(microsoftAuth.authorizeUrl(microsoftCredentials)));
+
+        Button githubLoginButton = new Button("Login with GitHub");
+        gridPane.add(githubLoginButton, 0, 7, 2, 1);
+        GridPane.setMargin(githubLoginButton, new Insets(12, 0, 12, 0));
+        GridPane.setHalignment(githubLoginButton, HPos.CENTER);
+        githubLoginButton.setOnAction(event ->
+                getWebAPI().openURL(gitHubAuth.authorizeUrl(githubCredentials)));
 
         return new StackPane(gridPane);
     }

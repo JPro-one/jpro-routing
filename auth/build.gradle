@@ -4,7 +4,7 @@ plugins {
 }
 
 apply plugin: 'org.openjfx.javafxplugin'
-//apply plugin: 'com.sandec.jpro'
+apply plugin: 'de.sandec.simplefx'
 
 group = 'one.jpro'
 version = "$JPRO_WEB_VERSION"
@@ -21,6 +21,7 @@ dependencies {
     api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     api "SANDEC:jnodes:$JNODES_VERSION"
     api "de.sandec:JMemoryBuddy:0.5.1"
+    api project(':core')
 
     api 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     api 'jakarta.inject:jakarta.inject-api:2.0.1'
