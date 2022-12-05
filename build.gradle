@@ -20,7 +20,7 @@ buildscript {
 
 configure([project(':core'),project(':example'), project(':dev')]) {
   repositories {
-    jcenter()
+    mavenCentral()
     maven {
       url "https://sandec.jfrog.io/artifactory/repo"
     }

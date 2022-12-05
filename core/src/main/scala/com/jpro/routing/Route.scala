@@ -42,6 +42,9 @@ trait Route {
     println("got R: " + r2)
     r2
   })
+  def when(cond: java.util.function.Function[Request, FXFuture[java.lang.Boolean]], _then: Response): Route = and(r => {
+    cond.apply(r).map(condResult => if(condResult) _then else null)
+  })
   def when(cond: Predicate[Request], _then: Route, _else: Route): Route = and(r => {
     if(cond.test(r)) _then(r) else _else(r)
   })
