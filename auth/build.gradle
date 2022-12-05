@@ -4,7 +4,6 @@ plugins {
 }
 
 apply plugin: 'org.openjfx.javafxplugin'
-apply plugin: 'de.sandec.simplefx'
 
 group = 'one.jpro'
 version = "$JPRO_WEB_VERSION"
@@ -44,26 +43,4 @@ java {
 javafx {
     version = "$JAVAFX_VERSION"
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            groupId project.group
-            artifactId ("jpro-routing-" + project.name)
-            version project.version
-            //artifact sourcesJar
-        }
-    }
-    repositories {
-        maven {
-            name = "artifactory"
-            url = "https://sandec.jfrog.io/artifactory/repo"
-            credentials {
-                username System.getenv("SANDEC_ARTIFACTORY_USERNAME")
-                password System.getenv("SANDEC_ARTIFACTORY_PASSWORD")
-            }
-        }
-    }
 }

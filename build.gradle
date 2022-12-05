@@ -51,7 +51,7 @@ configure([project(':core'),project(':example'), project(':dev')]) {
   }
 }
 
-configure([project(':core'), project(':dev')]) {
+configure([project(':core'), project(':dev'), project(':auth')]) {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
 
@@ -93,6 +93,12 @@ configure([project(':core'), project(':dev')]) {
     }
   }
 
+}
+
+configure([project(':core')]) {
+  dependencies {
+    api "SANDEC:simplefx_2.12:$SIMPLEFX_VERSION"
+  }
 }
 
 configure([project(':dev')]) {
