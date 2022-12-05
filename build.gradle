@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 System.setProperty("file.encoding", "UTF-8")
 
 buildscript {
@@ -12,7 +14,7 @@ buildscript {
   dependencies {
     classpath "com.sandec.jpro:jpro-plugin-gradle:$JPRO_VERSION"
     classpath "SANDEC:simplefx-plugin-gradle:$SIMPLEFX_VERSION"
-    classpath 'org.openjfx:javafx-plugin:0.0.12'
+    classpath 'org.openjfx:javafx-plugin:0.0.13'
   }
 }
 
@@ -42,15 +44,14 @@ configure([project(':core'),project(':example'), project(':dev')]) {
     useJUnitPlatform()
 
     testLogging.showStandardStreams = true
-    testLogging.exceptionFormat org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    testLogging.exceptionFormat TestExceptionFormat.FULL
     testLogging.showExceptions true
     testLogging.showCauses true
     testLogging.showStackTraces true
   }
 }
 
-configure([project(':core'),project(':dev')]) {
-  apply plugin: 'java'
+configure([project(':core'), project(':dev')]) {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
 
@@ -59,8 +60,8 @@ configure([project(':core'),project(':dev')]) {
     api "SANDEC:jnodes:$JNODES_VERSION"
     api "de.sandec:JMemoryBuddy:0.5.1"
     api "org.scala-lang:scala-library:2.12.10"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 
     // https://mvnrepository.com/artifact/commons-validator/commons-validator
     api group: 'commons-validator', name: 'commons-validator', version: '1.7'
@@ -107,8 +108,10 @@ configure([project(':example')]) {
   //mainClassName = "example.scala.TestWebApplication"
   //mainClassName = "example.scala.TestExtensions"
   //mainClassName = "example.scala.ColorTransitionApp"
-  mainClassName = "example.colors.ColorsApp"
+//  mainClassName = "example.colors.ColorsApp"
+  mainClassName = "example.login.LoginApp"
   dependencies {
+    implementation project(":auth")
     implementation project(':core')
     implementation project(':dev')
     implementation 'org.controlsfx:controlsfx:11.1.2'
