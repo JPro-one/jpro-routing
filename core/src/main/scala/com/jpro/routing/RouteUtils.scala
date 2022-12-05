@@ -15,8 +15,13 @@ object RouteUtils {
 
   def redirect(path: String, to: String): Route = get(path, (r) => Redirect(to))
 
-  def get(path: String, f: Function[Request,Response]): Route = (request: Request) => if(request.path == path) FXFuture.unit(f.apply(request)) else null
-  def getNode(path: String, node: Function[Request,Node]): Route = (request: Request) => if(request.path == path) FXFuture.unit(viewFromNode(node.apply(request))) else null
+  def getFuture(path: String, f: Function[Request, FXFuture[Response]]): Route = (request: Request) => if (request.path == path) f.apply(request) else FXFuture.unit(null)
+
+  def get(path: String, f: Function[Request, Response]): Route = (request: Request) => if (request.path == path) FXFuture.unit(f.apply(request)) else null
+
+  def getNodeFuture(path: String, node: Function[Request, FXFuture[Node]]): Route = (request: Request) => if (request.path == path) node.apply(request).map(node => viewFromNode(node)) else FXFuture.unit(null)
+
+  def getNode(path: String, node: Function[Request, Node]): Route = (request: Request) => if (request.path == path) FXFuture.unit(viewFromNode(node.apply(request))) else null
 
   implicit def toRoute(f: Response => FXFuture[Request]): Route = new Route {
     override def apply(r: Request): FXFuture[Response] = f(r)
