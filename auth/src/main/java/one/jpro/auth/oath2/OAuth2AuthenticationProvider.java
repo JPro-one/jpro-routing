@@ -97,7 +97,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     params.put("code", oauth2Credentials.getCode());
                     // must be identical to the redirect URI provided in the original link
                     if (oauth2Credentials.getRedirectUri() != null) {
-                        params.put("redirect_uri", oauth2Credentials.getRedirectUri());
+                        params.put("redirect_uri", normalizeUri(oauth2Credentials.getRedirectUri()));
                     }
                     // the plaintext string that was previously hashed to create the code_challenge
                     if (oauth2Credentials.getCodeVerifier() != null) {
@@ -159,7 +159,6 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
                                     // Create authorization instance
                                     user = Authentication.create(authJSON);
-                                    System.out.println("\nAttributes: " + user.getAttributes());
                                 } else {
                                     return CompletableFuture.failedFuture(new RuntimeException("Authorization is expired"));
                                 }
