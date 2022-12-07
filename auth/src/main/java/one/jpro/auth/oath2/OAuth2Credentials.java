@@ -28,6 +28,8 @@ public class OAuth2Credentials implements Credentials {
     private OAuth2Flow flow;
     private String nonce;
 
+    private String completeRedirectUri;
+
     /**
      * Default constructor.
      */
@@ -124,6 +126,28 @@ public class OAuth2Credentials implements Credentials {
         return this;
     }
 
+    /**
+     * Returns the normalized version of the redirect uri.
+     * This method is used internally.
+     *
+     * @return the normalized redirected uri
+     */
+    private String getNormalizedRedirectUri() {
+        if (completeRedirectUri == null) {
+            return redirectUri;
+        }
+        return completeRedirectUri;
+    }
+
+    /**
+     * Sets the normalized version of the redirect uri.
+     * This method is used internally.
+     */
+    OAuth2Credentials normalizedRedirectUri(String completeRedirectUri) {
+        this.completeRedirectUri = completeRedirectUri;
+        return this;
+    }
+
     @Override
     public <V> void validate(V arg) throws CredentialValidationException {
         OAuth2Flow flow = (OAuth2Flow) arg;
@@ -156,7 +180,7 @@ public class OAuth2Credentials implements Credentials {
         JSONObject json = new JSONObject();
         Optional.ofNullable(getCode()).ifPresent(code -> json.put("code", code));
         Optional.ofNullable(getCodeVerifier()).ifPresent(codeVerifier -> json.put("code_verifier", codeVerifier));
-        Optional.ofNullable(getRedirectUri()).ifPresent(redirectUri -> json.put("redirect_uri", redirectUri));
+        Optional.ofNullable(getNormalizedRedirectUri()).ifPresent(redirectUri -> json.put("redirect_uri", redirectUri));
         Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow));
         Optional.ofNullable(getJwt()).ifPresent(jwt -> json.put("jwt", jwt));
         Optional.ofNullable(getAssertion()).ifPresent(assertion -> json.put("assertion", assertion));

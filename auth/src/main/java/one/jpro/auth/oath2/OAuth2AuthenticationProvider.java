@@ -47,7 +47,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     public String authorizeUrl(OAuth2Credentials credentials) {
-        return api.authorizeURL(credentials.redirectUri(normalizeUri(credentials.getRedirectUri())));
+        return api.authorizeURL(credentials.normalizedRedirectUri(normalizeUri(credentials.getRedirectUri())));
     }
 
     @Override
