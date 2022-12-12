@@ -124,7 +124,17 @@ object LinkUtil {
     }
     if(!WebAPI.isBrowser) {
       node.onMouseClicked --> { e =>
-        if(e.isStillSincePress) LinkUtil.getSessionManager(node).gotoURL(link)
+        def isExternalLink(x: String) = x.startsWith("http") || x.startsWith("mailto")
+        if(e.isStillSincePress) {
+          if(isExternalLink(link)) {
+            // Open link with awt
+            import java.awt.Desktop
+            import java.net.URI
+            Desktop.getDesktop.browse(new URI(link))
+          } else {
+            LinkUtil.getSessionManager(node).gotoURL(link)
+          }
+        }
       }
     } else {
       var currentParent: ObservableList[Node] = null
