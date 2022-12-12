@@ -10,19 +10,19 @@ import javafx.scene.Parent
 abstract class RouteApp extends Application {
 
   private var _stage: Stage = null;
-  def getStage(): Stage = _stage
-
   private var routeNode: RouteNode = null
-
+  private var _scene: Scene = null
+  def getStage(): Stage = _stage
+  def getScene(): Scene = _scene
   def getRouteNode(): RouteNode = routeNode
   def getWebAPI(): WebAPI = if(WebAPI.isBrowser) WebAPI.getWebAPI(getStage()) else null
 
   override def start(stage: Stage): Unit = {
     _stage = stage
     routeNode = new RouteNode(stage)
+    _scene = new Scene(routeNode, 1400, 800)
+    stage.setScene(_scene)
     routeNode.setRoute(createRoute())
-    val scene = new Scene(routeNode, 1400, 800)
-    stage.setScene(scene)
     stage.show()
     routeNode.start(SessionManager.getDefault(routeNode, stage))
   }
