@@ -5,17 +5,21 @@ import com.jpro.webapi.WebAPI
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
+import javafx.scene.Parent
 
 abstract class RouteApp extends Application {
 
   private var _stage: Stage = null;
   def getStage(): Stage = _stage
 
-  def getWebAPI(): WebAPI = WebAPI.getWebAPI(getStage())
+  private var routeNode: RouteNode = null
+
+  def getRouteNode(): RouteNode = routeNode
+  def getWebAPI(): WebAPI = if(WebAPI.isBrowser) WebAPI.getWebAPI(getStage()) else null
 
   override def start(stage: Stage): Unit = {
     _stage = stage
-    val routeNode = new RouteNode(stage)
+    routeNode = new RouteNode(stage)
     routeNode.setRoute(createRoute())
     val scene = new Scene(routeNode, 1400, 800)
     stage.setScene(scene)
