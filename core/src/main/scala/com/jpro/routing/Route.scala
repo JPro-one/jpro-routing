@@ -28,9 +28,16 @@ trait Route {
     }
   })
   def filter(filter: Filter): Route = filter(this)
-  def filterWhen(cond: Predicate[Request], filter: Filter): Route = { r =>
+  def filterWhen(cond: Predicate[Request], filter: (Request) => Filter): Route = { r =>
     if(cond.test(r)) {
-      filter(this).apply(r)
+      filter.apply(r)(this).apply(r)
+    } else {
+      this.apply(r)
+    }
+  }
+  def filterWhenFuture(cond: Predicate[Request], filter: (Request) => FXFuture[Filter]): Route = { r =>
+    if(cond.test(r)) {
+      filter(r).flatMap(filter => filter(this).apply(r))
     } else {
       this.apply(r)
     }
