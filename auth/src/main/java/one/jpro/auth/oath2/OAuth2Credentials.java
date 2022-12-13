@@ -172,12 +172,15 @@ public class OAuth2Credentials implements Credentials {
                     throw new CredentialValidationException("password cannot be null or empty");
                 }
                 break;
+            case CLIENT:
+                // no fields are required
+                break;
         }
     }
 
     @Override
     public JSONObject toJSON() {
-        JSONObject json = new JSONObject();
+        final JSONObject json = new JSONObject();
         Optional.ofNullable(getCode()).ifPresent(code -> json.put("code", code));
         Optional.ofNullable(getCodeVerifier()).ifPresent(codeVerifier -> json.put("code_verifier", codeVerifier));
         Optional.ofNullable(getNormalizedRedirectUri()).ifPresent(redirectUri -> json.put("redirect_uri", redirectUri));

@@ -25,8 +25,8 @@ public class GoogleAuthenticationProvider extends OAuth2AuthenticationProvider {
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Google.
      *
-     * @param clientId          the client id given to you by Google
-     * @param clientSecret      the client secret given to you by Google
+     * @param clientId     the client id given to you by Google
+     * @param clientSecret the client secret given to you by Google
      */
     public GoogleAuthenticationProvider(WebAPI webAPI, String clientId, String clientSecret) {
         super(webAPI, new OAuth2Options()

@@ -1,5 +1,6 @@
 package one.jpro.auth.oath2;
 
+import one.jpro.auth.utils.Utils;
 import org.json.JSONObject;
 
 import java.net.http.HttpClient;
@@ -209,7 +210,7 @@ public class OAuth2Options {
     }
 
     public OAuth2Options setClientId(String clientId) {
-        this.clientId = clientId;
+        this.clientId = Utils.requireNonNullOrBlank(clientId, "Client id cannot be null or blank");
         return this;
     }
 
@@ -218,7 +219,7 @@ public class OAuth2Options {
     }
 
     public OAuth2Options setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
+        this.clientSecret = Utils.requireNonNullOrBlank(clientSecret, "Client secret cannot be null or blank");
         return this;
     }
 

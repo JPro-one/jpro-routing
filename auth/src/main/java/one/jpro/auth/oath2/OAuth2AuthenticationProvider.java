@@ -6,6 +6,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
+import jakarta.validation.constraints.NotNull;
 import one.jpro.auth.authentication.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,6 +16,7 @@ import java.net.URL;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,15 +27,18 @@ import java.util.concurrent.CompletableFuture;
  */
 public class OAuth2AuthenticationProvider implements AuthenticationProvider<Credentials> {
 
+    @NotNull
     private final WebAPI webAPI;
+    @NotNull
     private final OAuth2Options options;
+    @NotNull
     private final OAuth2API api;
-
+    @NotNull
     private JwkProvider jwkProvider;
 
     public OAuth2AuthenticationProvider(WebAPI webAPI, OAuth2Options options) {
-        this.webAPI = webAPI;
-        this.options = options;
+        this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
+        this.options = Objects.requireNonNull(options, "OAuth2 options cannot be null");
         this.api = new OAuth2API(options);
 
         try {
