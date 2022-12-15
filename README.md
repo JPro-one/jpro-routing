@@ -56,15 +56,15 @@ dependency>
 ### publishing
 local:
 ```gradle
-./gradlew :core:publishToMavenLocal :dev:publishToMavenLocal :auth:publishToMavenLocal
+./gradlew :core:publishToMavenLocal :dev:publishToMavenLocal :auth:publishToMavenLocal :popup:publishToMavenLocal
 ```
 
 internal:
 ```gradle
-./gradlew :core:publish :dev:publish :auth:publish
+./gradlew :core:publish :dev:publish :auth:publish :popup:publish
 ```
 
 ### clear cache:
 ```
-find ~/.m2 ~/.gradle | grep jpro-routing | grep <version> | xargs rm -r
+find ~/.m2 ~/.gradle | grep jpro-routing | grep 0.12 | xargs rm -r
 ```

@@ -51,7 +51,7 @@ configure([project(':core'),project(':example'), project(':dev')]) {
   }
 }
 
-configure([project(':core'), project(':dev'), project(':auth')]) {
+configure([project(':core'), project(':dev'), project(':auth'), project(':popup')]) {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
 
@@ -119,6 +119,7 @@ configure([project(':example')]) {
   dependencies {
     implementation project(":auth")
     implementation project(':core')
+    implementation project(':popup')
     implementation project(':dev')
     implementation 'org.controlsfx:controlsfx:11.1.2'
     implementation "fr.brouillard.oss:cssfx:11.5.0"
