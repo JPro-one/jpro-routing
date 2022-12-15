@@ -6,6 +6,7 @@ import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
 import javafx.scene.Parent
+import javafx.scene.layout.StackPane
 
 abstract class RouteApp extends Application {
 
@@ -20,7 +21,11 @@ abstract class RouteApp extends Application {
   override def start(stage: Stage): Unit = {
     _stage = stage
     routeNode = new RouteNode(stage)
-    _scene = new Scene(routeNode, 1400, 800)
+
+    // Add node between RouteNode and Scene, so Popups work correctly with ScenicView
+    val root = new StackPane(routeNode)
+
+    _scene = new Scene(root, 1400, 800)
     stage.setScene(_scene)
     routeNode.setRoute(createRoute())
     stage.show()
