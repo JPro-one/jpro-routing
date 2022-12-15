@@ -46,12 +46,22 @@ trait SessionManager { THIS =>
   }
   def gotoURL(url: String, pushState: Boolean = true, track: Boolean = true): Unit = {
     val url2 = SessionManager.mergeURLs(THIS.url, url)
-    println(s"goto: $url")
-    val newView = if(view != null && view.handleURL(url)) FXFuture(view) else {
-      getView(url2)
-    }
-    newView.map { view =>
-      gotoURL(url2, view, pushState, track)
+    try {
+      println(s"goto: $url")
+      val newView = if(view != null && view.handleURL(url)) FXFuture(view) else {
+        getView(url2)
+      }
+      if(newView != null) {
+        newView.map { view =>
+          gotoURL(url2, view, pushState, track)
+        }
+      } else {
+        new NullPointerException(s"Error: no view found for $url").printStackTrace()
+      }
+    } catch {
+      case e: Exception =>
+        println(s"Error while loading the path $url2")
+        e.printStackTrace()
     }
   }
 
