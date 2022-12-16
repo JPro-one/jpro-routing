@@ -22,8 +22,8 @@ import one.jpro.auth.utils.AuthFilters;
 
 import java.util.List;
 
-import static com.jpro.routing.RouteUtils.EmptyRoute;
 import static com.jpro.routing.RouteUtils.getNode;
+import static com.jpro.routing.RouteUtils.get;
 
 /**
  * Login example application.
@@ -85,7 +85,7 @@ public class LoginApp extends RouteApp {
                 .scopes(List.of("openid", "user"))
                 .redirectUri("/auth/github");
 
-        return EmptyRoute()
+        return Route.empty()
                 .and(getNode("/", (r) ->
                         initView(googleAuth, googleCredentials,
                                 microsoftAuth, microsoftCredentials/*,

@@ -17,7 +17,7 @@ class MyApp(stage: Stage) extends RouteNode(stage) {
   stylesheets ::= "test.css"
 
   setRoute(
-    EmptyRoute
+    Route.empty()
       .and(get("", (r) => new MainView))
       .and(get("/", (r) => new MainView))
       .and(get("/?page=main", (r) => new MainView))

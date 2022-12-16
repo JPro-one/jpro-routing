@@ -1,6 +1,6 @@
 package com.jpro.routing.crawler
 
-import com.jpro.routing.{Redirect, RouteNode}
+import com.jpro.routing.{Redirect, Route, RouteNode}
 import TestUtils._
 import com.jpro.routing.RouteUtils._
 import com.jpro.routing.crawl.{AppCrawler, SitemapGenerator}
@@ -12,7 +12,7 @@ class TestSitemapGenerator {
   @Test
   def test(): Unit = {
     def app = new RouteNode(null) {
-      setRoute(EmptyRoute
+      setRoute(Route.empty()
         .and(get("/", r => new Page1))
         .and(get("/page2", r => new Page2))
         .and(get("/page4", r => new Page2))
@@ -29,7 +29,7 @@ class TestSitemapGenerator {
   @Test
   def testMailToRedirect(): Unit = {
     def app = new RouteNode(null) {
-      setRoute(EmptyRoute
+      setRoute(Route.empty()
         .and(get("/", r => pageWithLink(List("/page2", "/page3", "mailto:something"))))
         .and(get("/page2", r => new Redirect("mailto:something-2"))))
     }

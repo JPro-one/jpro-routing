@@ -23,7 +23,7 @@ class RouteNode(stage: Stage) extends StackPane { THIS =>
 
   def getRoute(): Route = newRoute
   def setRoute(x: Route): Unit = newRoute = x
-  var newRoute: Route = RouteUtils.EmptyRoute
+  var newRoute: Route = Route.empty()
 
   def route(s: String, oldView: Node) = {
     newRoute(Request.fromString(s).copy(oldContent = oldView, origOldContent = oldView))

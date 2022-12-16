@@ -1,8 +1,8 @@
 package example.scala
 
 
-import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode, redirect}
-import com.jpro.routing.{Filters, Redirect, Request, RouteUtils, LinkUtil, RouteNode}
+import com.jpro.routing.RouteUtils.{get, getNode, redirect}
+import com.jpro.routing.{Filters, LinkUtil, Redirect, Request, Route, RouteNode, RouteUtils}
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.all._
@@ -20,7 +20,7 @@ class TestExtensionsApp(stage: Stage) extends RouteNode(stage) {
   stylesheets <++ "/com/jpro/routing/extensions/linkheader/css/linkheader.css"
   
   setRoute(
-    EmptyRoute /* StartRoute? */
+    Route.empty() /* StartRoute? */
       .and(redirect("/", "/home"))
       .and(getNode("/home", (r) => new Label("HOME")))
       .and(getNode("/secret", (r) => new Label("SECRET")))

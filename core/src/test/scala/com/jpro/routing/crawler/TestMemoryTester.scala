@@ -1,6 +1,6 @@
 package com.jpro.routing.crawler
 
-import com.jpro.routing.RouteNode
+import com.jpro.routing.{Route, RouteNode}
 import com.jpro.routing.RouteUtils._
 import com.jpro.routing.crawl.{AppCrawler, MemoryTester}
 import com.jpro.routing.crawler.TestUtils.{Page1, Page2}
@@ -13,7 +13,7 @@ class TestMemoryTest {
   @Test
   def simpleTest(): Unit = {
     def app = new RouteNode(null) {
-      setRoute(EmptyRoute
+      setRoute(Route.empty()
         .and(get("/", r => new Page1))
         .and(get("/page2", r => new Page2))
         .and(get("/page4", r => new Page2)))
@@ -26,7 +26,7 @@ class TestMemoryTest {
   def simpleFailingTest(): Unit = {
     val page2 = new Page2
     def app = new RouteNode(null) {
-      setRoute(EmptyRoute
+      setRoute(Route.empty()
         .and(get("/", r => new Page1))
         .and(get("/page2", r => page2))
         .and(get("/page4", r => new Page2)))
@@ -38,7 +38,7 @@ class TestMemoryTest {
   @Test
   def simpleFailingTest2(): Unit = {
     val app = inFX(new RouteNode(null) {
-      setRoute(EmptyRoute
+      setRoute(Route.empty()
         .and(get("/", r => new Page1))
         .and(get("/page2", r => new Page2))
         .and(get("/page4", r => new Page2)))

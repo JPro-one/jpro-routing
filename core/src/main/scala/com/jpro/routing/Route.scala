@@ -3,6 +3,10 @@ package com.jpro.routing
 import simplefx.experimental._
 import java.util.function.Predicate
 
+
+object Route {
+  def empty(): Route = (r) => null
+}
 @FunctionalInterface
 trait Route {
   def apply(r: Request): FXFuture[Response]

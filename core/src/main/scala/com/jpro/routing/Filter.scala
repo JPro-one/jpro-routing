@@ -1,5 +1,9 @@
 package com.jpro.routing
 
+object Filter {
+  def empty(): Filter = route => route
+}
+
 @FunctionalInterface
 trait Filter {
     def apply(route: Route): Route

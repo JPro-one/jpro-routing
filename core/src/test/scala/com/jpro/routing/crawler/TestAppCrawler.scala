@@ -2,7 +2,7 @@ package com.jpro.routing.crawler
 
 import com.jpro.routing.crawl.AppCrawler
 import com.jpro.routing.crawl.AppCrawler._
-import com.jpro.routing.{LinkUtil, RouteNode, View}
+import com.jpro.routing.{LinkUtil, Route, RouteNode, View}
 import simplefx.all._
 import simplefx.core._
 import TestUtils._
@@ -36,7 +36,7 @@ class TestAppCrawler {
   @Test
   def testCrawlApp(): Unit = {
     def app = new RouteNode(null) {
-      setRoute(EmptyRoute
+      setRoute(Route.empty()
         .and(get("/", r => new Page1))
         .and(get("/page2", r => new Page2)))
     }
@@ -51,7 +51,7 @@ class TestAppCrawler {
   @Test
   def testEmptyImage(): Unit = {
     def app = new RouteNode(null) {
-      setRoute(EmptyRoute
+      setRoute(Route.empty()
         .and(get("/", r => new View {
           override def title: String = ""
 

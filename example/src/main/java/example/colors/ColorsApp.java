@@ -11,12 +11,13 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.validator.UrlValidator;
+import simplefx.experimental.parts.FXFuture;
 
 import java.util.List;
 
 import static com.jpro.routing.RouteUtils.redirect;
 import static com.jpro.routing.RouteUtils.getNode;
-import static com.jpro.routing.RouteUtils.EmptyRoute;
 
 public class ColorsApp extends RouteApp {
   public static void main(String[] args) {
@@ -24,15 +25,14 @@ public class ColorsApp extends RouteApp {
   }
 
   public Route createRoute() {
-    return EmptyRoute()
+    return Route.empty()
             .and(redirect("/", "/green"))
-            //.and(CreateMDPages("/documentation1", "resources/something.md"))
             .and(getNode("/green", (r) -> gen("Green","/red", Color.GREEN)))
             .and(getNode("/red", (r) -> gen("Red", "/blue", Color.RED)))
             .and(getNode("/blue", (r) -> gen("Blue", "/yellow", Color.BLUE)))
             .and(getNode("/yellow", (r) -> gen("Yellow", "/red", Color.YELLOW)))
             .path("/colors",
-                    EmptyRoute()
+                    Route.empty()
                             .and(getNode("/green", (r) -> gen("Green","./red", Color.GREEN)))
                             .and(getNode("/red", (r) -> gen("Red", "./green", Color.RED)))
             ).filter(Filters.FullscreenFilter(true))
