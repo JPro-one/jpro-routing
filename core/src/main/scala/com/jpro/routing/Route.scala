@@ -18,7 +18,12 @@ trait Route {
     } else {
       r.flatMap{ r =>
         if(r == null) {
-          x.apply(request)
+          val r = x.apply(request)
+          if(r == null) {
+            FXFuture.unit(null)
+          } else {
+            r
+          }
         } else FXFuture.unit(r)
       }
     }
@@ -49,8 +54,6 @@ trait Route {
   def when(cond: Predicate[Request], _then: Route): Route = and(r => {
     val condResult = cond.test(r)
     val r2: FXFuture[Response] = if(condResult) _then(r) else null
-    println("got condResult: " + condResult)
-    println("got R: " + r2)
     r2
   })
   def when(cond: java.util.function.Function[Request, FXFuture[java.lang.Boolean]], _then: Response): Route = and(r => {
