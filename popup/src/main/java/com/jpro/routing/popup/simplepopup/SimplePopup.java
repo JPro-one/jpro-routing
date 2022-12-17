@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
 
@@ -45,8 +46,11 @@ public class SimplePopup extends StackPane {
         topArea.getChildren().add(titleLabel);
 
         if(closable) {
-            Button closeButton = new Button("X");
+            Button closeButton = new Button();
             closeButton.getStyleClass().add("simple-popup-close-button");
+            // Set ikonli close icon
+            FontIcon closeIcon = new FontIcon("eva-close");
+            closeButton.setGraphic(closeIcon);
             StackPane.setAlignment(closeButton, Pos.CENTER_RIGHT);
             closeButton.setOnAction(e -> {
                 PopupAPI.closePopup(this);

@@ -104,7 +104,10 @@ configure([project(':core')]) {
 configure([project(':dev')]) {
   dependencies {
     implementation project(':core')
-    implementation "fr.brouillard.oss:cssfx:11.5.0"
+    api "org.kordamp.ikonli:ikonli-javafx:$IKONLY_VERSION"
+    api "org.kordamp.ikonli:ikonli-evaicons-pack:$IKONLY_VERSION"
+    api "org.kordamp.ikonli:ikonli-ionicons4-pack:$IKONLY_VERSION"
+    implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
     implementation 'net.raumzeitfalle.fx:scenic-view:11.0.2'
   }
 }
@@ -114,15 +117,16 @@ configure([project(':example')]) {
   //mainClassName = "example.scala.TestWebApplication"
   //mainClassName = "example.scala.TestExtensions"
   //mainClassName = "example.scala.ColorTransitionApp"
-//  mainClassName = "example.colors.ColorsApp"
-  mainClassName = "example.login.LoginApp"
+  mainClassName = "example.colors.ColorsApp"
+  mainClassName = "example.popup.PopupApp"
+//  mainClassName = "example.login.LoginApp"
   dependencies {
     implementation project(":auth")
     implementation project(':core')
     implementation project(':popup')
     implementation project(':dev')
     implementation 'org.controlsfx:controlsfx:11.1.2'
-    implementation "fr.brouillard.oss:cssfx:11.5.0"
+    implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
   }
 
   jpro {

@@ -10,6 +10,7 @@ import fr.brouillard.oss.cssfx.CSSFX
 import com.jpro.routing.LinkUtil
 import com.jpro.routing.filter.container.ContainerFilter
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
+import org.kordamp.ikonli.javafx.FontIcon
 
 object DevFilter {
 
@@ -33,20 +34,23 @@ object DevFilter {
   
       this <++ new HBox {
         styleClass <++ "devfilter-hbox"
-        this <++ new Button("<") {
+        this <++ new Button() {
           styleClass ::= "devfilter-icon-button"
+          graphic = new FontIcon("eva-arrow-back")
           onAction --> {
             LinkUtil.goBack(this)
           }
         }
-        this <++ new Button(">") {
+        this <++ new Button() {
           styleClass ::= "devfilter-icon-button"
+          graphic = new FontIcon("eva-arrow-forward")
           onAction --> {
             LinkUtil.goForward(this)
           }
         }
-        this <++ new Button("↻") {
+        this <++ new Button() {
           styleClass ::= "devfilter-icon-button"
+          graphic = new FontIcon("ion4-ios-refresh")
           onAction --> {
             LinkUtil.refresh(this)
           }

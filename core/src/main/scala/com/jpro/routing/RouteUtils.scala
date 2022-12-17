@@ -11,6 +11,7 @@ import java.util.function.Supplier
 
 object RouteUtils {
 
+  @deprecated
   val EmptyRoute: Route = (x) => null
 
   def redirect(path: String, to: String): Route = get(path, (r) => Redirect(to))

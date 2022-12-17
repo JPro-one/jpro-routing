@@ -28,7 +28,10 @@
 .simple-popup-close-button {
   -fx-background-color: #00000000;
   -fx-background-radius: 16;
-  -fx-padding: 8;
+  -fx-padding: 4;
+}
+.simple-popup-close-button .ikonli-font-icon {
+  -fx-font-size: 28;
 }
 .simple-popup-close-button:hover {
   -fx-background-color: #00000022;

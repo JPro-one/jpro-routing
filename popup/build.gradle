@@ -22,6 +22,8 @@ dependencies {
     api "de.sandec:JMemoryBuddy:0.5.1"
     api project(':core')
 
+    api "org.kordamp.ikonli:ikonli-javafx:$IKONLY_VERSION"
+    api "org.kordamp.ikonli:ikonli-evaicons-pack:$IKONLY_VERSION"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
