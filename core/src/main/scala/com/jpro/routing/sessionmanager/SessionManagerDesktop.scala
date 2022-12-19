@@ -67,7 +67,7 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
     //this.padding = Insets(0)
     style = "-fx-padding: 0;"
     background = Background.EMPTY
-    vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.ALWAYS)
+     vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.AS_NEEDED)
   }
   webApp <++ scrollpane
   @Bind var isFullscreen = true
