@@ -42,5 +42,6 @@ java {
 
 javafx {
     version = "$JAVAFX_VERSION"
+     configurations = ["compileOnly", "testImplementation"]
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
 }
