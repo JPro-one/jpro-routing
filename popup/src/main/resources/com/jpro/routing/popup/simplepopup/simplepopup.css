@@ -31,7 +31,7 @@
   -fx-padding: 4;
 }
 .simple-popup-close-button .ikonli-font-icon {
-  -fx-font-size: 28;
+  -fx-icon-size: 28;
 }
 .simple-popup-close-button:hover {
   -fx-background-color: #00000022;

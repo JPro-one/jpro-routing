@@ -108,7 +108,7 @@ configure([project(':dev')]) {
     api "org.kordamp.ikonli:ikonli-evaicons-pack:$IKONLY_VERSION"
     api "org.kordamp.ikonli:ikonli-ionicons4-pack:$IKONLY_VERSION"
     implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
-    implementation 'net.raumzeitfalle.fx:scenic-view:11.0.2'
+    implementation 'org.scenic-view:scenic-view:11.0.3-SNAPSHOT-FORK'
   }
 }
 

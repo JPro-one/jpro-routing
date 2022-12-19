@@ -9,6 +9,7 @@ import com.jpro.routing.Filter
 import fr.brouillard.oss.cssfx.CSSFX
 import com.jpro.routing.LinkUtil
 import com.jpro.routing.filter.container.ContainerFilter
+import com.jpro.webapi.WebAPI
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import org.kordamp.ikonli.javafx.FontIcon
 
@@ -18,7 +19,7 @@ object DevFilter {
 
     override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
     override def createContainer() = new MyContainer
-    class MyContainer extends VBox with Container {
+    class MyContainer extends VBox with Container { CONTAINER =>
       stylesheets <++ "/com/jpro/routing/dev/devfilter.css"
 
       styleClass <++ "devfilter-vbox"
@@ -68,7 +69,13 @@ object DevFilter {
         }
         this <++ new Button("Scenic View") {
             onAction --> {
-                ScenicView.show(this.scene)
+                if(WebAPI.isBrowser) {
+                    val stage = new Stage()
+                    WebAPI.getWebAPI(CONTAINER.getScene()).openStageAsPopup(stage)
+                    ScenicView.show(content.getScene().getRoot, stage)
+                } else {
+                    ScenicView.show(this.scene)
+                }
             }
         }
         this <++ new Label {
