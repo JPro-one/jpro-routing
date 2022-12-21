@@ -41,7 +41,7 @@ object LinkUtil {
     text.map {desc =>
       node.getProperties.put("description",desc)
     }
-    if(url == null || url.startsWith("/")) {
+    if(url == null || url.startsWith("/") || url.startsWith("./") || url.startsWith("../")) {
       setLinkInternal(node,url, text, children)
     } else {
       setLinkExternal(node,url, text, children)

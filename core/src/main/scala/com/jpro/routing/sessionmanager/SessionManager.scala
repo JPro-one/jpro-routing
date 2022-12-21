@@ -53,7 +53,9 @@ trait SessionManager { THIS =>
       }
       if(newView != null) {
         newView.map { view =>
-          gotoURL(url2, view, pushState, track)
+          val decodedURL = URLDecoder.decode(url2,"UTF-8")
+          this.url = decodedURL
+          gotoURL(decodedURL, view, pushState, track)
         }
       } else {
         new NullPointerException(s"Error: no view found for $url").printStackTrace()

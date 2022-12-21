@@ -30,9 +30,10 @@ class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionMa
   })
 
   def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit = {
-    val url = URLDecoder.decode(_url,"UTF-8")
+    val url = _url
     x match {
-      case Redirect(url) => gotoURL(url)
+      case Redirect(url) =>
+        gotoURL(url)
       case view: View =>
         this.url = url
         view.sessionManager = this
