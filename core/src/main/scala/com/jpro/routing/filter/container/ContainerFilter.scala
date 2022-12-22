@@ -33,11 +33,14 @@ object ContainerFilter {
 
   def create[A <: javafx.scene.Node](containerLogic: ContainerFactory): Filter = route => request => {
     var container: Node = null
-    val request2: Request = if (request.oldContent != null && containerLogic.isContainer(request.oldContent)) {
-      container = request.oldContent
-      request.mapContent(x => containerLogic.getContent(container))
-    } else {
-      request
+    val request2: Request = {
+      val oldContentV = request.oldContent.get()
+      if (oldContentV != null && containerLogic.isContainer(oldContentV)) {
+        container = oldContentV
+        request.mapContent(x => containerLogic.getContent(container))
+      } else {
+        request
+      }
     }
     val r = route(request2)
     if (r == null) null

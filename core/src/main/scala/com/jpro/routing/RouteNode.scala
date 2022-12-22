@@ -6,6 +6,8 @@ import simplefx.core._
 import simplefx.all._
 import simplefx.experimental._
 
+import java.lang.ref.WeakReference
+
 class RouteNode(stage: Stage) extends StackPane { THIS =>
 
   styleClass ::= "jpro-web-app"
@@ -26,7 +28,8 @@ class RouteNode(stage: Stage) extends StackPane { THIS =>
   var newRoute: Route = Route.empty()
 
   def route(s: String, oldView: Node) = {
-    newRoute(Request.fromString(s).copy(oldContent = oldView, origOldContent = oldView))
+    val oldViewW = new WeakReference(oldView)
+    newRoute(Request.fromString(s).copy(oldContent = oldViewW, origOldContent = oldViewW))
   }
   def route = {
     (s: String) => newRoute(Request.fromString(s))
@@ -37,5 +40,7 @@ class RouteNode(stage: Stage) extends StackPane { THIS =>
     SessionManagerContext.setContext(this, sessionManager)
     sessionManager.start()
   }
+
+
 
 }

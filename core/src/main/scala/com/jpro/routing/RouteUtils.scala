@@ -31,7 +31,7 @@ object RouteUtils {
   def transitionFilter(seconds: Double): Filter = route => { request => {
     route.apply(request).map{
       case x: View =>
-        val oldNode = request.oldContent
+        val oldNode = request.oldContent.get()
         val newNode = x.content
         val t = (seconds s)
         if(oldNode == null) {
@@ -51,7 +51,7 @@ object RouteUtils {
   def sideTransitionFilter(seconds: Double): Filter = route => { request => {
     route.apply(request).map{
       case x: View =>
-        val oldNode = request.oldContent
+        val oldNode = request.oldContent.get()
         val newNode = x.content
         val t = (seconds s)
         if(oldNode == null) {
