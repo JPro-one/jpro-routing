@@ -17,11 +17,16 @@ case class Request (
 ) {
   def mapContent(f: Node => Node) = {
     val oldContentV = oldContent.get()
-    val oldContentVW = new WeakReference(if(oldContentV eq null) null else f(oldContentV))
+    val oldContentVW = if(oldContentV eq null) {
+      Request.wref_null
+    } else {
+      new WeakReference(f(oldContentV))
+    }
     this.copy(oldContent = oldContentVW)
   }
 }
 object Request {
+  private var wref_null = new WeakReference[Node](null)
   def fromString(x: String): Request = {
     if(!isValidLink(x)) {
       println("Warning - Invalid Link: " + x)
@@ -32,7 +37,7 @@ object Request {
       a -> b
     }).toMap
     val path = uri.getPath
-    val res = Request(x, uri.getHost,path,path,query,null,null)
+    val res = Request(x, uri.getHost,path,path,query,wref_null,wref_null)
     res
   }
 }

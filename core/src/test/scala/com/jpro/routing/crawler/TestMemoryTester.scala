@@ -4,11 +4,12 @@ import com.jpro.routing.{Route, RouteNode}
 import com.jpro.routing.RouteUtils._
 import com.jpro.routing.crawl.{AppCrawler, MemoryTester}
 import com.jpro.routing.crawler.TestUtils.{Page1, Page2}
+import javafx.scene.control.Label
 import simplefx.cores.default.inFX
 import simplefx.util.Predef.intercept
 import org.junit.jupiter.api.Test
 
-class TestMemoryTest {
+class TestMemoryTester {
 
   @Test
   def simpleTest(): Unit = {
@@ -37,6 +38,21 @@ class TestMemoryTest {
 
   @Test
   def simpleFailingTest2(): Unit = {
+    var node2 = new Label()
+
+    def app = new RouteNode(null) {
+      setRoute(Route.empty()
+        .and(get("/", r => new Page1))
+        .and(get("/page2", r => viewFromNode(node2)))
+        .and(get("/page4", r => new Page2)))
+    }
+
+    val result = AppCrawler.crawlApp("http://localhost", () => app)
+    intercept[Throwable](MemoryTester.testForLeaks(result, () => app))
+  }
+
+  @Test
+  def simpleFailingTest3(): Unit = {
     val app = inFX(new RouteNode(null) {
       setRoute(Route.empty()
         .and(get("/", r => new Page1))

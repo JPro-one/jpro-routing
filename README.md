@@ -56,12 +56,12 @@ dependency>
 ### publishing
 local:
 ```gradle
-./gradlew :core:publishToMavenLocal :dev:publishToMavenLocal :auth:publishToMavenLocal :popup:publishToMavenLocal
+./gradlew publishToMavenLocal
 ```
 
 internal:
 ```gradle
-./gradlew :core:publish :dev:publish :auth:publish :popup:publish
+./gradlew publish
 ```
 
 ### clear cache:
