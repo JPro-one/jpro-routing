@@ -8,7 +8,11 @@ import simplefx.experimental._
 
 import java.lang.ref.WeakReference
 
-class RouteNode(stage: Stage) extends StackPane { THIS =>
+class RouteNode(stage: Stage, route: Route) extends StackPane { THIS =>
+
+  def this(stage: Stage) = {
+    this(stage, Route.empty)
+  }
 
   styleClass ::= "jpro-web-app"
 
@@ -23,9 +27,9 @@ class RouteNode(stage: Stage) extends StackPane { THIS =>
 
   lazy val webAPI = if(WebAPI.isBrowser) com.jpro.webapi.WebAPI.getWebAPI(stage) else null
 
+  var newRoute: Route = route
   def getRoute(): Route = newRoute
   def setRoute(x: Route): Unit = newRoute = x
-  var newRoute: Route = Route.empty()
 
   def route(s: String, oldView: Node) = {
     val oldViewW = new WeakReference(oldView)
