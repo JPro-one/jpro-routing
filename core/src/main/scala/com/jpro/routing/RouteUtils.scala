@@ -24,9 +24,6 @@ object RouteUtils {
 
   def getNode(path: String, node: Function[Request, Node]): Route = (request: Request) => if (request.path == path) FXFuture.unit(viewFromNode(node.apply(request))) else null
 
-  implicit def toRoute(f: Response => FXFuture[Request]): Route = new Route {
-    override def apply(r: Request): FXFuture[Response] = f(r)
-  }
 
   def transitionFilter(seconds: Double): Filter = route => { request => {
     route.apply(request).map{
