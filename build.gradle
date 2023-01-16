@@ -72,6 +72,11 @@ configure([project(':core'), project(':dev'), project(':auth'), project(':popup'
   group = 'com.sandec.jpro'
   version = "$JPRO_WEB_VERSION"
 
+  java {
+    withSourcesJar() // this also works for scala, nice!
+    //withJavadocJar() // let's skip this for now, because it's unclear how this interacts with scala
+  }
+
   publishing {
     publications {
       mavenJava(MavenPublication) {
