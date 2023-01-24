@@ -12,7 +12,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.sandec.jpro:jpro-plugin-gradle:$JPRO_VERSION"
+    classpath "one.jpro:jpro-gradle-plugin:$JPRO_VERSION"
     classpath "SANDEC:simplefx-plugin-gradle:$SIMPLEFX_VERSION"
     classpath 'org.openjfx:javafx-plugin:0.0.14-SNAPSHOT-FORK'
   }
@@ -119,13 +119,13 @@ configure([project(':dev')]) {
 }
 
 configure([project(':example')]) {
-  apply plugin: 'com.sandec.jpro'
-  //mainClassName = "example.scala.TestWebApplication"
-  //mainClassName = "example.scala.TestExtensions"
-  //mainClassName = "example.scala.ColorTransitionApp"
-  mainClassName = "example.colors.ColorsApp"
-  mainClassName = "example.popup.PopupApp"
-//  mainClassName = "example.login.LoginApp"
+  apply plugin: 'jpro-gradle-plugin'
+//  mainClassName = "example.scala.TestWebApplication"
+//  mainClassName = "example.scala.TestExtensions"
+//  mainClassName = "example.scala.ColorTransitionApp"
+//  mainClassName = "example.colors.ColorsApp"
+//  mainClassName = "example.popup.PopupApp"
+  mainClassName = "example.login.LoginApp"
   dependencies {
     implementation project(":auth")
     implementation project(':core')
