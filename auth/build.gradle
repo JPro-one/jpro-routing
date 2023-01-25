@@ -19,20 +19,20 @@ repositories {
 dependencies {
     api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     api "SANDEC:jnodes:$JNODES_VERSION"
-    api "de.sandec:JMemoryBuddy:0.5.1"
+    api "de.sandec:JMemoryBuddy:$JMEMORYBUDDY_VERSION"
     api project(':core')
 
-    api 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-    api 'jakarta.inject:jakarta.inject-api:2.0.1'
-    api 'jakarta.validation:jakarta.validation-api:3.0.2'
-    api 'org.slf4j:slf4j-api:2.0.5'
-    api 'org.json:json:20220924'
+    api "jakarta.annotation:jakarta.annotation-api:$JAKARTA_ANNOTATIONS_VERSION"
+    api "jakarta.inject:jakarta.inject-api:$JAKARTA_INJECT_VERSION"
+    api "jakarta.validation:jakarta.validation-api:$JAKARTA_VALIDATION_VERSION"
+    api "org.slf4j:slf4j-api:$SLF4J_VERSION"
+    api "org.json:json:$JSON_VERSION"
 
-    implementation 'com.auth0:java-jwt:4.2.1'
-    implementation 'com.auth0:jwks-rsa:0.21.2'
+    implementation "com.auth0:java-jwt:$AUTH0_JAVAJWT_VERSION"
+    implementation "com.auth0:jwks-rsa:$AUTH0_JWKSRSA_VERSION"
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"
 }
 
 java {
