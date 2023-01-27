@@ -32,6 +32,23 @@ public class JWTOptions {
     public JWTOptions(){
     }
 
+    /**
+     * Copy constructor.
+     *
+     * @param other the JWT options to copy
+     */
+    public JWTOptions(JWTOptions other) {
+        this.issuer = other.issuer;
+        this.subject = other.subject;
+        this.audience = other.audience;
+        this.claims = other.claims;
+        this.leeway = other.leeway;
+        this.ignoreIssuedAt = other.ignoreIssuedAt;
+        this.cacheSize = other.cacheSize;
+        this.expiresIn = other.expiresIn;
+        this.nonceAlgorithm = other.nonceAlgorithm;
+    }
+
     public String getIssuer() {
         return issuer;
     }

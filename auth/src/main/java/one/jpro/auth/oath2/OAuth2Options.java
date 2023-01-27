@@ -4,6 +4,7 @@ import one.jpro.auth.utils.Utils;
 import org.json.JSONObject;
 
 import java.net.http.HttpClient;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,6 +60,9 @@ public class OAuth2Options {
     // extra parameters to be added while requesting a token
     private JSONObject extraParams;
 
+    /**
+     * Default constructor.
+     */
     public OAuth2Options() {
         flow = FLOW;
         validateIssuer = VALIDATE_ISSUER;
@@ -68,6 +72,47 @@ public class OAuth2Options {
         scopeSeparator = SCOPE_SEPARATOR;
         jwtOptions = JWT_OPTIONS;
         jwkMaxAge = JWK_DEFAULT_AGE;
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param other the OAuth2 options to copy
+     */
+    public OAuth2Options(OAuth2Options other) {
+        flow = other.flow;
+        supportedGrantTypes = other.supportedGrantTypes;
+        authorizationPath = other.authorizationPath;
+        tokenPath = other.tokenPath;
+        revocationPath = other.revocationPath;
+        scopeSeparator = other.scopeSeparator;
+        validateIssuer = other.validateIssuer;
+        logoutPath = other.logoutPath;
+        userInfoPath = other.userInfoPath;
+        introspectionPath = other.introspectionPath;
+        jwkPath = other.jwkPath;
+        jwkMaxAge = other.jwkMaxAge;
+        tenant = other.tenant;
+        site = other.site;
+        clientId = other.clientId;
+        clientSecret = other.clientSecret;
+        clientAssertionType = other.clientAssertionType;
+        clientAssertion = other.clientAssertion;
+        userAgent = other.userAgent;
+        pubSecKeys = other.pubSecKeys;
+        jwtOptions = other.jwtOptions;
+        // extra parameters
+        if (other.extraParams != null) {
+            extraParams = new JSONObject(other.extraParams.toString());
+        }
+        // headers
+        if (other.headers != null) {
+            headers = new JSONObject(other.headers.toString());
+        }
+        // user info params
+        if (other.userInfoParams != null) {
+            userInfoParams = new JSONObject(other.userInfoParams.toString());
+        }
     }
 
     public OAuth2Flow getFlow() {
@@ -85,6 +130,14 @@ public class OAuth2Options {
 
     public OAuth2Options setSupportedGrantTypes(List<String> supportedGrantTypes) {
         this.supportedGrantTypes = supportedGrantTypes;
+        return this;
+    }
+
+    public OAuth2Options addSupportedGrantType(String supportedGrantType) {
+        if (supportedGrantTypes == null) {
+            supportedGrantTypes = new ArrayList<>();
+        }
+        supportedGrantTypes.add(supportedGrantType);
         return this;
     }
 
@@ -268,11 +321,11 @@ public class OAuth2Options {
         return this;
     }
 
-    public JWTOptions getJwtOptions() {
+    public JWTOptions getJWTOptions() {
         return jwtOptions;
     }
 
-    public OAuth2Options setJwtOptions(JWTOptions jwtOptions) {
+    public OAuth2Options setJWTOptions(JWTOptions jwtOptions) {
         this.jwtOptions = jwtOptions;
         return this;
     }
