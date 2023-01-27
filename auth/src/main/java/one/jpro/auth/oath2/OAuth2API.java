@@ -1,12 +1,15 @@
 package one.jpro.auth.oath2;
 
+import com.jpro.webapi.WebAPI;
 import one.jpro.auth.utils.HttpMethod;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.*;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -300,6 +303,102 @@ public class OAuth2API {
                         }
                         return CompletableFuture.completedFuture(json);
                     }
+                });
+    }
+
+    /**
+     * The discovery will use the given site in the configuration options
+     * and attempt to load the well known descriptor.
+     *
+     * @param config the initial options, it should contain the site url
+     * @return the OAuth2 options with the discovered values
+     */
+    public CompletableFuture<OAuth2AuthenticationProvider> discover(final WebAPI webAPI, final OAuth2Options config) {
+        if (config.getSite() == null) {
+            CompletableFuture.failedFuture(new RuntimeException("the site url cannot be null"));
+        }
+
+        final String oidc_discovery_path = "/.well-known/openid-configuration";
+
+        String issuer = config.getSite();
+        if (issuer.endsWith(oidc_discovery_path)) {
+            issuer = issuer.substring(0, issuer.length() - oidc_discovery_path.length());
+        }
+
+        // fetch the OpenID Connect provider metadata as defined in:
+        // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+        return fetch(HttpMethod.GET, issuer + oidc_discovery_path,
+                new JSONObject().put("Accept", "application/json"), null)
+                .thenCompose(response -> {
+                    if (response.statusCode() != 200) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException("Bad Response [" + response.statusCode() + "] " + response.body()));
+                    }
+
+                    if (!containsValue(response.headers(), "application/json")) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException("Cannot handle content type: "
+                                        + response.headers().allValues("Content-Type")));
+                    }
+
+                    final JSONObject json = new JSONObject(response.body());
+
+                    // some providers return errors as JSON
+                    if (json.has("error")) {
+                        return CompletableFuture.failedFuture(new RuntimeException(extractErrorDescription(json)));
+                    }
+
+                    // issuer validation
+                    if (config.isValidateIssuer()) {
+                        String issuerEndpoint = json.getString("issuer");
+                        if (issuerEndpoint != null) {
+                            // the provider is letting the user know the issuer endpoint, so we need to validate it
+                            if (issuerEndpoint.endsWith("/")) {
+                                issuerEndpoint = issuerEndpoint.substring(0, issuerEndpoint.length() - 1);
+                            }
+
+                            if (!config.getSite().equals(issuerEndpoint)) {
+                                return CompletableFuture.failedFuture(
+                                        new RuntimeException("Issuer validation failed: received ["
+                                                + issuerEndpoint + "]"));
+                            }
+                        }
+                    }
+
+                    config.setAuthorizationPath(json.getString("authorization_endpoint"));
+                    config.setTokenPath(json.getString("token_endpoint"));
+                    config.setLogoutPath(json.getString("end_session_endpoint"));
+                    config.setRevocationPath(json.getString("userinfo_endpoint"));
+                    config.setUserInfoPath(json.getString("userinfo_endpoint"));
+                    config.setJwkPath(json.getString("jwks_uri"));
+                    config.setIntrospectionPath(json.getString("introspection_endpoint"));
+
+                    if (json.has("issuer")) {
+                        // the discovery document includes the issuer, this means we can add it
+                        JWTOptions jwtOptions = config.getJWTOptions();
+                        if (jwtOptions == null) {
+                            jwtOptions = new JWTOptions();
+                            config.setJWTOptions(jwtOptions);
+                        }
+
+                        // set the issuer
+                        jwtOptions.setIssuer(json.getString("issuer"));
+                    }
+
+                    // reset supported grant types
+                    config.setSupportedGrantTypes(null);
+                    if (json.has("grant_types_supported") && config.getFlow() != null) {
+                        // optional config
+                        JSONArray flows = json.getJSONArray("grant_types_supported");
+                        flows.forEach(grantType -> config.addSupportedGrantType((String) grantType));
+
+                        if (!flows.toList().contains(config.getFlow().getGrantType())) {
+                            return CompletableFuture.failedFuture(new RuntimeException("Unsupported flow: " +
+                                    config.getFlow().getGrantType() + ", allowed: " + flows));
+                        }
+                    }
+
+                    return CompletableFuture.completedFuture(new OAuth2AuthenticationProvider(webAPI, config));
                 });
     }
 
