@@ -7,6 +7,7 @@ import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import simplefx.experimental.parts.FXFuture;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -23,17 +24,20 @@ public final class AuthFilters {
      *
      * @param authProvider the OAuth2 authentication provider
      * @param credentials the OAuth2 credentials
-     * @param consumer operation on the given user argument
+     * @param userConsumer operation on the given user argument
      * @return a {@link Filter} object
      */
     public static Filter create(OAuth2AuthenticationProvider authProvider,
                                 OAuth2Credentials credentials,
-                                Consumer<User> consumer) {
+                                Consumer<User> userConsumer) {
+        Objects.requireNonNull(authProvider, "auth provider can not be null");
+        Objects.requireNonNull(credentials, "credentials can not be null");
+        Objects.requireNonNull(userConsumer, "user consumer can not be null");
         return (route) -> (request) -> {
             if (request.path().equals(credentials.getRedirectUri())) {
                 return FXFuture.fromJava(authProvider.authenticate(credentials))
                         .map(user -> {
-                            consumer.accept(user);
+                            userConsumer.accept(user);
                             return user;
                         })
                         .flatMap(user -> route.apply(request));
@@ -43,9 +47,7 @@ public final class AuthFilters {
         };
     }
 
-    /**
-     * Hide the default constructor.
-     */
     private AuthFilters() {
+        // Hide the default constructor.
     }
 }
