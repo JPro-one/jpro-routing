@@ -8,6 +8,8 @@ import one.jpro.auth.oath2.OAuth2Options;
 import one.jpro.auth.oath2.PubSecKeyOptions;
 import org.json.JSONObject;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Simplified factory to create an {@link AuthenticationProvider} for Keycloak.
  *
@@ -96,5 +98,19 @@ public class KeycloakAuthenticationProvider extends OAuth2AuthenticationProvider
                     ));
         }
         return options;
+    }
+
+    /**
+     * Create an {@link OAuth2AuthenticationProvider} for OpenID Connect Discovery. The discovery will use the default
+     * site in the configuration options and attempt to load the well-known descriptor. If a site is provided, then
+     * it will be used to do the lookup.
+     *
+     * @param webAPI  the JPro WebAPI
+     * @param options custom OAuth2 options
+     * @return a future with the instantiated {@link OAuth2AuthenticationProvider}
+     */
+    public static CompletableFuture<OAuth2AuthenticationProvider> discover(final WebAPI webAPI,
+                                                                           final OAuth2Options options) {
+        return new KeycloakAuthenticationProvider(webAPI, options).discover();
     }
 }
