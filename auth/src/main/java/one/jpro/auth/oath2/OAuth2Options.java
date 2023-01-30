@@ -321,6 +321,14 @@ public class OAuth2Options {
         return this;
     }
 
+    public OAuth2Options addPubSecKeys(PubSecKeyOptions pubSecKey) {
+        if (pubSecKeys == null) {
+            pubSecKeys = new ArrayList<>();
+        }
+        pubSecKeys.add(pubSecKey);
+        return this;
+    }
+
     public JWTOptions getJWTOptions() {
         return jwtOptions;
     }
