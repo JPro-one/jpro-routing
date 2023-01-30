@@ -28,11 +28,11 @@ import java.util.concurrent.CompletableFuture;
 public class OAuth2AuthenticationProvider implements AuthenticationProvider<Credentials> {
 
     @NotNull
-    private final WebAPI webAPI;
+    protected final WebAPI webAPI;
     @NotNull
-    private final OAuth2Options options;
+    protected final OAuth2Options options;
     @NotNull
-    private final OAuth2API api;
+    protected final OAuth2API api;
     @NotNull
     private JwkProvider jwkProvider;
 
@@ -46,7 +46,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
             jwkProvider = new JwkProviderBuilder(options.getJwkPath())
-                .cached(options.getJwtOptions().getCacheSize(), options.getJwtOptions().getExpiresIn())
+                .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
                 .build();
         }
     }
@@ -80,6 +80,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
             } else {
                 flow = options.getFlow();
             }
+
+            // TODO: handle possible exceptions
 
             // Retrieve the authorization code
             oauth2Credentials.code(webAPI.getURLQueryParams().get("code"));
@@ -134,7 +136,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             return api.token(flow.getGrantType(), params)
                     .thenCompose(tokenJSON -> {
-                        // attempt to create an user from the json object
+                        // attempt to create a user from the json object
                         User user = null;
 
                         if (tokenJSON.has("access_token")) {
@@ -183,6 +185,16 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         }
     }
 
+    /**
+     * Creates a OAuth2 authentication provider for OpenID Connect Discovery. The discovery will use the given
+     * site in the configuration options and attempt to load the well-known descriptor.
+     *
+     * @return an {@link OAuth2AuthenticationProvider} instance.
+     */
+    public CompletableFuture<OAuth2AuthenticationProvider> discover() {
+        return api.discover(webAPI, options);
+    }
+
     private JSONObject jwtToJson(DecodedJWT jwt, String tokenKey) {
         final JSONObject json = new JSONObject();
         // Decoded JWT info
@@ -208,9 +220,9 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
     private String normalizeUri(String uri) {
         // Complete uri if is partial
-        var redirectUri = uri;
+        String redirectUri = uri;
         if (redirectUri != null && redirectUri.charAt(0) == '/') {
-            final var serverUrl = webAPI.getServer().contains("localhost") ?
+            final String serverUrl = webAPI.getServer().contains("localhost") ?
                     "http://" + webAPI.getServer()  : "https://" + webAPI.getServer();
             redirectUri = serverUrl + redirectUri;
         }
