@@ -7,6 +7,8 @@ import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Flow;
 import one.jpro.auth.oath2.OAuth2Options;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Simplified factory to create an {@link AuthenticationProvider} for Microsoft.
  *
@@ -44,6 +46,33 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
                 .setTokenPath("/oauth2/v2.0/token")
                 .setAuthorizationPath("/oauth2/v2.0/authorize")
                 .setJwkPath("/discovery/v2.0/keys")
-                .setJwtOptions(new JWTOptions().setNonceAlgorithm("SHA-256")));
+                .setJWTOptions(new JWTOptions().setNonceAlgorithm("SHA-256")));
+    }
+
+    /**
+     * Create an {@link OAuth2AuthenticationProvider} for OpenID Connect Discovery. The discovery will use the default
+     * site in the configuration options and attempt to load the well-known descriptor. If a site is provided, then
+     * it will be used to do the lookup.
+     *
+     * @param webAPI  the JPro WebAPI
+     * @param options custom OAuth2 options
+     * @return a future with the instantiated {@link OAuth2AuthenticationProvider}
+     */
+    public static CompletableFuture<OAuth2AuthenticationProvider> discover(WebAPI webAPI, OAuth2Options options) {
+        final String site = options.getSite() == null ?
+                "https://login.microsoftonline.com/{tenant}" : options.getSite();
+        final JWTOptions jwtOptions = options.getJWTOptions() == null ?
+                new JWTOptions() : new JWTOptions(options.getJWTOptions());
+        // Microsoft default nonce algorithm
+        if (jwtOptions.getNonceAlgorithm() == null) {
+            jwtOptions.setNonceAlgorithm("SHA-256");
+        }
+
+        return new MicrosoftAuthenticationProvider(webAPI,
+                new OAuth2Options(options)
+                        // Microsoft OpenID does not return the same url where the request was sent to
+                        .setValidateIssuer(false)
+                        .setSite(site)
+                        .setJWTOptions(jwtOptions)).discover();
     }
 }
