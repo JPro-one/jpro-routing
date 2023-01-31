@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import one.jpro.auth.authentication.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,6 +28,8 @@ import java.util.concurrent.CompletableFuture;
  * @author Besmir Beqiri
  */
 public class OAuth2AuthenticationProvider implements AuthenticationProvider<Credentials> {
+
+    private final Logger log = LoggerFactory.getLogger(OAuth2AuthenticationProvider.class);
 
     @NotNull
     protected final WebAPI webAPI;
@@ -46,8 +50,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
             jwkProvider = new JwkProviderBuilder(options.getJwkPath())
-                .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
-                .build();
+                    .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
+                    .build();
         }
     }
 
@@ -71,6 +75,69 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 return authenticate(oauth2Credentials);
             }
 
+            // if the credentials already contain a token, then validate it to confirm
+            // that it can be reused, otherwise, based on the configured flow, request
+            // a new token from the authority provider
+
+            if (credentials instanceof TokenCredentials) {
+                TokenCredentials tokenCredentials = (TokenCredentials) credentials;
+                tokenCredentials.validate(null);
+
+                // credentials already contain a token, validate it
+                // attempt to create a user from the credentials
+                // final User newUser = createUser(new JSONObject().put("access_token", tokenCredentials.getToken()));
+                // check if the token has expired or not
+                // if (token expired) {
+                //      return CompletableFuture.failedFuture(new RuntimeException("Token is expired."));
+                // } else {
+                     // validation passed
+                     // return CompletableFuture.completedFuture(newUser);
+                // }
+
+                // the token is not JWT format or this authentication provider is not configured to use JWTs
+                // in this case we must rely on token introspection in order to know more about its state
+                // attempt to create a token object from the given string representation
+
+                // not all providers support this, so we need to check if the call is possible
+                if (options.getIntrospectionPath() == null) {
+                    // this provider doesn't allow introspection, this means we are not able
+                    // to perform any authentication
+                    return CompletableFuture.failedFuture(
+                            new RuntimeException("Can't authenticate `access_token`: " +
+                                    "Provider doesn't support token introspection"));
+                }
+
+                // perform the introspection in accordance to RFC7662
+                return api.tokenIntrospection("access_token", tokenCredentials.getToken())
+                        .thenCompose(json -> {
+                            // RFC7662 dictates that there is a boolean active field,
+                            // however token info implementation may not return this
+                            if (json.has("active") && json.getBoolean("active")) {
+                                return CompletableFuture.failedFuture(new RuntimeException("Inactive Token"));
+                            }
+
+                            // validate client_id
+                            if (json.has("client_id")) {
+                                final String clientId = options.getClientId();
+                                if (clientId != null && !clientId.equals(json.getString("client_id"))) {
+                                    // client identifier for the OAuth2 client that requested this token
+                                    log.info("Introspect `client_id` doesn't match configured `client_id`");
+                                }
+                            }
+
+                            // attempt to create a user from the JSON object
+                            final User newUser = createUser(json);
+                            // finally, check if the token has expired or not
+//                            if (token expired) {
+//                                return CompletableFuture.failedFuture(new RuntimeException("Token is expired."));
+//                            } else {
+//                                // validation passed
+                                return CompletableFuture.completedFuture(newUser);
+//                            }
+                        });
+            }
+
+            // from this point, the only allowed credentials subtype is OAuth2Credentials
             OAuth2Credentials oauth2Credentials = (OAuth2Credentials) credentials;
 
             final JSONObject params = new JSONObject();
@@ -157,7 +224,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                                     // Set principal name
                                     params.put(Authentication.KEY_NAME, name);
                                     // Store JWT authorization
-                                    params.put("jwt", jwtToJson(decodedToken,"access_token"));
+                                    params.put("jwt", jwtToJson(decodedToken, "access_token"));
 
                                     // TODO: Configure roles
 
@@ -195,6 +262,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         return api.discover(webAPI, options);
     }
 
+    private User createUser(JSONObject json) {
+        return Authentication.create(json);
+    }
+
     private JSONObject jwtToJson(DecodedJWT jwt, String tokenKey) {
         final JSONObject json = new JSONObject();
         // Decoded JWT info
@@ -223,7 +294,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         String redirectUri = uri;
         if (redirectUri != null && redirectUri.charAt(0) == '/') {
             final String serverUrl = webAPI.getServer().contains("localhost") ?
-                    "http://" + webAPI.getServer()  : "https://" + webAPI.getServer();
+                    "http://" + webAPI.getServer() : "https://" + webAPI.getServer();
             redirectUri = serverUrl + redirectUri;
         }
         return redirectUri;
