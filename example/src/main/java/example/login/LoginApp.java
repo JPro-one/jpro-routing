@@ -23,7 +23,6 @@ import one.jpro.auth.utils.AuthFilters;
 import java.util.List;
 
 import static com.jpro.routing.RouteUtils.getNode;
-import static com.jpro.routing.RouteUtils.get;
 
 /**
  * Login example application.
@@ -58,9 +57,9 @@ public class LoginApp extends RouteApp {
                 .create();
 
         final var googleCredentials = new OAuth2Credentials()
-                .scopes(List.of("openid", "email"))
-                .redirectUri("/auth/google")
-                .nonce("0394852-3190485-2490358");
+                .setScopes(List.of("openid", "email"))
+                .setRedirectUri("/auth/google")
+                .setNonce("0394852-3190485-2490358");
 
         // Microsoft Auth provider
         final var microsoftAuth = AuthAPI.microsoftAuth()
@@ -71,27 +70,14 @@ public class LoginApp extends RouteApp {
                 .create();
 
         final var microsoftCredentials = new OAuth2Credentials()
-                .scopes(List.of("openid", "email"))
-                .redirectUri("/auth/microsoft");
-
-        // GitHub Auth provider
-        //final var githubAuth = AuthAPI.githubAuth()
-        //        .webAPI(getWebAPI())
-        //        .clientId(GITHUB_CLIENT_ID)
-        //        .clientSecret(GITHUB_CLIENT_SECRET)
-        //        .create();
-
-        final var githubCredentials = new OAuth2Credentials()
-                .scopes(List.of("openid", "user"))
-                .redirectUri("/auth/github");
+                .setScopes(List.of("openid", "email"))
+                .setRedirectUri("/auth/microsoft");
 
         return Route.empty()
                 .and(getNode("/", (r) ->
                         initView(googleAuth, googleCredentials,
-                                microsoftAuth, microsoftCredentials/*,
-                                githubAuth, githubCredentials*/)))
+                                microsoftAuth, microsoftCredentials)))
                 .and(getNode("/auth/google", (r) -> loginDataView()))
-                .and(getNode("/auth/microsoft", (r) -> loginDataView()))
                 .and(getNode("/auth/microsoft", (r) -> loginDataView()))
                 .filter(Filters.FullscreenFilter(true))
                 .filter(AuthFilters.create(googleAuth, googleCredentials, user -> {
@@ -108,9 +94,7 @@ public class LoginApp extends RouteApp {
     public Node initView(GoogleAuthenticationProvider googleAuth,
                          OAuth2Credentials googleCredentials,
                          MicrosoftAuthenticationProvider microsoftAuth,
-                         OAuth2Credentials microsoftCredentials/*,
-                         GitHubAuthenticationProvider gitHubAuth,
-                         OAuth2Credentials githubCredentials*/) {
+                         OAuth2Credentials microsoftCredentials) {
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setHgap(12.0);
@@ -168,14 +152,6 @@ public class LoginApp extends RouteApp {
         GridPane.setHalignment(microsoftLoginButton, HPos.CENTER);
         microsoftLoginButton.setOnAction(event ->
                 getWebAPI().openURL(microsoftAuth.authorizeUrl(microsoftCredentials)));
-
-        /*
-        Button githubLoginButton = new Button("Login with GitHub");
-        gridPane.add(githubLoginButton, 0, 7, 2, 1);
-        GridPane.setMargin(githubLoginButton, new Insets(12, 0, 12, 0));
-        GridPane.setHalignment(githubLoginButton, HPos.CENTER);
-        githubLoginButton.setOnAction(event ->
-                getWebAPI().openURL(gitHubAuth.authorizeUrl(githubCredentials)));*/
 
         return new StackPane(gridPane);
     }
