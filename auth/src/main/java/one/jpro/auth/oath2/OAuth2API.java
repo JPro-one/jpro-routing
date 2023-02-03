@@ -311,7 +311,7 @@ public class OAuth2API {
      * and attempt to load the well known descriptor.
      *
      * @param config the initial options, it should contain the site url
-     * @return the OAuth2 options with the discovered values
+     * @return an OAuth2 provider with the discovered option values
      */
     public CompletableFuture<OAuth2AuthenticationProvider> discover(final WebAPI webAPI, final OAuth2Options config) {
         if (config.getSite() == null) {
@@ -399,6 +399,40 @@ public class OAuth2API {
                     }
 
                     return CompletableFuture.completedFuture(new OAuth2AuthenticationProvider(webAPI, config));
+                });
+    }
+
+    /**
+     * Logout the user from the OAuth2 provider.
+     *
+     * @param accessToken the access token
+     * @param refreshToken the refresh token
+     */
+    public CompletableFuture<Void> logout(String accessToken, String refreshToken) {
+        final JSONObject headers = new JSONObject();
+        headers.put("Authorization", "Bearer " + accessToken);
+
+        final JSONObject form = new JSONObject();
+        form.put("client_id", options.getClientId());
+        if (options.getClientSecret() != null) {
+            form.put("client_secret", options.getClientSecret());
+        }
+        if (refreshToken != null) {
+            form.put("refresh_token", refreshToken);
+        }
+
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        final String payload = jsonToQuery(form);
+        headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
+
+        return fetch(HttpMethod.POST, options.getLogoutPath(), headers, payload)
+                .thenCompose(response -> {
+                    if (response.statusCode() != 200) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException("Bad Response [" + response.statusCode() + "] " + response.body()));
+                    }
+
+                    return CompletableFuture.completedFuture(null);
                 });
     }
 
