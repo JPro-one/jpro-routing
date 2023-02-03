@@ -91,9 +91,12 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     final User newUser = createUser(new JSONObject().put("access_token", tokenCredentials.getToken()));
                     // basic validation passed
                     return CompletableFuture.completedFuture(newUser);
-                } catch (TokenExpiredException | IllegalStateException | JwkException ex) {
+                } catch (TokenExpiredException | IllegalStateException ex) {
                     log.error(ex.getMessage(), ex);
-                    // return CompletableFuture.failedFuture(ex);
+//                    return CompletableFuture.failedFuture(ex);
+                } catch (JwkException ex) {
+                    log.error(ex.getMessage(), ex);
+//                    return CompletableFuture.failedFuture(new RuntimeException(ex.getMessage(), ex));
                 }
 
                 // the token is not JWT format or this authentication provider is not configured to use JWTs
@@ -127,12 +130,15 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                                 }
                             }
 
+                            // attempt to create a user from the json object
                             try {
                                 final User newUser = createUser(json);
                                 // basic validation passed
                                 return CompletableFuture.completedFuture(newUser);
-                            } catch (TokenExpiredException | IllegalStateException | JwkException ex) {
+                            } catch (TokenExpiredException | IllegalStateException ex) {
                                 return CompletableFuture.failedFuture(ex);
+                            } catch (JwkException ex) {
+                                return CompletableFuture.failedFuture(new RuntimeException(ex.getMessage(), ex));
                             }
                         });
             }
@@ -202,14 +208,15 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
             }
 
             return api.token(flow.getGrantType(), params)
-                    .thenCompose(tokenJSON -> {
+                    .thenCompose(json -> {
+                        // attempt to create a user from the json object
                         try {
-                            final User newUser = createUser(tokenJSON, params);
+                            final User newUser = createUser(json, params);
                             oauth2Credentials.setUsername(newUser.getName());
                             // basic validation passed
                             return CompletableFuture.completedFuture(newUser);
-                        } catch (TokenExpiredException tex) {
-                            return CompletableFuture.failedFuture(tex);
+                        } catch (TokenExpiredException | IllegalStateException ex) {
+                            return CompletableFuture.failedFuture(ex);
                         } catch (JwkException ex) {
                             return CompletableFuture.failedFuture(new RuntimeException(ex.getMessage(), ex));
                         }
@@ -227,6 +234,27 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      */
     public CompletableFuture<OAuth2AuthenticationProvider> discover() {
         return api.discover(webAPI, options);
+    }
+
+    public CompletableFuture<User> refresh(User user) {
+        final Object refreshToken = user.getAttributes().get("refresh_token");
+        if (refreshToken == null || refreshToken.toString().isBlank()) {
+            return CompletableFuture.failedFuture(new RuntimeException("refresh_token is null or missing"));
+        }
+
+        return api.token("refresh_token", new JSONObject().put("refresh_token", refreshToken.toString()))
+                .thenCompose(json -> {
+                    // attempt to create a user from the json object
+                    try {
+                        final User newUser = createUser(json);
+                        // basic validation passed
+                        return CompletableFuture.completedFuture(newUser);
+                    } catch (TokenExpiredException | IllegalStateException ex) {
+                        return CompletableFuture.failedFuture(ex);
+                    } catch (JwkException ex) {
+                        return CompletableFuture.failedFuture(new RuntimeException(ex.getMessage(), ex));
+                    }
+                });
     }
 
     private User createUser(JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {
