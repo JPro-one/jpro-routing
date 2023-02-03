@@ -31,7 +31,7 @@ public class TokenCredentials implements Credentials {
         return token;
     }
 
-    public TokenCredentials token(String token) {
+    public TokenCredentials setToken(String token) {
         this.token = token;
         return this;
     }
@@ -40,12 +40,12 @@ public class TokenCredentials implements Credentials {
         return scopes;
     }
 
-    public TokenCredentials scopes(List<String> scopes) {
+    public TokenCredentials setScopes(List<String> scopes) {
         this.scopes = scopes;
         return this;
     }
 
-    public TokenCredentials scopes(String... scopes) {
+    public TokenCredentials setScopes(String... scopes) {
         if (this.scopes == null) {
             this.scopes = new ArrayList<>();
         }

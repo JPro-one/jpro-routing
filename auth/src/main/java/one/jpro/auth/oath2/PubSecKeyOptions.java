@@ -45,7 +45,7 @@ public class PubSecKeyOptions {
      * Sets the key identifier.
      *
      * @param id the key identifier
-     * @return a reference to this, so the API can be used fluently.
+     * @return a reference to this, so the API can be used fluently
      */
     public PubSecKeyOptions setId(String id) {
         this.id = id;
@@ -65,7 +65,7 @@ public class PubSecKeyOptions {
      * Sets the algorithm.
      *
      * @param algorithm the algorithm
-     * @return a reference to this, so the API can be used fluently.
+     * @return a reference to this, so the API can be used fluently
      */
     public PubSecKeyOptions setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
@@ -77,7 +77,7 @@ public class PubSecKeyOptions {
      * {@code UTF-8}. PEM files are expected to be {@code US_ASCII} as the format uses a base64 encoding for the
      * payload.
      *
-     * @return the buffer.
+     * @return the buffer
      */
     public Buffer getBuffer() {
         return buffer;
@@ -89,7 +89,7 @@ public class PubSecKeyOptions {
      * payload.
      *
      * @param buffer the PEM or Secret key string
-     * @return a reference to this, so the API can be used fluently.
+     * @return a reference to this, so the API can be used fluently
      */
     public PubSecKeyOptions setBuffer(String buffer) {
         this.buffer = ByteBuffer.wrap(buffer.getBytes(StandardCharsets.UTF_8));
@@ -102,7 +102,7 @@ public class PubSecKeyOptions {
      * payload.
      *
      * @param buffer the PEM or Secret key buffer
-     * @return a reference to this, so the API can be used fluently.
+     * @return a reference to this, so the API can be used fluently
      */
     public PubSecKeyOptions setBuffer(Buffer buffer) {
         this.buffer = buffer;

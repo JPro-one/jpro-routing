@@ -58,7 +58,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     public String authorizeUrl(OAuth2Credentials credentials) {
-        return api.authorizeURL(credentials.normalizedRedirectUri(normalizeUri(credentials.getRedirectUri())));
+        return api.authorizeURL(credentials.setNormalizedRedirectUri(normalizeUri(credentials.getRedirectUri())));
     }
 
     @Override
@@ -70,9 +70,9 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 usernamePasswordCredentials.validate(null);
 
                 OAuth2Credentials oauth2Credentials = new OAuth2Credentials()
-                        .username(usernamePasswordCredentials.getUsername())
-                        .password(usernamePasswordCredentials.getPassword())
-                        .flow(OAuth2Flow.PASSWORD);
+                        .setUsername(usernamePasswordCredentials.getUsername())
+                        .setPassword(usernamePasswordCredentials.getPassword())
+                        .setFlow(OAuth2Flow.PASSWORD);
 
                 return authenticate(oauth2Credentials);
             }
@@ -151,7 +151,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
             // TODO: handle possible exceptions
 
             // Retrieve the authorization code
-            oauth2Credentials.code(webAPI.getURLQueryParams().get("code"));
+            oauth2Credentials.setCode(webAPI.getURLQueryParams().get("code"));
             if (oauth2Credentials.getCode() == null || oauth2Credentials.getCode().isBlank()) {
                 return CompletableFuture.failedFuture(new RuntimeException("Authorization code is missing"));
             }
@@ -205,7 +205,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     .thenCompose(tokenJSON -> {
                         try {
                             final User newUser = createUser(tokenJSON, params);
-                            oauth2Credentials.username(newUser.getName());
+                            oauth2Credentials.setUsername(newUser.getName());
                             // basic validation passed
                             return CompletableFuture.completedFuture(newUser);
                         } catch (TokenExpiredException tex) {
