@@ -18,9 +18,11 @@ import java.net.URL;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * OAuth2 authentication provider.
@@ -85,14 +87,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
                 // credentials already contain a token, validate it
                 // attempt to create a user from the credentials
-                // final User newUser = createUser(new JSONObject().put("access_token", tokenCredentials.getToken()));
-                // check if the token has expired or not
-                // if (token expired) {
-                //      return CompletableFuture.failedFuture(new RuntimeException("Token is expired."));
-                // } else {
-                     // validation passed
-                     // return CompletableFuture.completedFuture(newUser);
-                // }
+                try {
+                    final User newUser = createUser(new JSONObject().put("access_token", tokenCredentials.getToken()));
+                    // basic validation passed
+                    return CompletableFuture.completedFuture(newUser);
+                } catch (TokenExpiredException | IllegalStateException | JwkException ex) {
+                    log.error(ex.getMessage(), ex);
+                    // return CompletableFuture.failedFuture(ex);
+                }
 
                 // the token is not JWT format or this authentication provider is not configured to use JWTs
                 // in this case we must rely on token introspection in order to know more about its state
@@ -125,15 +127,13 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                                 }
                             }
 
-                            // attempt to create a user from the JSON object
-                            final User newUser = createUser(json);
-                            // finally, check if the token has expired or not
-//                            if (token expired) {
-//                                return CompletableFuture.failedFuture(new RuntimeException("Token is expired."));
-//                            } else {
-//                                // validation passed
+                            try {
+                                final User newUser = createUser(json);
+                                // basic validation passed
                                 return CompletableFuture.completedFuture(newUser);
-//                            }
+                            } catch (TokenExpiredException | IllegalStateException | JwkException ex) {
+                                return CompletableFuture.failedFuture(ex);
+                            }
                         });
             }
 
@@ -203,50 +203,17 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             return api.token(flow.getGrantType(), params)
                     .thenCompose(tokenJSON -> {
-                        // attempt to create a user from the json object
-                        User user = null;
-
-                        if (tokenJSON.has("access_token")) {
-                            try {
-                                // attempt to decode tokens if jwt keys are available
-                                final String id_token = tokenJSON.getString("id_token");
-                                final DecodedJWT decodedToken = JWT.decode(id_token);
-                                final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
-
-                                // final step, verify if the user is not expired
-                                // this may happen if the user tokens have been issued for future use for example
-                                final Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
-                                final JWTVerifier verifier = JWT.require(algorithm).build();
-                                final DecodedJWT verifiedToken = verifier.verify(id_token);
-                                if (verifiedToken.getExpiresAt().toInstant().isAfter(Instant.now())) {
-                                    final String name = decodedToken.getClaim("email").asString();
-                                    oauth2Credentials.username(name);
-                                    // Set principal name
-                                    params.put(Authentication.KEY_NAME, name);
-                                    // Store JWT authorization
-                                    params.put("jwt", jwtToJson(decodedToken, "access_token"));
-
-                                    // TODO: Configure roles
-
-                                    JSONObject authJSON = new JSONObject(params, JSONObject.getNames(params));
-                                    authJSON.put(Authentication.KEY_ATTRIBUTES, params);
-
-                                    // Create authorization instance
-                                    user = Authentication.create(authJSON);
-                                } else {
-                                    return CompletableFuture.failedFuture(new RuntimeException("Authorization is expired"));
-                                }
-                            } catch (JwkException ex) {
-                                return CompletableFuture.failedFuture(new RuntimeException(ex.getMessage(), ex));
-                            }
+                        try {
+                            final User newUser = createUser(tokenJSON, params);
+                            oauth2Credentials.username(newUser.getName());
+                            // basic validation passed
+                            return CompletableFuture.completedFuture(newUser);
+                        } catch (TokenExpiredException tex) {
+                            return CompletableFuture.failedFuture(tex);
+                        } catch (JwkException ex) {
+                            return CompletableFuture.failedFuture(new RuntimeException(ex.getMessage(), ex));
                         }
-
-                        // TODO: handle "id_token"
-
-                        // basic validation passed, the token is not expired
-                        return CompletableFuture.completedFuture(user);
                     });
-
         } catch (ClassCastException | CredentialValidationException ex) {
             return CompletableFuture.failedFuture(ex);
         }
@@ -262,31 +229,181 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         return api.discover(webAPI, options);
     }
 
-    private User createUser(JSONObject json) {
-        return Authentication.create(json);
+    private User createUser(JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {
+        return createUser(json, null);
     }
 
-    private JSONObject jwtToJson(DecodedJWT jwt, String tokenKey) {
+    private User createUser(JSONObject json, JSONObject params) throws JwkException,
+            TokenExpiredException, IllegalStateException {
+
+        if (params == null) params = new JSONObject();
+
+        if (json.has("access_token")) {
+            // attempt to create a user from the json object
+            final String token = json.getString("access_token");
+            final DecodedJWT decodedToken = JWT.decode(token);
+
+            // verify if the user is not expired
+            // this may happen if the user tokens have been issued for future use for example
+            final JSONObject jwtJSON = verifyToken(token, decodedToken, false);
+            // Store JWT authorization
+            params.put("jwt", jwtJSON);
+
+            final String name = decodedToken.getClaim("email").asString();
+            // Set principal name
+            params.put(Authentication.KEY_NAME, name);
+        }
+
+        if (json.has("id_token")) {
+            // attempt to create a user from the json object
+            final String token = json.getString("id_token");
+            final DecodedJWT decodedToken = JWT.decode(token);
+
+            // verify if the user is not expired
+            // this may happen if the user tokens have been issued for future use for example
+            final JSONObject jwtJSON = verifyToken(token, decodedToken, true);
+            // Store JWT authorization
+            params.put("jwt", jwtJSON);
+        }
+
+        JSONObject authJSON = new JSONObject(params, JSONObject.getNames(params));
+        authJSON.put(Authentication.KEY_ATTRIBUTES, params);
+
+        // TODO: Configure roles
+
+        // Create authentication instance
+        return Authentication.create(authJSON);
+    }
+
+    /**
+     * Performs a token verification and basic validation.
+     *
+     * @param token the token string
+     * @param decodedToken represents a Json Web Token that was decoded from its string representation
+     * @param idToken set to <code>true</code> if this token is an id_token, otherwise <code>false</code>
+     * @return a {@link JSONObject} holding the Json Web Token information related to this token.
+     * @throws JwkException if no jwk can be found using the given token kid
+     * @throws TokenExpiredException if the token has expired
+     * @throws IllegalStateException if the basic validation fails
+     */
+    private JSONObject verifyToken(String token, DecodedJWT decodedToken, boolean idToken) throws JwkException,
+            TokenExpiredException, IllegalStateException {
+        final JWTOptions jwtOptions = options.getJWTOptions();
+
+        JSONObject json;
+        try {
+            final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
+            final Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+            final JWTVerifier verifier = JWT.require(algorithm).build();
+            final DecodedJWT verifiedToken = verifier.verify(token);
+            json = jwtToJson(verifiedToken, idToken ? "id_token" : "access_token");
+        } catch (com.auth0.jwt.exceptions.TokenExpiredException tex) {
+            throw new TokenExpiredException(tex.getMessage(), tex.getExpiredOn());
+        }
+
+        // validate the audience
+        if (json.has("aud")) {
+            final JSONArray audience = json.getJSONArray("aud");
+            if (audience == null || audience.isEmpty()) {
+                throw new IllegalStateException("User audience is null or empty");
+            }
+
+            if (audience.length() > 0) {
+                if (idToken || jwtOptions.getAudience() == null) {
+                    // In reference to: https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
+                    // The Client MUST validate that the aud (audience) Claim contains its client_id value registered at
+                    // the Issuer identified by the iss (issuer) Claim as an audience. The aud (audience) Claim MAY contain
+                    // an array with more than one element. The ID Token MUST be rejected if the ID Token does not list the
+                    // Client as a valid audience, or if it contains additional audiences not trusted by the Client.
+                    if (!audience.toString().contains(options.getClientId())) {
+                        throw new IllegalStateException("Invalid JWT audience, expected: " + options.getClientId() +
+                                ", actual: " + audience);
+                    }
+                } else {
+                    final List<String> audList = audience.toList().stream()
+                            .map(Object::toString)
+                            .collect(Collectors.toList());
+                    for (String aud : jwtOptions.getAudience()) {
+                        if (!audList.contains(aud)) {
+                            throw new IllegalStateException("Invalid JWT audience, expected: " + aud +
+                                    ", actual: " + audience);
+                        }
+                    }
+                }
+            }
+        }
+
+        // validate the issuer
+        if (jwtOptions.getIssuer() != null) {
+            if (!jwtOptions.getIssuer().equals(json.getString("iss"))) {
+                throw new IllegalStateException("Invalid JWT issuer, expected: " + jwtOptions.getIssuer() +
+                        ", actual: " + json.getString("iss"));
+            }
+        }
+
+        // validate authorised party
+        if (idToken) {
+            if (json.has("azp")) {
+                if (!options.getClientId().equals(json.getString("azp"))) {
+                    throw new IllegalStateException("Invalid authorised party, expected: " + options.getClientId() +
+                            ", actual: " + json.getString("azp"));
+                }
+
+                final JSONArray audience = json.getJSONArray("aud");
+                if (audience != null && audience.length() > 1) {
+                    // In reference to: https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
+                    // If the ID Token contains multiple audiences, the Client SHOULD verify that an azp Claim is present.
+                    final List<String> audList = audience.toList().stream()
+                            .map(Object::toString)
+                            .collect(Collectors.toList());
+                    if (audList.contains(json.getString("azp"))) {
+                        throw new IllegalStateException("ID token with multiple audiences, " +
+                                "doesn't contain the azp Claim value");
+                    }
+                }
+            }
+        }
+
+        return json;
+    }
+
+    /**
+     * Returns a JSON representation of a Json Web Token.
+     *
+     * @param jwt represents a Json Web Token that was decoded from its string representation
+     * @param tokenType a string representation of the type of this token, like "access_token" or "id_token"
+     * @return a {@link JSONObject} holding the JWT information.
+     */
+    private JSONObject jwtToJson(DecodedJWT jwt, String tokenType) {
         final JSONObject json = new JSONObject();
         // Decoded JWT info
-        json.put(tokenKey, jwt.getToken());
+        json.put(tokenType, jwt.getToken());
         Optional.ofNullable(jwt.getHeader()).ifPresent(header -> json.put("header", header));
         Optional.ofNullable(jwt.getPayload()).ifPresent(payload -> json.put("payload", payload));
         Optional.ofNullable(jwt.getSignature()).ifPresent(signature -> json.put("signature", signature));
 
         // Payload info
-        Optional.ofNullable(jwt.getIssuer()).ifPresent(issuer -> json.put("issuer", issuer));
-        Optional.ofNullable(jwt.getSubject()).ifPresent(subject -> json.put("subject", subject));
-        Optional.ofNullable(jwt.getAudience()).ifPresent(audience -> json.put("audience", audience));
+        Optional.ofNullable(jwt.getIssuer()).ifPresent(issuer -> json.put("iss", issuer));
+        Optional.ofNullable(jwt.getSubject()).ifPresent(subject -> json.put("sub", subject));
+        Optional.ofNullable(jwt.getAudience()).ifPresent(audience -> json.put("aud", new JSONArray(audience)));
         Optional.ofNullable(jwt.getExpiresAt()).map(Date::getTime).ifPresent(exp -> json.put("exp", exp));
         Optional.ofNullable(jwt.getIssuedAt()).map(Date::getTime).ifPresent(iat -> json.put("iat", iat));
         Optional.ofNullable(jwt.getNotBefore()).map(Date::getTime).ifPresent(nbr -> json.put("nbr", nbr));
         Optional.ofNullable(jwt.getId()).ifPresent(kid -> json.put("kid", kid));
-        Optional.ofNullable(jwt.getClaims()).ifPresent(claimMap -> {
-            JSONArray jsonArray = new JSONArray(claimMap.entrySet());
-            json.put("claims", jsonArray);
-        });
+        Optional.ofNullable(jwt.getClaim("azp")).ifPresent(azp -> json.put("azp", azp.asString()));
+        Optional.ofNullable(jwt.getClaims()).ifPresent(claimMap -> json.put("claims", new JSONArray(claimMap.entrySet())));
         return json;
+    }
+
+    private boolean hasExpired(User user) {
+        if (user.getAttributes().containsKey("jwt")) {
+            JSONObject jwtInfo = (JSONObject) user.getAttributes().get("jwt");
+            if (jwtInfo.has("exp")) {
+                final Instant expiredAt = Instant.ofEpochMilli(jwtInfo.getLong("exp"));
+                return expiredAt.isBefore(Instant.now());
+            }
+        }
+        return false;
     }
 
     private String normalizeUri(String uri) {
