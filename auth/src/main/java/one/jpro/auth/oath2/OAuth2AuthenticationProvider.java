@@ -257,6 +257,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 });
     }
 
+    public CompletableFuture<Void> revoke(User user, String tokenType) {
+        return api.tokenRevocation(tokenType, user.getAttributes().get(tokenType).toString());
+    }
+
     private User createUser(JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {
         return createUser(json, null);
     }
