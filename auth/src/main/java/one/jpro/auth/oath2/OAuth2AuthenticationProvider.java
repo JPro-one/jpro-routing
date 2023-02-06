@@ -261,14 +261,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         return api.tokenRevocation(tokenType, user.getAttributes().get(tokenType).toString());
     }
 
-    private User createUser(JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {
-        return createUser(json, null);
+    private User createUser(@NotNull JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {
+        return createUser(json, new JSONObject());
     }
 
-    private User createUser(JSONObject json, JSONObject params) throws JwkException,
+    private User createUser(@NotNull JSONObject json, @NotNull JSONObject params) throws JwkException,
             TokenExpiredException, IllegalStateException {
-
-        if (params == null) params = new JSONObject();
+        Objects.requireNonNull(json, "json can not be null");
+        Objects.requireNonNull(params, "params can not be null");
 
         if (json.has("access_token")) {
             // attempt to create a user from the json object
