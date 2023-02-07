@@ -47,8 +47,8 @@ public class OAuth2API {
     /**
      * The client sends the end-user's browser to this endpoint to request their authentication and consent.
      * This endpoint is used in the code and implicit OAuth 2.0 flows which require end-user interaction.
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public String authorizeURL(OAuth2Credentials credentials) {
         final JSONObject query = credentials.toJSON();
@@ -90,8 +90,8 @@ public class OAuth2API {
     /**
      * Post an OAuth 2.0 grant (code, refresh token, resource owner password credentials, client credentials)
      * to obtain an ID and / or access token.
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public CompletableFuture<JSONObject> token(String grantType, JSONObject params) {
         if (grantType == null) {
@@ -111,7 +111,7 @@ public class OAuth2API {
         // Send authorization params in the body
         final JSONObject form = new JSONObject(params.toString());
         if (options.getExtraParams() != null) {
-            for(String key : JSONObject.getNames(options.getExtraParams())){
+            for (String key : JSONObject.getNames(options.getExtraParams())) {
                 form.put(key, options.getExtraParams().get(key));
             }
         }
@@ -146,10 +146,10 @@ public class OAuth2API {
 
                     JSONObject json;
                     final var header = response.headers();
-                    if (containsValue(header,"application/json")) {
+                    if (containsValue(header, "application/json")) {
                         json = new JSONObject(response.body());
-                    } else if (containsValue(header,"application/x-www-form-urlencoded")
-                            || containsValue(header,"text/plain")) {
+                    } else if (containsValue(header, "application/x-www-form-urlencoded")
+                            || containsValue(header, "text/plain")) {
                         json = queryToJson(response.body());
                     } else {
                         return CompletableFuture.failedFuture(
@@ -169,8 +169,8 @@ public class OAuth2API {
 
     /**
      * Validate an access token and retrieve its underlying authorisation (for resource servers).
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public CompletableFuture<JSONObject> tokenIntrospection(String tokenType, String token) {
         final JSONObject headers = new JSONObject();
@@ -206,8 +206,8 @@ public class OAuth2API {
                             containsValue(response.headers(), "text/plain")) {
                         json = queryToJson(response.body());
                     } else return CompletableFuture.failedFuture(
-                                new RuntimeException("Cannot handle accessToken type: "
-                                        + response.headers().allValues("Content-Type")));
+                            new RuntimeException("Cannot handle accessToken type: "
+                                    + response.headers().allValues("Content-Type")));
 
                     if (json == null || json.has("error")) {
                         return CompletableFuture.failedFuture(
@@ -221,8 +221,8 @@ public class OAuth2API {
 
     /**
      * Revoke an obtained access or refresh token.
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public CompletableFuture<Void> tokenRevocation(String tokenType, String token) {
         if (token == null) {
@@ -230,19 +230,16 @@ public class OAuth2API {
         }
 
         final JSONObject headers = new JSONObject();
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
 
         final boolean confidentialClient = options.getClientId() != null && options.getClientSecret() != null;
-
         if (confidentialClient) {
             String basic = options.getClientId() + ":" + options.getClientSecret();
             headers.put("Authorization", "Basic " + BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
         }
 
         final JSONObject form = new JSONObject();
-
         form.put("token", token).put("token_type_hint", tokenType);
-
-        headers.put("Content-Type", "application/x-www-form-urlencoded");
         final String payload = jsonToQuery(form);
         // specify preferred accepted accessToken type
         headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
@@ -277,8 +274,8 @@ public class OAuth2API {
                             containsValue(response.headers(), "application/json")) {
                         json = new JSONObject(response.body());
                     } else return CompletableFuture.failedFuture(
-                                new RuntimeException("Cannot handle content type: "
-                                        + response.headers().allValues("Content-Type")));
+                            new RuntimeException("Cannot handle content type: "
+                                    + response.headers().allValues("Content-Type")));
 
                     if (json.has("error")) {
                         return CompletableFuture.failedFuture(new RuntimeException(extractErrorDescription(json)));
@@ -405,7 +402,7 @@ public class OAuth2API {
     /**
      * Logout the user from the OAuth2 provider.
      *
-     * @param accessToken the access token
+     * @param accessToken  the access token
      * @param refreshToken the refresh token
      */
     public CompletableFuture<Void> logout(String accessToken, String refreshToken) {
