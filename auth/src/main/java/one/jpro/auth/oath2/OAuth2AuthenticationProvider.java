@@ -273,27 +273,25 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         if (json.has("access_token")) {
             // attempt to create a user from the json object
             final String token = json.getString("access_token");
-            final DecodedJWT decodedToken = JWT.decode(token);
 
             // verify if the user is not expired
             // this may happen if the user tokens have been issued for future use for example
-            final JSONObject jwtJSON = verifyToken(token, decodedToken, false);
+            final JSONObject jwtJSON = verifyToken(token, false);
             // Store JWT authorization
             params.put("jwt", jwtJSON);
 
-            final String name = decodedToken.getClaim("email").asString();
+            final String email = jwtJSON.getJSONObject("claims").getString("email");
             // Set principal name
-            params.put(Authentication.KEY_NAME, name);
+            params.put(Authentication.KEY_NAME, email);
         }
 
         if (json.has("id_token")) {
             // attempt to create a user from the json object
             final String token = json.getString("id_token");
-            final DecodedJWT decodedToken = JWT.decode(token);
 
             // verify if the user is not expired
             // this may happen if the user tokens have been issued for future use for example
-            final JSONObject jwtJSON = verifyToken(token, decodedToken, true);
+            final JSONObject jwtJSON = verifyToken(token, true);
             // Store JWT authorization
             params.put("jwt", jwtJSON);
         }
@@ -311,21 +309,37 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      * Performs a token verification and basic validation.
      *
      * @param token the token string
-     * @param decodedToken represents a Json Web Token that was decoded from its string representation
      * @param idToken set to <code>true</code> if this token is an id_token, otherwise <code>false</code>
      * @return a {@link JSONObject} holding the Json Web Token information related to this token.
      * @throws JwkException if no jwk can be found using the given token kid
      * @throws TokenExpiredException if the token has expired
      * @throws IllegalStateException if the basic validation fails
      */
-    private JSONObject verifyToken(String token, DecodedJWT decodedToken, boolean idToken) throws JwkException,
+    private JSONObject verifyToken(String token, boolean idToken) throws JwkException,
             TokenExpiredException, IllegalStateException {
         final JWTOptions jwtOptions = options.getJWTOptions();
 
         JSONObject json;
         try {
-            final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
-            final Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+            final DecodedJWT decodedToken = JWT.decode(token);
+            final String alg = decodedToken.getAlgorithm();
+            Algorithm algorithm = Algorithm.none();
+            // TODO: Add support for other algorithms
+            switch (alg) {
+                case "HS256":
+                    algorithm = Algorithm.HMAC256(options.getClientSecret());
+                    break;
+                case "RS256":
+                    final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
+                    algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+                    break;
+            }
+
+            // Allow only secure algorithms
+            if (Algorithm.none().equals(algorithm)) {
+                throw new IllegalStateException("Algorithm \"none\" not allowed");
+            }
+
             final JWTVerifier verifier = JWT.require(algorithm).build();
             final DecodedJWT verifiedToken = verifier.verify(token);
             json = jwtToJson(verifiedToken, idToken ? "id_token" : "access_token");
@@ -423,7 +437,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         Optional.ofNullable(jwt.getNotBefore()).map(Date::getTime).ifPresent(nbr -> json.put("nbr", nbr));
         Optional.ofNullable(jwt.getId()).ifPresent(kid -> json.put("kid", kid));
         Optional.ofNullable(jwt.getClaim("azp")).ifPresent(azp -> json.put("azp", azp.asString()));
-        Optional.ofNullable(jwt.getClaims()).ifPresent(claimMap -> json.put("claims", new JSONArray(claimMap.entrySet())));
+        Optional.ofNullable(jwt.getClaims()).ifPresent(claimMap -> json.put("claims", new JSONObject(claimMap)));
         return json;
     }
 
