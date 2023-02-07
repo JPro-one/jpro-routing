@@ -494,14 +494,12 @@ public class OAuth2API {
 
     public CompletableFuture<HttpResponse<String>> fetch(HttpMethod method, String path,
                                                          JSONObject headers, String payload) {
-
         if (path == null || path.length() == 0) {
             // and this can happen as it is a config option that is dependent on the provider
             return CompletableFuture.failedFuture(new IllegalArgumentException("Invalid path"));
         }
 
         final String url = path.charAt(0) == '/' ? options.getSite() + path : path;
-
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().uri(URI.create(url));
 
         // apply the provider required headers

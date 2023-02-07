@@ -1,7 +1,6 @@
 package one.jpro.auth.oath2.provider;
 
 import com.jpro.webapi.WebAPI;
-import one.jpro.auth.authentication.AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Flow;
 import one.jpro.auth.oath2.OAuth2Options;
@@ -10,7 +9,7 @@ import org.json.JSONObject;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Simplified factory to create an {@link AuthenticationProvider} for Google.
+ * Simplified factory to create an {@link OAuth2AuthenticationProvider} for Google.
  *
  * @author Besmir Beqiri
  */
