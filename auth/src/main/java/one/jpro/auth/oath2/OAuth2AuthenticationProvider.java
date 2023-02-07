@@ -261,6 +261,46 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         return api.tokenRevocation(tokenType, user.getAttributes().get(tokenType).toString());
     }
 
+    /**
+     * Retrieve user information and other attributes for a logged-in end-user.
+     *
+     * @param user the user (access token) to fetch the user information.
+     * @return a {@link JSONObject} with the user information.
+     * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#UserInfo">OpenID Connect Core 1.0</a>
+     */
+    public CompletableFuture<JSONObject> userInfo(User user) {
+        Objects.requireNonNull(user, "User must not be null");
+        final JSONObject userJSON = user.toJson();
+        final JSONObject attributesJSON = userJSON.getJSONObject(User.KEY_ATTRIBUTES);
+
+        return api.userInfo(attributesJSON.getString("access_token"))
+                .thenCompose(json -> {
+                    // validate if the subject of this token match the user subject
+                    if (user.hasAttribute("sub")) {
+                        final String userSub = attributesJSON.getJSONObject("jwt").getString("sub");
+                        final JSONObject userInfoPayload = json.getJSONObject("payload");
+                        if (!userSub.equals(userInfoPayload.getString("sub"))) {
+                            return CompletableFuture.failedFuture(
+                                    new AuthenticationException("User subject does not match UserInfo subject"));
+                        }
+                    }
+
+                    // verify if expired
+                    if (json.has("token")) {
+                        try {
+                            verifyToken(json.getString("token") ,false);
+                        } catch (TokenExpiredException | IllegalStateException ex) {
+                            return CompletableFuture.failedFuture(ex);
+                        } catch (JwkException ex) {
+                            return CompletableFuture.failedFuture(
+                                    new AuthenticationException(ex.getMessage(), ex));
+                        }
+                    }
+
+                    return CompletableFuture.completedFuture(json);
+                });
+    }
+
     private User createUser(@NotNull JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {
         return createUser(json, new JSONObject());
     }

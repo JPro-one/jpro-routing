@@ -1,6 +1,9 @@
 package one.jpro.auth.oath2;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
+import one.jpro.auth.authentication.AuthenticationException;
 import one.jpro.auth.utils.HttpMethod;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -251,6 +254,62 @@ public class OAuth2API {
                     }
 
                     return CompletableFuture.completedFuture(null); // Void type
+                });
+    }
+
+    /**
+     * Retrieve user information and other attributes for a logged-in end-user.
+     *
+     * @param accessToken the access token
+     * @return the user information wrapped in a JSON object
+     */
+    public CompletableFuture<JSONObject> userInfo(String accessToken) {
+        final JSONObject headers = new JSONObject();
+        final JSONObject extraParams = options.getExtraParams();
+        String path = options.getUserInfoPath();
+
+        if (path == null) {
+            return CompletableFuture.failedFuture(new AuthenticationException("userInfo path is not configured"));
+        }
+
+        if (extraParams != null) {
+            path += "?" + jsonToQuery(extraParams);
+        }
+
+        headers.put("Authorization", "Bearer " + accessToken);
+        // specify preferred accepted accessToken type
+        headers.put("Accept", "application/json,application/jwt,application/x-www-form-urlencoded;q=0.9");
+
+        return fetch(HttpMethod.GET, path, headers, null)
+                .thenCompose(response -> {
+                    String body = response.body();
+
+                    if (body == null) { // TODO: check if it's possible to have an empty body (body.length() == 0)
+                        return CompletableFuture.failedFuture(new AuthenticationException("No Body"));
+                    }
+
+                    // userInfo is expected to be a JWT
+                    JSONObject userInfo;
+                    if (containsValue(response.headers(), "application/json")) {
+                        userInfo = new JSONObject(body);
+                    } else if (containsValue(response.headers(), "applications/jwt")) {
+                        // userInfo is expected to be a JWT
+                        final DecodedJWT decodedJWT = JWT.decode(body);
+                        final JSONObject jwtHeader = new JSONObject(decodedJWT.getHeader());
+                        final JSONObject jwtPayload = new JSONObject(decodedJWT.getPayload());
+                        userInfo = new JSONObject().put("header", jwtHeader).put("payload", jwtPayload);
+                    } else if (containsValue(response.headers(), "application/x-www-form-urlencoded")
+                            || containsValue(response.headers(), "text/plain")) {
+                        // attempt to convert url encoded string to json
+                        userInfo = queryToJson(body);
+                    } else {
+                        return CompletableFuture.failedFuture(
+                                new AuthenticationException("Cannot handle Content-Type: "
+                                        + response.headers().allValues("Content-Type")));
+                    }
+
+                    processNonStandardHeaders(userInfo, response, options.getScopeSeparator());
+                    return CompletableFuture.completedFuture(userInfo);
                 });
     }
 

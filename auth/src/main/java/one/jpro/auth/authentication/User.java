@@ -3,6 +3,7 @@ package one.jpro.auth.authentication;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -30,8 +31,8 @@ public class User implements Authentication {
     /**
      * Create a server authentication holding user's name, roles and attributes.
      *
-     * @param name The name the authenticated user
-     * @param roles Roles of the authenticated user
+     * @param name       The name the authenticated user
+     * @param roles      Roles of the authenticated user
      * @param attributes Attributes of the authenticated user
      */
     public User(@Nonnull String name,
@@ -87,11 +88,29 @@ public class User implements Authentication {
         return Collections.unmodifiableMap(attributes);
     }
 
+    public boolean hasAttribute(String key) {
+        return hasKey(toJson().getJSONObject(KEY_ATTRIBUTES), key);
+    }
+
+    private boolean hasKey(JSONObject json, String key) {
+        boolean exists = json.has(key);
+        if (!exists) {
+            Iterator<String> keys = json.keys();
+            while (keys.hasNext()) {
+                String nextKey = keys.next();
+                if (json.get(nextKey) instanceof JSONObject) {
+                    exists = hasKey(json.getJSONObject(nextKey), key);
+                }
+            }
+        }
+        return exists;
+    }
+
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         json.put(KEY_NAME, getName());
-        json.put(KEY_ROLES, getRoles());
-        json.put(KEY_ATTRIBUTES, getAttributes());
+        json.put(KEY_ROLES, new JSONArray(getRoles()));
+        json.put(KEY_ATTRIBUTES, new JSONObject(getAttributes()));
         return json;
     }
 }
