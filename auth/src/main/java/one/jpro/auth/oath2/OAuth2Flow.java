@@ -24,7 +24,7 @@ public enum OAuth2Flow {
 
     public static OAuth2Flow getFlow(String grantType) {
         for (var flow : values()) {
-            if (flow.getGrantType().equals(grantType)) {
+            if (flow.getGrantType().equals(grantType.toUpperCase())) {
                 return flow;
             }
         }
