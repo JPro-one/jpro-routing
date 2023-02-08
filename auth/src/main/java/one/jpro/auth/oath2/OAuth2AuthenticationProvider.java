@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.*;
+import one.jpro.auth.jwt.JWTOptions;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,22 +40,11 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     protected final OAuth2Options options;
     @NotNull
     protected final OAuth2API api;
-    @NotNull
-    private JwkProvider jwkProvider;
 
-    public OAuth2AuthenticationProvider(WebAPI webAPI, OAuth2Options options) {
+    public OAuth2AuthenticationProvider(@NotNull final WebAPI webAPI, @NotNull final OAuth2Options options) {
         this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
         this.options = Objects.requireNonNull(options, "OAuth2 options cannot be null");
         this.api = new OAuth2API(options);
-
-        try {
-            jwkProvider = new UrlJwkProvider(new URL(options.getJwkPath()));
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-            jwkProvider = new JwkProviderBuilder(options.getJwkPath())
-                    .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
-                    .build();
-        }
     }
 
     public String authorizeUrl(OAuth2Credentials credentials) {
@@ -288,7 +278,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     // verify if expired
                     if (json.has("token")) {
                         try {
-                            verifyToken(json.getString("token") ,false);
+                            verifyToken(json.getString("token"), false);
                         } catch (TokenExpiredException | IllegalStateException ex) {
                             return CompletableFuture.failedFuture(ex);
                         } catch (JwkException ex) {
@@ -348,10 +338,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     /**
      * Performs a token verification and basic validation.
      *
-     * @param token the token string
+     * @param token   the token string
      * @param idToken set to <code>true</code> if this token is an id_token, otherwise <code>false</code>
      * @return a {@link JSONObject} holding the Json Web Token information related to this token.
-     * @throws JwkException if no jwk can be found using the given token kid
+     * @throws JwkException          if no jwk can be found using the given token kid
      * @throws TokenExpiredException if the token has expired
      * @throws IllegalStateException if the basic validation fails
      */
@@ -370,6 +360,15 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     algorithm = Algorithm.HMAC256(options.getClientSecret());
                     break;
                 case "RS256":
+                    JwkProvider jwkProvider;
+                    try {
+                        jwkProvider = new UrlJwkProvider(new URL(options.getJwkPath()));
+//                        jwkProvider = new JwkProviderBuilder(options.getJwkPath())
+//                                .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
+//                                .build();
+                    } catch (MalformedURLException ex) {
+                        throw new IllegalStateException("Invalid JWK path: " + options.getJwkPath());
+                    }
                     final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
                     algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
                     break;
@@ -456,7 +455,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     /**
      * Returns a JSON representation of a Json Web Token.
      *
-     * @param jwt represents a Json Web Token that was decoded from its string representation
+     * @param jwt       represents a Json Web Token that was decoded from its string representation
      * @param tokenType a string representation of the type of this token, like "access_token" or "id_token"
      * @return a {@link JSONObject} holding the JWT information.
      */
