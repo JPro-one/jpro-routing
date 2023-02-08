@@ -1,8 +1,7 @@
 package one.jpro.auth.authentication;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,14 +17,13 @@ import java.util.stream.Collectors;
  */
 public class User implements Authentication {
 
-    @Nonnull
-    @NotBlank
+    @NotNull
     private final String name;
 
-    @Nonnull
+    @NotNull
     private final Collection<String> roles;
 
-    @Nonnull
+    @NotNull
     private final Map<String, Object> attributes;
 
     /**
@@ -35,7 +33,7 @@ public class User implements Authentication {
      * @param roles      Roles of the authenticated user
      * @param attributes Attributes of the authenticated user
      */
-    public User(@Nonnull String name,
+    public User(@NotNull String name,
                 @Nullable Collection<String> roles,
                 @Nullable Map<String, Object> attributes) {
         Objects.requireNonNull(name, "User's name is null.");
@@ -44,7 +42,7 @@ public class User implements Authentication {
         this.attributes = attributes == null ? Collections.emptyMap() : attributes;
     }
 
-    public User(@Nonnull JSONObject json) {
+    public User(@NotNull JSONObject json) {
         String username = json.optString(KEY_NAME); // check with name key
         if (username == null || username.isBlank()) {
             username = json.optString("username"); // check with username key
@@ -70,20 +68,19 @@ public class User implements Authentication {
     }
 
     @Override
-    @Nonnull
-    @NotBlank
+    @NotNull
     public String getName() {
         return name;
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public Collection<String> getRoles() {
         return Collections.unmodifiableCollection(roles);
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public Map<String, Object> getAttributes() {
         return Collections.unmodifiableMap(attributes);
     }

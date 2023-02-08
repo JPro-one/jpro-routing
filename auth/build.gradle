@@ -22,9 +22,8 @@ dependencies {
     api "de.sandec:JMemoryBuddy:$JMEMORYBUDDY_VERSION"
     api project(':core')
 
-    api "jakarta.annotation:jakarta.annotation-api:$JAKARTA_ANNOTATIONS_VERSION"
+    implementation "org.jetbrains:annotations:$JETBRAINS_ANNOTATIONS_VERSION"
     api "jakarta.inject:jakarta.inject-api:$JAKARTA_INJECT_VERSION"
-    api "jakarta.validation:jakarta.validation-api:$JAKARTA_VALIDATION_VERSION"
     api "org.slf4j:slf4j-api:$SLF4J_VERSION"
     api "org.json:json:$JSON_VERSION"
 
