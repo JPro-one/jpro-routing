@@ -2,6 +2,7 @@ package one.jpro.auth.authentication;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -74,12 +75,14 @@ public class User implements Authentication {
 
     @Override
     @NotNull
+    @Unmodifiable
     public Collection<String> getRoles() {
         return Collections.unmodifiableCollection(roles);
     }
 
     @Override
     @NotNull
+    @Unmodifiable
     public Map<String, Object> getAttributes() {
         return Collections.unmodifiableMap(attributes);
     }
