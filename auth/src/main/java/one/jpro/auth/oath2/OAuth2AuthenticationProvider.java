@@ -470,7 +470,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     private JSONObject jwtToJson(DecodedJWT jwt, String tokenType) {
         final JSONObject json = new JSONObject();
         // Decoded JWT info
-        json.put(tokenType, jwt.getToken());
+        json.put("token", jwt.getToken());
+        json.put("token_type", tokenType);
         Optional.ofNullable(jwt.getHeader()).ifPresent(header -> json.put("header", header));
         Optional.ofNullable(jwt.getPayload()).ifPresent(payload -> json.put("payload", payload));
         Optional.ofNullable(jwt.getSignature()).ifPresent(signature -> json.put("signature", signature));
