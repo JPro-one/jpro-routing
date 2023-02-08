@@ -84,6 +84,10 @@ public class User implements Authentication {
         return Collections.unmodifiableMap(attributes);
     }
 
+    public boolean hasRole(String role) {
+        return getRoles().contains(role);
+    }
+
     public boolean hasAttribute(String key) {
         return hasKey(toJSON().getJSONObject(KEY_ATTRIBUTES), key);
     }
