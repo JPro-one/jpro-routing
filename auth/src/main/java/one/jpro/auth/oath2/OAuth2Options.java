@@ -36,9 +36,9 @@ public class OAuth2Options {
     private String userInfoPath;
     // extra parameters to be added while requesting the user info
     private JSONObject userInfoParams;
-    // introspection RFC7662
+    // introspection RFC7662 https://tools.ietf.org/html/rfc7662
     private String introspectionPath;
-    // JWK path RFC7517
+    // JWK path RFC7517 https://tools.ietf.org/html/rfc7517
     private String jwkPath;
     //seconds of JWKs lifetime
     private long jwkMaxAge;
@@ -49,7 +49,7 @@ public class OAuth2Options {
     private String clientId;
     private String clientSecret;
 
-    //https://tools.ietf.org/html/rfc7521
+    // assertion RFC7521 https://tools.ietf.org/html/rfc7521
     private String clientAssertionType;
     private String clientAssertion;
 
