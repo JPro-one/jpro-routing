@@ -2,7 +2,6 @@ package one.jpro.auth.authentication;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -86,7 +85,7 @@ public class User implements Authentication {
     }
 
     public boolean hasAttribute(String key) {
-        return hasKey(toJson().getJSONObject(KEY_ATTRIBUTES), key);
+        return hasKey(toJSON().getJSONObject(KEY_ATTRIBUTES), key);
     }
 
     private boolean hasKey(JSONObject json, String key) {
@@ -101,13 +100,5 @@ public class User implements Authentication {
             }
         }
         return exists;
-    }
-
-    public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        json.put(KEY_NAME, getName());
-        json.put(KEY_ROLES, new JSONArray(getRoles()));
-        json.put(KEY_ATTRIBUTES, new JSONObject(getAttributes()));
-        return json;
     }
 }

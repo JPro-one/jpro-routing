@@ -2,6 +2,7 @@ package one.jpro.auth.authentication;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.security.Principal;
@@ -37,6 +38,20 @@ public interface Authentication extends Principal {
     @NotNull
     default Collection<String> getRoles() {
         return Collections.emptyList();
+    }
+
+    /**
+     * Convert the authentication information to JSON format.
+     *
+     * @return a JSON object.
+     */
+    @NotNull
+    default JSONObject toJSON() {
+        final JSONObject json = new JSONObject();
+        json.put(KEY_NAME, getName());
+        json.put(KEY_ROLES, new JSONArray(getRoles()));
+        json.put(KEY_ATTRIBUTES, new JSONObject(getAttributes()));
+        return json;
     }
 
     @NotNull

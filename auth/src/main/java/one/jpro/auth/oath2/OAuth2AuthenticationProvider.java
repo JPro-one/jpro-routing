@@ -6,8 +6,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
-import jakarta.validation.constraints.NotNull;
 import one.jpro.auth.authentication.*;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -270,7 +270,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      */
     public CompletableFuture<JSONObject> userInfo(User user) {
         Objects.requireNonNull(user, "User must not be null");
-        final JSONObject userJSON = user.toJson();
+        final JSONObject userJSON = user.toJSON();
         final JSONObject attributesJSON = userJSON.getJSONObject(User.KEY_ATTRIBUTES);
 
         return api.userInfo(attributesJSON.getString("access_token"))
