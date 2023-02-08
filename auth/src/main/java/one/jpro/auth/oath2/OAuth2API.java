@@ -87,6 +87,7 @@ public class OAuth2API {
             }
         }
 
+        log.info("Authorize URL: {}", options.getAuthorizationPath() + '?' + jsonToQuery(query));
         return options.getAuthorizationPath() + '?' + jsonToQuery(query);
     }
 
@@ -568,7 +569,7 @@ public class OAuth2API {
 
     private String jsonToQuery(JSONObject json) {
         return json.toMap().entrySet().stream()
-                .filter(entry -> entry.getValue() != null)
+                .filter(entry -> entry.getValue() != null && !entry.getValue().toString().isBlank())
                 .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
                         URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8))
                 .collect(Collectors.joining("&"));
