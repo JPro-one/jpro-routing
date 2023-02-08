@@ -192,6 +192,16 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     }
                     break;
 
+                case AUTH_JWT:
+                    if (oauth2Credentials.getAssertion() != null) {
+                        params.put("assertion", oauth2Credentials.getAssertion());
+                    }
+
+                    if (oauth2Credentials.getScopes() != null) {
+                        params.put("scope", String.join(options.getScopeSeparator(), oauth2Credentials.getScopes()));
+                    }
+                    break;
+
                 default:
                     return CompletableFuture.failedFuture(
                             new RuntimeException("Current flow does not allow acquiring a token by the replay party"));
