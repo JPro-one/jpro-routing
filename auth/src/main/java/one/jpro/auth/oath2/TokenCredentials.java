@@ -3,6 +3,8 @@ package one.jpro.auth.oath2;
 import one.jpro.auth.authentication.AuthenticationProvider;
 import one.jpro.auth.authentication.CredentialValidationException;
 import one.jpro.auth.authentication.Credentials;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,22 +22,26 @@ import java.util.stream.Stream;
  */
 public class TokenCredentials implements Credentials {
 
+    @NotNull
     private String token;
+    @Nullable
     private List<String> scopes;
 
-    public TokenCredentials(String token) {
+    public TokenCredentials(@NotNull final String token) {
         this.token = token;
     }
 
+    @NotNull
     public String getToken() {
         return token;
     }
 
-    public TokenCredentials setToken(String token) {
+    public TokenCredentials setToken(@NotNull String token) {
         this.token = token;
         return this;
     }
 
+    @Nullable
     public List<String> getScopes() {
         return scopes;
     }
@@ -63,7 +69,7 @@ public class TokenCredentials implements Credentials {
     @Override
     public JSONObject toJSON() {
         final JSONObject json = new JSONObject();
-        Optional.ofNullable(getToken()).ifPresent(token -> json.put("token", token));
+        Optional.of(getToken()).ifPresent(token -> json.put("token", token));
         Optional.ofNullable(Stream.ofNullable(getScopes())
                         .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
                 .ifPresent(jsonArray -> json.put("scopes", jsonArray));
