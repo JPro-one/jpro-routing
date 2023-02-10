@@ -63,9 +63,12 @@ public class OAuth2API {
             flow = options.getFlow();
         }
 
-        if (flow != OAuth2Flow.AUTH_CODE) {
-            throw new IllegalStateException("authorization URL cannot be computed for non AUTH_CODE flow");
+        if (flow == OAuth2Flow.AUTH_CODE) {
+            query.put("response_type", "code");
         }
+//        else {
+//            throw new IllegalStateException("authorization URL cannot be computed for non AUTH_CODE flow");
+//        }
 
         if (query.has("scopes")) {
             // scopes have been passed as a list so the provider must generate the correct string for it
@@ -74,7 +77,6 @@ public class OAuth2API {
             query.remove("scopes");
         }
 
-        query.put("response_type", "code");
         final String clientId = options.getClientId();
         if (clientId != null) {
             query.put("client_id", clientId);
