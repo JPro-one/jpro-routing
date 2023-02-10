@@ -51,6 +51,8 @@ public class OAuth2API {
      * The client sends the end-user's browser to this endpoint to request their authentication and consent.
      * This endpoint is used in the code and implicit OAuth 2.0 flows which require end-user interaction.
      *
+     * @param credentials the credentials to be used to authorize the user.
+     * @return the url to be used to authorize the user.
      * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public String authorizeURL(OAuth2Credentials credentials) {
@@ -97,6 +99,8 @@ public class OAuth2API {
      * Post an OAuth 2.0 grant (code, refresh token, resource owner password credentials, client credentials)
      * to obtain an ID and / or access token.
      *
+     * @param grantType the grant type.
+     * @param params    the parameters to be sent.
      * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public CompletableFuture<JSONObject> token(String grantType, JSONObject params) {
@@ -176,6 +180,8 @@ public class OAuth2API {
     /**
      * Validate an access token and retrieve its underlying authorisation (for resource servers).
      *
+     * @param tokenType the type of the token to be introspected.
+     * @param token     the token to be introspected.
      * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public CompletableFuture<JSONObject> tokenIntrospection(String tokenType, String token) {
@@ -228,6 +234,8 @@ public class OAuth2API {
     /**
      * Revoke an obtained access or refresh token.
      *
+     * @param tokenType the type of the token to be revoked.
+     * @param token     the token to be revoked.
      * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public CompletableFuture<Void> tokenRevocation(String tokenType, String token) {
@@ -495,8 +503,8 @@ public class OAuth2API {
                 });
     }
 
-    public CompletableFuture<HttpResponse<String>> fetch(HttpMethod method, String path,
-                                                         JSONObject headers, String payload) {
+    private CompletableFuture<HttpResponse<String>> fetch(HttpMethod method, String path,
+                                                          JSONObject headers, String payload) {
         if (path == null || path.length() == 0) {
             // and this can happen as it is a config option that is dependent on the provider
             return CompletableFuture.failedFuture(new IllegalArgumentException("Invalid path"));
