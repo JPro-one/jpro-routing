@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -29,6 +30,19 @@ public class TokenCredentials implements Credentials {
 
     public TokenCredentials(@NotNull final String token) {
         this.token = token;
+    }
+
+    // token credentials from json
+    public TokenCredentials(@NotNull final JSONObject json) {
+        // token
+        this.token = json.getString("token");
+        // scopes
+        if (json.has("scope")) {
+            addScopes(json.getString("scope"));
+        } else if (json.has("scopes")) {
+            final JSONArray scopes = json.getJSONArray("scopes");
+            setScopes(scopes.toList().stream().map(Object::toString).collect(Collectors.toList()));
+        }
     }
 
     @NotNull
@@ -51,7 +65,7 @@ public class TokenCredentials implements Credentials {
         return this;
     }
 
-    public TokenCredentials setScopes(String... scopes) {
+    public TokenCredentials addScopes(String... scopes) {
         if (this.scopes == null) {
             this.scopes = new ArrayList<>();
         }
