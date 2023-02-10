@@ -195,4 +195,9 @@ public class OAuth2Credentials implements Credentials {
         Optional.ofNullable(getNonce()).ifPresent(nonce -> json.put("nonce", nonce));
         return json;
     }
+
+    @Override
+    public String toString() {
+        return toJSON().toString();
+    }
 }
