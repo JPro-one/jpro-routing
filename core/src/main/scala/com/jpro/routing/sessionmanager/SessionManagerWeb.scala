@@ -12,6 +12,8 @@ import simplefx.experimental._
 
 class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionManager { THIS =>
 
+  val container = new StackPane
+  webApp <++ container
 
   def goBack(): Unit = {
     webAPI.executeScript("history.go(-1);")
@@ -41,7 +43,7 @@ class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionMa
 
         view.isMobile = webAPI.isMobile
 
-        webApp.children = List(view.realContent)
+        container.children = List(view.realContent)
         if(THIS.view != null && THIS.view != view) {
           THIS.view.onClose()
           THIS.view.sessionManager = null
@@ -102,6 +104,7 @@ class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionMa
   }
 
   def start() = {
+
     gotoFullEncodedURL(webAPI.getServerName, false, false)
     println("registering popstate")
     webAPI.registerJavaFunction("popstatejava", new WebCallback {
@@ -161,6 +164,7 @@ class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionMa
         |  history.scrollRestoration = 'manual';
         |}
       """.stripMargin)
+
 
   }
 }

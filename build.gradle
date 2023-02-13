@@ -12,7 +12,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.sandec.jpro:jpro-plugin-gradle:$JPRO_VERSION"
+    classpath "one.jpro:jpro-gradle-plugin:$JPRO_VERSION"
     classpath "SANDEC:simplefx-plugin-gradle:$SIMPLEFX_VERSION"
     classpath 'org.openjfx:javafx-plugin:0.0.14-SNAPSHOT-FORK'
   }
