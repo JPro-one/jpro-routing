@@ -6,10 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.security.Principal;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents the state of an authentication.
@@ -60,7 +57,7 @@ public interface Authentication extends Principal {
     }
 
     static  Authentication create(@NotNull String username,
-                                  @NotNull Collection<String> roles) {
+                                  @NotNull Set<String> roles) {
         Objects.requireNonNull(roles, "User's roles are null.");
         return new User(username, roles, null);
     }
@@ -89,7 +86,7 @@ public interface Authentication extends Principal {
      */
     @NotNull
     static Authentication create(@NotNull String username,
-                                 @Nullable Collection<String> roles,
+                                 @Nullable Set<String> roles,
                                  @Nullable Map<String, Object> attributes) {
         return new User(username, roles, attributes);
     }

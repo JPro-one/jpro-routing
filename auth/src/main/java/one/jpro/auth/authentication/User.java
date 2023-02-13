@@ -21,7 +21,7 @@ public class User implements Authentication {
     private final String name;
 
     @NotNull
-    private final Collection<String> roles;
+    private final Set<String> roles;
 
     @NotNull
     private final Map<String, Object> attributes;
@@ -34,11 +34,11 @@ public class User implements Authentication {
      * @param attributes Attributes of the authenticated user
      */
     public User(@NotNull String name,
-                @Nullable Collection<String> roles,
+                @Nullable Set<String> roles,
                 @Nullable Map<String, Object> attributes) {
         Objects.requireNonNull(name, "User's name is null.");
         this.name = name;
-        this.roles = (roles == null || roles.isEmpty()) ? new ArrayList<>() : roles;
+        this.roles = (roles == null || roles.isEmpty()) ? Collections.emptySet() : roles;
         this.attributes = attributes == null ? Collections.emptyMap() : attributes;
     }
 
@@ -55,9 +55,9 @@ public class User implements Authentication {
 
         if (json.has(KEY_ROLES)) {
             this.roles = json.getJSONArray(KEY_ROLES).toList().stream().map(Object::toString)
-                    .collect(Collectors.toUnmodifiableList());
+                    .collect(Collectors.toUnmodifiableSet());
         } else {
-            this.roles = new ArrayList<>();
+            this.roles = Collections.emptySet();
         }
 
         if (json.has(KEY_ATTRIBUTES)) {
@@ -76,8 +76,8 @@ public class User implements Authentication {
     @Override
     @NotNull
     @Unmodifiable
-    public Collection<String> getRoles() {
-        return Collections.unmodifiableCollection(roles);
+    public Set<String> getRoles() {
+        return Collections.unmodifiableSet(roles);
     }
 
     @Override
