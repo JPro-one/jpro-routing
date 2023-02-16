@@ -59,7 +59,7 @@ configure([project(':core'), project(':dev'), project(':auth'), project(':popup'
   dependencies {
     api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     api "SANDEC:jnodes:$JNODES_VERSION"
-    api "de.sandec:JMemoryBuddy:0.5.1"
+    api "de.sandec:JMemoryBuddy:0.5.2"
     api "org.scala-lang:scala-library:2.12.10"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
@@ -119,7 +119,8 @@ configure([project(':dev')]) {
 }
 
 configure([project(':example')]) {
-  apply plugin: 'com.sandec.jpro'
+  apply plugin: 'jpro-gradle-plugin'
+
   //mainClassName = "example.scala.TestWebApplication"
   //mainClassName = "example.scala.TestExtensions"
   //mainClassName = "example.scala.ColorTransitionApp"
