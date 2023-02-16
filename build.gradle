@@ -136,6 +136,12 @@ configure([project(':example')]) {
     implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
   }
 
+  javafx {
+    version = "$JAVAFX_VERSION"
+    configurations = ["implementation"]
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
+  }
+
   jpro {
     openingPath = "/"
   }
