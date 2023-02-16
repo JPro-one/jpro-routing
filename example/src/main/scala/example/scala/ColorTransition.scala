@@ -1,7 +1,7 @@
 package example.scala
 
-import com.jpro.routing.RouteUtils.{EmptyRoute, get, getNode, redirect}
-import com.jpro.routing.{Filters, Redirect, Request, RouteUtils, LinkUtil, RouteNode}
+import com.jpro.routing.RouteUtils.{get, getNode, redirect}
+import com.jpro.routing.{Filters, LinkUtil, Redirect, Request, Route, RouteNode, RouteUtils}
 import com.jpro.routing.sessionmanager.SessionManager
 import com.jpro.webapi.WebAPI
 import simplefx.all._
@@ -42,14 +42,15 @@ class ColorTransition(stage: Stage) extends RouteNode(stage) {
   }
   /* Util rename into LinkUtil */
   setRoute(
-    EmptyRoute /* StartRoute? */
+    Route.empty() /* StartRoute? */
+      .and(get("a", r => null))
       .and(redirect("/", "/green"))
       .and(getNode("/green", gen("Green","/red", Color.GREEN)))
       .and(getNode("/red", gen("Red", "/blue", Color.RED)))
       .and(getNode("/blue", gen("Blue", "/yellow", Color.BLUE)))
       .and(getNode("/yellow", gen("Yellow", "/red", Color.YELLOW)))
-      .path("/colors", 
-        EmptyRoute
+      .path("/colors",
+        Route.empty()
           .and(getNode("/green", gen("Green","./red", Color.GREEN)))
           .and(getNode("/red", gen("Red", "./green", Color.RED)))
       )

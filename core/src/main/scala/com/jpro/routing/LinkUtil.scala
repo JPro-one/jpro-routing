@@ -14,14 +14,14 @@ import org.apache.commons.validator.routines.UrlValidator
 
 object LinkUtil {
 
-  private var openLinkExternal: String => Unit = { link =>
+  private var openLinkExternalFun: String => Unit = { link =>
     // Open link with awt
     import java.awt.Desktop
     import java.net.URI
     Desktop.getDesktop.browse(new URI(link))
   }
-  def setOpenLinkExternal(x: String => Unit): Unit = {
-    openLinkExternal = x
+  def setOpenLinkExternalFun(x: String => Unit): Unit = {
+    openLinkExternalFun = x
   }
 
   private val urlValidator = new UrlValidator()
@@ -137,7 +137,7 @@ object LinkUtil {
         def isExternalLink(x: String) = x.startsWith("http") || x.startsWith("mailto")
         if(e.isStillSincePress) {
           if(isExternalLink(link)) {
-            openLinkExternal(link)
+            openLinkExternalFun(link)
           } else {
             LinkUtil.getSessionManager(node).gotoURL(link)
           }
