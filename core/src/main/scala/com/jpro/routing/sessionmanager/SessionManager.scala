@@ -53,9 +53,8 @@ trait SessionManager { THIS =>
       }
       if(newView != null) {
         newView.map { view =>
-          val decodedURL = URLDecoder.decode(url2,"UTF-8")
-          this.url = decodedURL
-          gotoURL(decodedURL, view, pushState, track)
+          this.url = url2
+          gotoURL(url2, view, pushState, track)
         }
       } else {
         new NullPointerException(s"Error: no view found for $url").printStackTrace()
@@ -100,9 +99,12 @@ object SessionManager {
     else new SessionManagerDesktop(app)
   }
 
-  def mergeURLs(orig: String, next: String): String = {
+  def mergeURLs(orig: String, next: String): String = try {
     if(orig == null) next
-    else new URI(orig).resolve(next).toString
+    else URI.create(orig).resolve(next).toString
+  } catch {
+    case e: Exception =>
+      throw new Exception(s"Error while merging $orig and $next", e)
   }
 
   def setExternalLinkImpl(f: Consumer[String]) = externalLinkImpl = f

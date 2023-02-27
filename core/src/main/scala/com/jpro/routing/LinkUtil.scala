@@ -47,6 +47,8 @@ object LinkUtil {
     setLink(node,url,Some(text), children)
   }
   def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null): Unit = {
+    assert(url != "", s"Empty link: ''")
+    assert(isValidLink(url), s"Invalid link: '$url''")
     node.getProperties.put("link",url)
     text.map {desc =>
       node.getProperties.put("description",desc)

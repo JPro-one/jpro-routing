@@ -20,16 +20,15 @@ class MyApp(stage: Stage) extends RouteNode(stage) {
     Route.empty()
       .and(get("", (r) => new MainView))
       .and(get("/", (r) => new MainView))
-      .and(get("/?page=main", (r) => new MainView))
-      .and(get("/?page=green", (r) => new GreenView))
-      .and(get("/?page=orange", (r) => new OrangeView))
-      .and(get("/?page=sub", (r) => new SubView))
-      .and(get("/?page=redirect", (r) => Redirect("/?page=sub")))
-      .and(get("/?page=paralax", (r) => new ParalaxPage))
-      .and(get("/?page=pdf", (r) => new PDFTest))
-      .and(get("/?page=leak", (r) => new LeakingPage))
-      .and(get("/?page=collect", (r) => new CollectingPage))
-      .and(get("/?page=jmemorybuddy", (r) => new JMemoryBuddyPage))
+      .and(get("/main", (r) => new MainView))
+      .and(get("/green", (r) => new GreenView))
+      .and(get("/sub", (r) => new SubView))
+      .and(get("/redirect", (r) => Redirect("/sub")))
+      .and(get("/paralax", (r) => new ParalaxPage))
+      .and(get("/pdf", (r) => new PDFTest))
+      .and(get("/leak", (r) => new LeakingPage))
+      .and(get("/collect", (r) => new CollectingPage))
+      .and(get("/jmemorybuddy", (r) => new JMemoryBuddyPage))
       .and(get("/it's\" tricky", (r) => new MainView))
       .and(get("/it's\" tricky", (r) => new MainView))
   )
@@ -48,19 +47,18 @@ class Header(view: View, sessionManager: SessionManager) extends HBox {
       setLink(this, url, Some(str))
     }
   }
-  this <++ new HeaderLink("main"    , "/?page=main")
-  this <++ new HeaderLink("subpage" , "/?page=sub" )
-  this <++ new HeaderLink("redirect", "/?page=redirect" )
-  this <++ new HeaderLink("tricky!" , "/it's\" tricky" )
+  this <++ new HeaderLink("main"    , "/main")
+  this <++ new HeaderLink("subpage" , "/sub" )
+  this <++ new HeaderLink("redirect", "/redirect" )
+  //this <++ new HeaderLink("tricky!" , "/it's\" tricky" )
   this <++ new HeaderLink("google"  , "http://google.com" )
-  this <++ new HeaderLink("paralax" , "/?page=paralax" )
-  this <++ new HeaderLink("dead"    , "/?page=as df" )
-  this <++ new HeaderLink("green"   , "/?page=green" )
-  this <++ new HeaderLink("orange"  , "/?page=orange" )
-  this <++ new HeaderLink("pdf"     , "/?page=pdf" )
-  this <++ new HeaderLink("leak"    , "/?page=leak" )
-  this <++ new HeaderLink("collect"    , "/?page=collect" )
-  this <++ new HeaderLink("jmemorybuddy"    , "/?page=jmemorybuddy" )
+  this <++ new HeaderLink("paralax" , "/paralax" )
+  //this <++ new HeaderLink("dead"    , "/as df" )
+  this <++ new HeaderLink("green"   , "/green" )
+  this <++ new HeaderLink("pdf"     , "/pdf" )
+  this <++ new HeaderLink("leak"    , "/leak" )
+  this <++ new HeaderLink("collect"    , "/collect" )
+  this <++ new HeaderLink("jmemorybuddy"    , "/jmemorybuddy" )
   this <++ new HeaderLink("No Link" , "" ) {
     setLink(this, "/?1", Some("/?1"))
     runLater {
@@ -133,14 +131,7 @@ class UnknownPage(x: String) extends Page {
 
   def content = new Label("UNKNOWN PAGE: " + x) { font = new Font(60)}
 }
-class OrangeView() extends Page {
-  def title = "Orange Page"
-  def description = "desc Main"
 
-  override def fullscreen = false
-
-  def content = new StackPane { style = "-fx-background-color: orange;"}
-}
 class GreenView() extends Page {
   def title = "Green Page"
   def description = "desc Main"
@@ -186,7 +177,7 @@ class MainView extends Page {
     this <++ new Label(" label 123") { font = new Font(60)}
     this <++ new Label(" label 123") { font = new Font(60)}
     this <++ addGoogle
-    this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/?page=paralax" ) }
+    this <++ new Label("paralax" ) { font = new Font(60); setLink(this, "/paralax" ) }
 
   }
 }
