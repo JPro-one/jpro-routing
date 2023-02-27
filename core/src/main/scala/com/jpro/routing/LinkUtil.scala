@@ -24,7 +24,7 @@ object LinkUtil {
     openLinkExternalFun = x
   }
 
-  private val urlValidator = new UrlValidator()
+  private val urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS)
   private[routing] def isValidLink(x: String): Boolean = {
     if(x.startsWith("http")) {
       urlValidator.isValid(x)
