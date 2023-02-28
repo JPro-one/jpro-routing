@@ -1,6 +1,9 @@
 package one.jpro.auth.oath2;
 
-import com.auth0.jwk.*;
+import com.auth0.jwk.Jwk;
+import com.auth0.jwk.JwkException;
+import com.auth0.jwk.JwkProvider;
+import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -34,11 +37,11 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     private final Logger log = LoggerFactory.getLogger(OAuth2AuthenticationProvider.class);
 
     @NotNull
-    protected final WebAPI webAPI;
+    private final WebAPI webAPI;
     @NotNull
-    protected final OAuth2Options options;
+    private final OAuth2Options options;
     @NotNull
-    protected final OAuth2API api;
+    private final OAuth2API api;
 
     public OAuth2AuthenticationProvider(@NotNull final WebAPI webAPI, @NotNull final OAuth2Options options) {
         this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
