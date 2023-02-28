@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,9 @@ import java.util.stream.Collectors;
  * @author Besmir Beqiri
  */
 public final class Utils {
+
+    public static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder().withoutPadding();
+    public static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
 
     /**
      * Checks that the specified string is not {@code null} and
