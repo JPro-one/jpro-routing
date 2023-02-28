@@ -56,6 +56,12 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         return authorizeUrl;
     }
 
+    /**
+     * Authenticate a user with the given credentials.
+     *
+     * @param credentials the credentials to authenticate
+     * @return a future that will complete with the authenticated user
+     */
     @Override
     public CompletableFuture<User> authenticate(Credentials credentials) {
         try {
