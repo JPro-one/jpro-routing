@@ -1,6 +1,6 @@
 package one.jpro.auth.authentication;
 
-import one.jpro.auth.utils.Utils;
+import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 public class UsernamePasswordCredentials implements Credentials {
 
-    private static final Base64.Encoder BASE64_ENCODER = Utils.BASE64_ENCODER;
+    private static final Base64.Encoder BASE64_ENCODER = AuthUtils.BASE64_ENCODER;
 
     @NotNull
     private String username;

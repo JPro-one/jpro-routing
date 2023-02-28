@@ -5,7 +5,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationException;
 import one.jpro.auth.utils.HttpMethod;
-import one.jpro.auth.utils.Utils;
+import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static one.jpro.auth.utils.Utils.*;
+import static one.jpro.auth.utils.AuthUtils.*;
 
 /**
  * OAuth2 API class.
@@ -33,7 +33,7 @@ public class OAuth2API {
 
     private static final Pattern MAX_AGE = Pattern.compile("max-age=\"?(\\d+)\"?");
     private static final String CACHE_CONTROL = "cache-control";
-    private static final Base64.Encoder BASE64_ENCODER = Utils.BASE64_ENCODER;
+    private static final Base64.Encoder BASE64_ENCODER = AuthUtils.BASE64_ENCODER;
 
     @NotNull
     private final OAuth2Options options;
