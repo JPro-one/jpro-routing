@@ -5,27 +5,23 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationException;
 import one.jpro.auth.utils.HttpMethod;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static one.jpro.auth.utils.Utils.*;
 
 /**
  * OAuth2 API class.
@@ -34,15 +30,16 @@ import java.util.stream.Collectors;
  */
 public class OAuth2API {
 
-    private static final Logger log = LoggerFactory.getLogger(OAuth2API.class);
     private static final Pattern MAX_AGE = Pattern.compile("max-age=\"?(\\d+)\"?");
     private static final String CACHE_CONTROL = "cache-control";
     private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
+    @NotNull
     private final OAuth2Options options;
+    @NotNull
     private final HttpClient httpClient;
 
-    public OAuth2API(OAuth2Options options) {
+    public OAuth2API(@NotNull final OAuth2Options options) {
         this.options = options;
         this.httpClient = HttpClient.newHttpClient();
     }
@@ -91,7 +88,6 @@ public class OAuth2API {
             }
         }
 
-        log.info("Authorize URL: {}", options.getAuthorizationPath() + '?' + jsonToQuery(query));
         return options.getAuthorizationPath() + '?' + jsonToQuery(query);
     }
 
@@ -575,92 +571,5 @@ public class OAuth2API {
                         return CompletableFuture.completedFuture(response);
                     }
                 });
-    }
-
-    private String jsonToQuery(JSONObject json) {
-        return json.toMap().entrySet().stream()
-                .filter(entry -> entry.getValue() != null && !entry.getValue().toString().isBlank())
-                .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
-                        URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining("&"));
-    }
-
-    private JSONObject queryToJson(String query) {
-        if (query == null) {
-            return null;
-        }
-
-        final JSONObject json = new JSONObject();
-        final String[] pairs = query.split("&");
-        for (String pair : pairs) {
-            final int idx = pair.indexOf("=");
-            final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8) : pair;
-            final String value = (idx > 0 && pair.length() > idx + 1) ?
-                    URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8) : null;
-            if (!json.has(key)) {
-                json.put(key, value);
-            } else {
-                var oldValue = json.get(key);
-                JSONArray array;
-                if (oldValue instanceof JSONArray) {
-                    array = (JSONArray) oldValue;
-                } else {
-                    array = new JSONArray();
-                    array.put(oldValue);
-                    json.put(key, array);
-                }
-
-                array.put(Objects.requireNonNullElse(value, JSONObject.NULL));
-            }
-        }
-
-        return json;
-    }
-
-    private boolean containsValue(HttpHeaders headers, String value) {
-        return headers.map().entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream())
-                .anyMatch(s -> s.contains(value));
-    }
-
-    private void processNonStandardHeaders(JSONObject json, HttpResponse<String> response, String scopeSeparator) {
-        // inspect the response header for the non-standard:
-        // X-OAuth-Scopes and X-Accepted-OAuth-Scopes
-        final var xOAuthScopes = response.headers().firstValue("X-OAuth-Scopes");
-        final var xAcceptedOAuthScopes = response.headers().firstValue("X-OAuth-Scopes");
-
-        xOAuthScopes.ifPresent(scopes -> {
-            log.trace("Received non-standard X-OAuth-Scopes: {}", scopes);
-            if (json.has("scope")) {
-                json.put("scope", json.getString("scope") + scopeSeparator + scopes);
-            } else {
-                json.put("scope", scopes);
-            }
-        });
-
-        xAcceptedOAuthScopes.ifPresent(scopes -> {
-            log.trace("Received non-standard X-OAuth-Scopes: {}", scopes);
-            json.put("acceptedScopes", scopes);
-        });
-    }
-
-    private String extractErrorDescription(JSONObject json) {
-        if (json == null) {
-            return "null";
-        }
-
-        String description;
-        var error = json.get("error");
-        if (error instanceof JSONObject) {
-            description = ((JSONObject) error).getString("message");
-        } else {
-            description = json.optString("error_description", json.getString("error"));
-        }
-
-        if (description == null) {
-            return "null";
-        }
-
-        return description;
     }
 }

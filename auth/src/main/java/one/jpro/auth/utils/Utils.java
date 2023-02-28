@@ -1,5 +1,16 @@
 package one.jpro.auth.utils;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * Utility methods.
  *
@@ -34,6 +45,89 @@ public final class Utils {
             throw new IllegalArgumentException(message);
         }
         return str;
+    }
+
+    public static String jsonToQuery(JSONObject json) {
+        return json.toMap().entrySet().stream()
+                .filter(entry -> entry.getValue() != null && !entry.getValue().toString().isBlank())
+                .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
+                        URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
+    }
+
+    public static JSONObject queryToJson(String query) {
+        if (query == null) {
+            return null;
+        }
+
+        final JSONObject json = new JSONObject();
+        final String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            final int idx = pair.indexOf("=");
+            final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8) : pair;
+            final String value = (idx > 0 && pair.length() > idx + 1) ?
+                    URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8) : null;
+            if (!json.has(key)) {
+                json.put(key, value);
+            } else {
+                var oldValue = json.get(key);
+                JSONArray array;
+                if (oldValue instanceof JSONArray) {
+                    array = (JSONArray) oldValue;
+                } else {
+                    array = new JSONArray();
+                    array.put(oldValue);
+                    json.put(key, array);
+                }
+
+                array.put(Objects.requireNonNullElse(value, JSONObject.NULL));
+            }
+        }
+
+        return json;
+    }
+
+    public static boolean containsValue(HttpHeaders headers, String value) {
+        return headers.map().entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream())
+                .anyMatch(s -> s.contains(value));
+    }
+
+    public static void processNonStandardHeaders(JSONObject json, HttpResponse<String> response, String scopeSeparator) {
+        // inspect the response header for the non-standard:
+        // X-OAuth-Scopes and X-Accepted-OAuth-Scopes
+        final var xOAuthScopes = response.headers().firstValue("X-OAuth-Scopes");
+        final var xAcceptedOAuthScopes = response.headers().firstValue("X-OAuth-Scopes");
+
+        xOAuthScopes.ifPresent(scopes -> {
+            if (json.has("scope")) {
+                json.put("scope", json.getString("scope") + scopeSeparator + scopes);
+            } else {
+                json.put("scope", scopes);
+            }
+        });
+
+        xAcceptedOAuthScopes.ifPresent(scopes -> json.put("acceptedScopes", scopes));
+    }
+
+    public static String extractErrorDescription(JSONObject json) {
+        if (json == null) {
+            return "null";
+        }
+
+        String description;
+        var error = json.get("error");
+        if (error instanceof JSONObject) {
+            description = ((JSONObject) error).getString("message");
+        } else {
+            description = json.optString("error_description", json.getString("error"));
+        }
+
+        if (description == null) {
+            return "null";
+        }
+
+        return description;
     }
 
     private Utils() {
