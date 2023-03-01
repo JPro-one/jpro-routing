@@ -1,7 +1,7 @@
 package one.jpro.auth.oath2.provider;
 
 import com.jpro.webapi.WebAPI;
-import one.jpro.auth.oath2.JWTOptions;
+import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Flow;
 import one.jpro.auth.oath2.OAuth2Options;

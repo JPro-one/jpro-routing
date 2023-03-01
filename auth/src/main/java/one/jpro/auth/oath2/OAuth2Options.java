@@ -1,5 +1,6 @@
 package one.jpro.auth.oath2;
 
+import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.utils.AuthUtils;
 import org.json.JSONObject;
 

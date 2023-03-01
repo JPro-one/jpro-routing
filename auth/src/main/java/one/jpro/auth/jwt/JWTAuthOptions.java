@@ -1,7 +1,5 @@
 package one.jpro.auth.jwt;
 
-import one.jpro.auth.oath2.JWTOptions;
-
 /**
  * Options describing how an {@link JWTAuthenticationProvider} should behave.
  *

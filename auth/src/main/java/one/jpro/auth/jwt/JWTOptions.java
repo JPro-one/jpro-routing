@@ -1,4 +1,4 @@
-package one.jpro.auth.oath2;
+package one.jpro.auth.jwt;
 
 import java.time.Duration;
 import java.util.List;

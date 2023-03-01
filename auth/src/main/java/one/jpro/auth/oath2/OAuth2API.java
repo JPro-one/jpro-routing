@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationException;
+import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.utils.HttpMethod;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;

@@ -3,7 +3,6 @@ package one.jpro.auth.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import one.jpro.auth.authentication.*;
-import one.jpro.auth.oath2.JWTOptions;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
