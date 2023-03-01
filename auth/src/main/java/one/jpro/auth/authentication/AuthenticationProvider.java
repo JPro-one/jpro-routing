@@ -10,5 +10,12 @@ import java.util.concurrent.CompletableFuture;
 @FunctionalInterface
 public interface AuthenticationProvider<T extends Credentials> {
 
+    /**
+     * Authenticate a user with the given credentials.
+     *
+     * @param credentials a {@link Credentials} object containing the
+     *                    information for authenticating the user.
+     * @return the result future
+     */
     CompletableFuture<User> authenticate(T credentials);
 }
