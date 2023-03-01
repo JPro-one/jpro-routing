@@ -10,6 +10,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.*;
+import one.jpro.auth.jwt.TokenCredentials;
+import one.jpro.auth.jwt.TokenExpiredException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;

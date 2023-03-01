@@ -1,4 +1,4 @@
-package one.jpro.auth.oath2;
+package one.jpro.auth.jwt;
 
 import one.jpro.auth.authentication.AuthenticationProvider;
 import one.jpro.auth.authentication.CredentialValidationException;
