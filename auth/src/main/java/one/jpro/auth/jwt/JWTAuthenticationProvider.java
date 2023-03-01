@@ -52,6 +52,7 @@ public class JWTAuthenticationProvider implements AuthenticationProvider<TokenCr
     }
 
     @Override
+    @NotNull
     public CompletableFuture<User> authenticate(@NotNull final TokenCredentials credentials) {
         try {
             credentials.validate(null);

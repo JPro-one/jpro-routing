@@ -65,7 +65,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      * @return a future that will complete with the authenticated user
      */
     @Override
-    public CompletableFuture<User> authenticate(Credentials credentials) {
+    @NotNull
+    public CompletableFuture<User> authenticate(@NotNull final Credentials credentials) {
         try {
             if (credentials instanceof UsernamePasswordCredentials) {
                 UsernamePasswordCredentials usernamePasswordCredentials = (UsernamePasswordCredentials) credentials;
