@@ -150,28 +150,58 @@ public class OAuth2Options {
         return this;
     }
 
+    /**
+     * Returns the URL of the authorization server's authorization endpoint.
+     *
+     * @return an URL as a string
+     */
     public String getAuthorizationPath() {
         return getCompletePath(authorizationPath);
     }
 
+    /**
+     * Sets the URL of the authorization server's authorization endpoint.
+     *
+     * @param authorizationPath an URL as a string
+     */
     public OAuth2Options setAuthorizationPath(String authorizationPath) {
         this.authorizationPath = authorizationPath;
         return this;
     }
 
+    /**
+     * Returns the URL of the authorization server's token endpoint.
+     *
+     * @return an URL as a string
+     */
     public String getTokenPath() {
         return getCompletePath(tokenPath);
     }
 
+    /**
+     * Sets the URL of the authorization server's token endpoint.
+     *
+     * @param tokenPath an URL as a string
+     */
     public OAuth2Options setTokenPath(String tokenPath) {
         this.tokenPath = tokenPath;
         return this;
     }
 
+    /**
+     * Returns the URL of the authorization server's revocation endpoint.
+     *
+     * @return an URL as a string
+     */
     public String getRevocationPath() {
         return getCompletePath(revocationPath);
     }
 
+    /**
+     * Sets the URL of the authorization server's revocation endpoint.
+     *
+     * @param revocationPath an URL as a string
+     */
     public OAuth2Options setRevocationPath(String revocationPath) {
         this.revocationPath = revocationPath;
         return this;
@@ -195,19 +225,39 @@ public class OAuth2Options {
         return this;
     }
 
+    /**
+     * Returns the URL of the authorization server's logout endpoint.
+     *
+     * @return an URL as a string
+     */
     public String getLogoutPath() {
         return logoutPath;
     }
 
+    /**
+     * Sets the URL of the authorization server's logout endpoint.
+     *
+     * @param logoutPath an URL as a string
+     */
     public OAuth2Options setLogoutPath(String logoutPath) {
         this.logoutPath = logoutPath;
         return this;
     }
 
+    /**
+     * Returns the URL of the authorization server's userinfo endpoint.
+     *
+     * @return an URL as a string
+     */
     public String getUserInfoPath() {
         return getCompletePath(userInfoPath);
     }
 
+    /**
+     * Sets the URL of the authorization server's userinfo endpoint.
+     *
+     * @param userInfoPath an URL as a string
+     */
     public OAuth2Options setUserInfoPath(String userInfoPath) {
         this.userInfoPath = userInfoPath;
         return this;
@@ -222,19 +272,39 @@ public class OAuth2Options {
         return this;
     }
 
+    /**
+     * Returns the URL of the authorization server's introspection endpoint.
+     *
+     * @return an URL as a string
+     */
     public String getIntrospectionPath() {
         return getCompletePath(introspectionPath);
     }
 
+    /**
+     * Sets the URL of the authorization server's introspection endpoint.
+     *
+     * @param introspectionPath an URL as a string
+     */
     public OAuth2Options setIntrospectionPath(String introspectionPath) {
         this.introspectionPath = introspectionPath;
         return this;
     }
 
+    /**
+     * Returns the URL of the authorization server's JSON Web Key Set endpoint.
+     *
+     * @return an URL as a string
+     */
     public String getJwkPath() {
         return getCompletePath(jwkPath);
     }
 
+    /**
+     * Sets the URL of the authorization server's JSON Web Key Set endpoint.
+     *
+     * @param jwkPath an URL as a string
+     */
     public OAuth2Options setJwkPath(String jwkPath) {
         this.jwkPath = jwkPath;
         return this;
