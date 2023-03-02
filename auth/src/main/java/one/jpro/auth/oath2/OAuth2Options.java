@@ -2,11 +2,14 @@ package one.jpro.auth.oath2;
 
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.utils.AuthUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Options describing how an OAuth2 {@link HttpClient} will make connection.
@@ -24,6 +27,7 @@ public class OAuth2Options {
     private static final String SCOPE_SEPARATOR = " ";
     private static final boolean VALIDATE_ISSUER = true;
     private static final long JWK_DEFAULT_AGE = -1L; // seconds of JWK default age (-1 means no rotation)
+    private static final Pattern TENANT_PATTERN = Pattern.compile("\\{(tenant|realm)}");
 
     private OAuth2Flow flow;
     private List<String> supportedGrantTypes;
@@ -348,16 +352,42 @@ public class OAuth2Options {
         return this;
     }
 
+    /**
+     * Complete the path if its relative prepending the site.
+     *
+     * @param path the path
+     * @return the complete path as a string
+     */
     private String getCompletePath(String path) {
-        if (path != null && path.charAt(0) == '/') {
-            if (site != null && site.contains("{tenant}")) {
-                if (tenant != null && !tenant.isBlank()) {
-                    site = site.replace("{tenant}", tenant);
-                } else {
-                    throw new IllegalArgumentException("The tenant value is null or blank.");
+        if (path != null && !path.isBlank() && path.charAt(0) == '/') {
+            if (site != null) {
+                // remove trailing slash if present
+                if (site.endsWith("/")) {
+                    site = site.substring(0, site.length() - 1);
                 }
+                path = site + path;
             }
-            return site + path;
+
+            return replaceVariables(path);
+        }
+        return path;
+    }
+
+    /**
+     * Replace the tenant/realm variable in the path.
+     *
+     * @param path the path
+     * @return the path with the tenant/realm variable replaced
+     */
+    private String replaceVariables(@Nullable final String path) {
+        if (path != null) {
+            final Matcher matcher = TENANT_PATTERN.matcher(path);
+            if (matcher.find()) {
+                if (tenant == null || tenant.isBlank()) {
+                    throw new IllegalStateException("The tenant value is null or blank.");
+                }
+                return matcher.replaceAll(tenant);
+            }
         }
         return path;
     }
