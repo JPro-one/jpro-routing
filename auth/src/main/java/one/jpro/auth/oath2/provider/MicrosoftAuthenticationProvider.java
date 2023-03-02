@@ -59,7 +59,7 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
      */
     public static CompletableFuture<OAuth2AuthenticationProvider> discover(WebAPI webAPI, OAuth2Options options) {
         final String site = options.getSite() == null ?
-                "https://login.microsoftonline.com/{tenant}" : options.getSite();
+                "https://login.microsoftonline.com/{tenant}/v2.0" : options.getSite();
         final JWTOptions jwtOptions = options.getJWTOptions() == null ?
                 new JWTOptions() : new JWTOptions(options.getJWTOptions());
         // Microsoft default nonce algorithm
