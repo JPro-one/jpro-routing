@@ -4,6 +4,8 @@ import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.http.HttpClient;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.regex.Pattern;
  * @author Besmir Beqiri
  */
 public class OAuth2Options {
+
+    private final Logger log = LoggerFactory.getLogger(OAuth2Options.class);
 
     // Defaults
     private static final OAuth2Flow FLOW = OAuth2Flow.AUTH_CODE;
@@ -394,5 +398,44 @@ public class OAuth2Options {
             }
         }
         return path;
+    }
+
+    /**
+     * Validate the configuration.
+     *
+     * @throws IllegalStateException if the configuration is invalid
+     */
+    public void validate() throws IllegalStateException {
+        if (flow == null) {
+            throw new IllegalStateException("Missing OAuth2 flow: [AUTH_CODE, PASSWORD, CLIENT, AUTH_JWT]");
+        }
+
+        switch (flow) {
+            case AUTH_CODE:
+            case AUTH_JWT:
+                if (clientAssertion == null && clientAssertionType == null) {
+                    // not using client assertion
+                    if (clientId == null) {
+                        throw new IllegalStateException("Missing configuration: [clientId]");
+                    }
+                } else {
+                    if (clientAssertion == null || clientAssertionType == null) {
+                        throw new IllegalStateException("Missing configuration: [clientAssertion] and [clientAssertionType]");
+                    }
+                }
+                break;
+            case PASSWORD:
+                if (clientAssertion == null && clientAssertionType == null) {
+                    // not using client assertion
+                    if (clientId == null) {
+                        log.debug("If you are using Client OAuth2 Resource Owner flow, please specify [clientId]");
+                    }
+                } else {
+                    if (clientAssertion == null || clientAssertionType == null) {
+                        throw new IllegalStateException("Missing configuration: [clientAssertion] and [clientAssertionType]");
+                    }
+                }
+                break;
+        }
     }
 }

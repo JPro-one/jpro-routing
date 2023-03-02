@@ -50,6 +50,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
         this.options = Objects.requireNonNull(options, "OAuth2 options cannot be null");
         this.api = new OAuth2API(options);
+        this.options.validate();
     }
 
     public String authorizeUrl(OAuth2Credentials credentials) {
