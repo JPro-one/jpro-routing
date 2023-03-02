@@ -439,6 +439,8 @@ public class OAuth2API {
                     config.setJwkPath(json.optString("jwks_uri", null));
                     config.setIntrospectionPath(json.optString("introspection_endpoint", null));
 
+                    // The complete URL for the authorization server.
+                    // This becomes the "iss" claim in an access token.
                     if (json.has("issuer")) {
                         // the discovery document includes the issuer, this means we can add it
                         JWTOptions jwtOptions = config.getJWTOptions();
@@ -451,7 +453,23 @@ public class OAuth2API {
                         jwtOptions.setIssuer(json.getString("issuer"));
                     }
 
-                    // reset supported grant types
+                    // reset supported response types
+                    config.setSupportedResponseTypes(null);
+                    if (json.has("response_types_supported")) {
+                        // optional config
+                        JSONArray responseTypes = json.getJSONArray("response_types_supported");
+                        responseTypes.forEach(responseType -> config.addSupportedResponseType((String) responseType));
+                    }
+
+                    // reset supported response modes
+                    config.setSupportedResponseModes(null);
+                    if (json.has("response_modes_supported")) {
+                        // optional config
+                        JSONArray responseModes = json.getJSONArray("response_modes_supported");
+                        responseModes.forEach(responseMode -> config.addSupportedResponseMode((String) responseMode));
+                    }
+
+                    // retrieve supported grant types
                     config.setSupportedGrantTypes(null);
                     if (json.has("grant_types_supported") && config.getFlow() != null) {
                         // optional config
@@ -462,6 +480,91 @@ public class OAuth2API {
                             return CompletableFuture.failedFuture(new RuntimeException("Unsupported flow: " +
                                     config.getFlow().getGrantType() + ", allowed: " + flows));
                         }
+                    }
+
+                    // reset supported subject types
+                    config.setSupportedSubjectTypes(null);
+                    if (json.has("subject_types_supported")) {
+                        // optional config
+                        JSONArray subjectTypes = json.getJSONArray("subject_types_supported");
+                        subjectTypes.forEach(subjectType -> config.addSupportedSubjectType((String) subjectType));
+                    }
+
+                    // reset supported scopes
+                    config.setSupportedScopes(null);
+                    if (json.has("scopes_supported")) {
+                        // optional config
+                        JSONArray scopes = json.getJSONArray("scopes_supported");
+                        scopes.forEach(scope -> config.addSupportedScope((String) scope));
+                    }
+
+                    // reset supported ID token signing algorithms
+                    config.setSupportedIdTokenSigningAlgValues(null);
+                    if (json.has("id_token_signing_alg_values_supported")) {
+                        // optional config
+                        JSONArray idTokenSigningAlgValues = json.getJSONArray("id_token_signing_alg_values_supported");
+                        idTokenSigningAlgValues.forEach(idTokenSigningAlgValue ->
+                                config.addSupportedIdTokenSigningAlgValue((String) idTokenSigningAlgValue));
+                    }
+
+                    // reset list of client supported authentication methods by token endpoint
+                    config.setSupportedTokenEndpointAuthMethods(null);
+                    if (json.has("token_endpoint_auth_methods_supported")) {
+                        // optional config
+                        JSONArray tokenEndpointAuthMethods = json.getJSONArray("token_endpoint_auth_methods_supported");
+                        tokenEndpointAuthMethods.forEach(tokenEndpointAuthMethod ->
+                                config.addSupportedTokenEndpointAuthMethod((String) tokenEndpointAuthMethod));
+                    }
+
+                    // reset supported claims
+                    config.setSupportedClaims(null);
+                    if (json.has("claims_supported")) {
+                        // optional config
+                        JSONArray claims = json.getJSONArray("claims_supported");
+                        claims.forEach(claim -> config.addSupportedClaim((String) claim));
+                    }
+
+                    // reset list of supported PKCE code challenge methods
+                    config.setSupportedCodeChallengeMethods(null);
+                    if (json.has("code_challenge_methods_supported")) {
+                        // optional config
+                        JSONArray codeChallengeMethods = json.getJSONArray("code_challenge_methods_supported");
+                        codeChallengeMethods.forEach(codeChallengeMethod ->
+                                config.addSupportedCodeChallengeMethod((String) codeChallengeMethod));
+                    }
+
+                    // reset list of supported client authentication methods by introspection endpoint
+                    config.setSupportedIntrospectionEndpointAuthMethods(null);
+                    if (json.has("introspection_endpoint_auth_methods_supported")) {
+                        // optional config
+                        JSONArray introspectionEndpointAuthMethods = json.getJSONArray("introspection_endpoint_auth_methods_supported");
+                        introspectionEndpointAuthMethods.forEach(introspectionEndpointAuthMethod ->
+                                config.addSupportedIntrospectionEndpointAuthMethod((String) introspectionEndpointAuthMethod));
+                    }
+
+                    // reset list of supported client authentication methods by revocation endpoint
+                    config.setSupportedRevocationEndpointAuthMethods(null);
+                    if (json.has("revocation_endpoint_auth_methods_supported")) {
+                        // optional config
+                        JSONArray revocationEndpointAuthMethods = json.getJSONArray("revocation_endpoint_auth_methods_supported");
+                        revocationEndpointAuthMethods.forEach(revocationEndpointAuthMethod ->
+                                config.addSupportedRevocationEndpointAuthMethod((String) revocationEndpointAuthMethod));
+                    }
+
+                    // reset supported request parameter
+                    config.setSupportedRequestParameter(false);
+                    if (json.has("request_parameter_supported")) {
+                        // optional config
+                        config.setSupportedRequestParameter(json.getBoolean("request_parameter_supported"));
+                    }
+
+                    // reset the signing algorithms that this provider supports for signed requests.
+                    config.setSupportedRequestObjectSigningAlgValues(null);
+                    if (json.has("request_object_signing_alg_values_supported")) {
+                        // optional config
+                        JSONArray requestObjectSigningAlgValues = json.getJSONArray("request_object_signing_alg_values_supported");
+                        requestObjectSigningAlgValues.forEach(requestObjectSigningAlgValue ->
+                                config.addSupportedRequestObjectSigningAlgValue((String) requestObjectSigningAlgValue));
                     }
 
                     return CompletableFuture.completedFuture(new OAuth2AuthenticationProvider(webAPI, config));

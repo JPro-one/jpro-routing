@@ -34,7 +34,19 @@ public class OAuth2Options {
     private static final Pattern TENANT_PATTERN = Pattern.compile("\\{(tenant|realm)}");
 
     private OAuth2Flow flow;
+    private List<String> supportedResponseTypes;
+    private List<String> supportedResponseModes;
     private List<String> supportedGrantTypes;
+    private List<String> supportedSubjectTypes;
+    private List<String> supportedScopes;
+    private List<String> supportedIdTokenSigningAlgValues;
+    private List<String> supportedTokenEndpointAuthMethods;
+    private List<String> supportedClaims;
+    private List<String> supportedCodeChallengeMethods;
+    private List<String> supportedIntrospectionEndpointAuthMethods;
+    private List<String> supportedRevocationEndpointAuthMethods;
+    private boolean supportedRequestParameter;
+    private List<String> supportedRequestObjectSigningAlgValues;
     private String authorizationPath;
     private String tokenPath;
     private String revocationPath;
@@ -90,7 +102,19 @@ public class OAuth2Options {
      */
     public OAuth2Options(OAuth2Options other) {
         flow = other.flow;
+        supportedResponseTypes = other.supportedResponseTypes;
+        supportedResponseModes = other.supportedResponseModes;
         supportedGrantTypes = other.supportedGrantTypes;
+        supportedSubjectTypes = other.supportedSubjectTypes;
+        supportedScopes = other.supportedScopes;
+        supportedIdTokenSigningAlgValues = other.supportedIdTokenSigningAlgValues;
+        supportedTokenEndpointAuthMethods = other.supportedTokenEndpointAuthMethods;
+        supportedClaims = other.supportedClaims;
+        supportedCodeChallengeMethods = other.supportedCodeChallengeMethods;
+        supportedIntrospectionEndpointAuthMethods = other.supportedIntrospectionEndpointAuthMethods;
+        supportedRevocationEndpointAuthMethods = other.supportedRevocationEndpointAuthMethods;
+        supportedRequestParameter = other.supportedRequestParameter;
+        supportedRequestObjectSigningAlgValues = other.supportedRequestObjectSigningAlgValues;
         authorizationPath = other.authorizationPath;
         tokenPath = other.tokenPath;
         revocationPath = other.revocationPath;
@@ -133,6 +157,40 @@ public class OAuth2Options {
         return this;
     }
 
+    public List<String> getSupportedResponseTypes() {
+        return supportedResponseTypes;
+    }
+
+    public OAuth2Options setSupportedResponseTypes(List<String> supportedResponseTypes) {
+        this.supportedResponseTypes = supportedResponseTypes;
+        return this;
+    }
+
+    public OAuth2Options addSupportedResponseType(String supportedResponseType) {
+        if (supportedResponseTypes == null) {
+            supportedResponseTypes = new ArrayList<>();
+        }
+        supportedResponseTypes.add(supportedResponseType);
+        return this;
+    }
+
+    public List<String> getSupportedResponseModes() {
+        return supportedResponseModes;
+    }
+
+    public OAuth2Options setSupportedResponseModes(List<String> supportedResponseModes) {
+        this.supportedResponseModes = supportedResponseModes;
+        return this;
+    }
+
+    public OAuth2Options addSupportedResponseMode(String supportedResponseMode) {
+        if (supportedResponseModes == null) {
+            supportedResponseModes = new ArrayList<>();
+        }
+        supportedResponseModes.add(supportedResponseMode);
+        return this;
+    }
+
     public List<String> getSupportedGrantTypes() {
         return supportedGrantTypes;
     }
@@ -147,6 +205,168 @@ public class OAuth2Options {
             supportedGrantTypes = new ArrayList<>();
         }
         supportedGrantTypes.add(supportedGrantType);
+        return this;
+    }
+
+    public List<String> getSupportedSubjectTypes() {
+        return supportedSubjectTypes;
+    }
+
+    public OAuth2Options setSupportedSubjectTypes(List<String> supportedSubjectTypes) {
+        this.supportedSubjectTypes = supportedSubjectTypes;
+        return this;
+    }
+
+    public OAuth2Options addSupportedSubjectType(String supportedSubjectType) {
+        if (supportedSubjectTypes == null) {
+            supportedSubjectTypes = new ArrayList<>();
+        }
+        supportedSubjectTypes.add(supportedSubjectType);
+        return this;
+    }
+
+    public List<String> getSupportedIdTokenSigningAlgValues() {
+        return supportedIdTokenSigningAlgValues;
+    }
+
+    public OAuth2Options setSupportedIdTokenSigningAlgValues(List<String> supportedIdTokenSigningAlgValues) {
+        this.supportedIdTokenSigningAlgValues = supportedIdTokenSigningAlgValues;
+        return this;
+    }
+
+    public OAuth2Options addSupportedIdTokenSigningAlgValue(String supportedIdTokenSigningAlgValue) {
+        if (supportedIdTokenSigningAlgValues == null) {
+            supportedIdTokenSigningAlgValues = new ArrayList<>();
+        }
+        supportedIdTokenSigningAlgValues.add(supportedIdTokenSigningAlgValue);
+        return this;
+    }
+
+    public List<String> getSupportedScopes() {
+        return supportedScopes;
+    }
+
+    public OAuth2Options setSupportedScopes(List<String> supportedScopes) {
+        this.supportedScopes = supportedScopes;
+        return this;
+    }
+
+    public OAuth2Options addSupportedScope(String supportedScope) {
+        if (supportedScopes == null) {
+            supportedScopes = new ArrayList<>();
+        }
+        supportedScopes.add(supportedScope);
+        return this;
+    }
+
+    public List<String> getSupportedTokenEndpointAuthMethods() {
+        return supportedTokenEndpointAuthMethods;
+    }
+
+    public OAuth2Options setSupportedTokenEndpointAuthMethods(List<String> supportedTokenEndpointAuthMethods) {
+        this.supportedTokenEndpointAuthMethods = supportedTokenEndpointAuthMethods;
+        return this;
+    }
+
+    public OAuth2Options addSupportedTokenEndpointAuthMethod(String supportedTokenEndpointAuthMethod) {
+        if (supportedTokenEndpointAuthMethods == null) {
+            supportedTokenEndpointAuthMethods = new ArrayList<>();
+        }
+        supportedTokenEndpointAuthMethods.add(supportedTokenEndpointAuthMethod);
+        return this;
+    }
+
+    public List<String> getSupportedClaims() {
+        return supportedClaims;
+    }
+
+    public OAuth2Options setSupportedClaims(List<String> supportedClaims) {
+        this.supportedClaims = supportedClaims;
+        return this;
+    }
+
+    public OAuth2Options addSupportedClaim(String supportedClaim) {
+        if (supportedClaims == null) {
+            supportedClaims = new ArrayList<>();
+        }
+        supportedClaims.add(supportedClaim);
+        return this;
+    }
+
+    public List<String> getSupportedCodeChallengeMethods() {
+        return supportedCodeChallengeMethods;
+    }
+
+    public OAuth2Options setSupportedCodeChallengeMethods(List<String> supportedCodeChallengeMethods) {
+        this.supportedCodeChallengeMethods = supportedCodeChallengeMethods;
+        return this;
+    }
+
+    public OAuth2Options addSupportedCodeChallengeMethod(String supportedCodeChallengeMethod) {
+        if (supportedCodeChallengeMethods == null) {
+            supportedCodeChallengeMethods = new ArrayList<>();
+        }
+        supportedCodeChallengeMethods.add(supportedCodeChallengeMethod);
+        return this;
+    }
+
+    public List<String> getSupportedIntrospectionEndpointAuthMethods() {
+        return supportedIntrospectionEndpointAuthMethods;
+    }
+
+    public OAuth2Options setSupportedIntrospectionEndpointAuthMethods(List<String> supportedIntrospectionEndpointAuthMethods) {
+        this.supportedIntrospectionEndpointAuthMethods = supportedIntrospectionEndpointAuthMethods;
+        return this;
+    }
+
+    public OAuth2Options addSupportedIntrospectionEndpointAuthMethod(String supportedIntrospectionEndpointAuthMethod) {
+        if (supportedIntrospectionEndpointAuthMethods == null) {
+            supportedIntrospectionEndpointAuthMethods = new ArrayList<>();
+        }
+        supportedIntrospectionEndpointAuthMethods.add(supportedIntrospectionEndpointAuthMethod);
+        return this;
+    }
+
+    public List<String> getSupportedRevocationEndpointAuthMethods() {
+        return supportedRevocationEndpointAuthMethods;
+    }
+
+    public OAuth2Options setSupportedRevocationEndpointAuthMethods(List<String> supportedRevocationEndpointAuthMethods) {
+        this.supportedRevocationEndpointAuthMethods = supportedRevocationEndpointAuthMethods;
+        return this;
+    }
+
+    public OAuth2Options addSupportedRevocationEndpointAuthMethod(String supportedRevocationEndpointAuthMethod) {
+        if (supportedRevocationEndpointAuthMethods == null) {
+            supportedRevocationEndpointAuthMethods = new ArrayList<>();
+        }
+        supportedRevocationEndpointAuthMethods.add(supportedRevocationEndpointAuthMethod);
+        return this;
+    }
+
+    public boolean isSupportedRequestParameter() {
+        return supportedRequestParameter;
+    }
+
+    public OAuth2Options setSupportedRequestParameter(boolean supportedRequestParameter) {
+        this.supportedRequestParameter = supportedRequestParameter;
+        return this;
+    }
+
+    public List<String> getSupportedRequestObjectSigningAlgValues() {
+        return supportedRequestObjectSigningAlgValues;
+    }
+
+    public OAuth2Options setSupportedRequestObjectSigningAlgValues(List<String> supportedRequestObjectSigningAlgValues) {
+        this.supportedRequestObjectSigningAlgValues = supportedRequestObjectSigningAlgValues;
+        return this;
+    }
+
+    public OAuth2Options addSupportedRequestObjectSigningAlgValue(String supportedRequestObjectSigningAlgValue) {
+        if (supportedRequestObjectSigningAlgValues == null) {
+            supportedRequestObjectSigningAlgValues = new ArrayList<>();
+        }
+        supportedRequestObjectSigningAlgValues.add(supportedRequestObjectSigningAlgValue);
         return this;
     }
 
