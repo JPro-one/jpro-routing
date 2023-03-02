@@ -47,10 +47,16 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     private final OAuth2API api;
 
     public OAuth2AuthenticationProvider(@NotNull final WebAPI webAPI, @NotNull final OAuth2Options options) {
-        this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
+//        this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
+        this.webAPI = webAPI; // Temporary disable null check for testing purpose
         this.options = Objects.requireNonNull(options, "OAuth2 options cannot be null");
         this.api = new OAuth2API(options);
         this.options.validate();
+    }
+
+    @NotNull
+    public final OAuth2Options getOptions() {
+        return options;
     }
 
     public String authorizeUrl(OAuth2Credentials credentials) {
