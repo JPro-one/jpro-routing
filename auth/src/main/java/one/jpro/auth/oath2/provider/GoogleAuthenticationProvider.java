@@ -38,12 +38,13 @@ public class GoogleAuthenticationProvider extends OAuth2AuthenticationProvider {
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)
                 .setSite("https://accounts.google.com")
-                .setTokenPath("/o/oauth2/token")
-                .setAuthorizationPath("/o/oauth2/v2/auth/oauthchooseaccount")
-                .setIntrospectionPath("/o/oauth2/tokeninfo")
+                .setTokenPath("https://oauth2.googleapis.com/token")
+                .setAuthorizationPath("/o/oauth2/v2/auth")
                 .setUserInfoPath("https://www.googleapis.com/oauth2/v1/userinfo")
                 .setJwkPath("https://www.googleapis.com/oauth2/v3/certs")
-                .setRevocationPath("https://oauth2.googleapis.com/revoke"));
+                .setIntrospectionPath("https://oauth2.googleapis.com/tokeninfo")
+                .setRevocationPath("https://oauth2.googleapis.com/revoke")
+                .setUserInfoParams(new JSONObject().put("alt", "json")));
     }
 
     /**
