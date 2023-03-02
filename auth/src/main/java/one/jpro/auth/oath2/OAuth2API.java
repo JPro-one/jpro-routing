@@ -418,6 +418,7 @@ public class OAuth2API {
                         String issuerEndpoint = json.getString("issuer");
                         if (issuerEndpoint != null) {
                             // the provider is letting the user know the issuer endpoint, so we need to validate it
+                            // by removing the trailing slash (if present) and comparing it to the received endpoint
                             if (issuerEndpoint.endsWith("/")) {
                                 issuerEndpoint = issuerEndpoint.substring(0, issuerEndpoint.length() - 1);
                             }
@@ -430,13 +431,13 @@ public class OAuth2API {
                         }
                     }
 
-                    config.setAuthorizationPath(json.getString("authorization_endpoint"));
-                    config.setTokenPath(json.getString("token_endpoint"));
-                    config.setLogoutPath(json.getString("end_session_endpoint"));
-                    config.setRevocationPath(json.getString("userinfo_endpoint"));
-                    config.setUserInfoPath(json.getString("userinfo_endpoint"));
-                    config.setJwkPath(json.getString("jwks_uri"));
-                    config.setIntrospectionPath(json.getString("introspection_endpoint"));
+                    config.setAuthorizationPath(json.optString("authorization_endpoint", null));
+                    config.setTokenPath(json.optString("token_endpoint", null));
+                    config.setLogoutPath(json.optString("end_session_endpoint", null));
+                    config.setRevocationPath(json.optString("revocation_endpoint", null));
+                    config.setUserInfoPath(json.optString("userinfo_endpoint", null));
+                    config.setJwkPath(json.optString("jwks_uri", null));
+                    config.setIntrospectionPath(json.optString("introspection_endpoint", null));
 
                     if (json.has("issuer")) {
                         // the discovery document includes the issuer, this means we can add it
