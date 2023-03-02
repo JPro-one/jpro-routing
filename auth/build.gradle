@@ -32,6 +32,7 @@ dependencies {
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"
+    testRuntimeOnly "ch.qos.logback:logback-classic:$LOGBACK_VERSION"
 }
 
 java {
@@ -43,4 +44,15 @@ javafx {
     version = "$JAVAFX_VERSION"
      configurations = ["compileOnly", "testImplementation"]
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        showExceptions true
+        showCauses true
+        showStackTraces true
+        exceptionFormat "full"
+    }
 }
