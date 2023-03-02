@@ -255,7 +255,11 @@ public class OAuth2Options {
     }
 
     public String getSite() {
-        return site;
+        // remove trailing slash if present
+        if (site != null && site.endsWith("/")) {
+            site = site.substring(0, site.length() - 1);
+        }
+        return replaceVariables(site);
     }
 
     public OAuth2Options setSite(String site) {
