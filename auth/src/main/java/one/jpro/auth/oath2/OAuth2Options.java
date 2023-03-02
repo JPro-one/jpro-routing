@@ -31,7 +31,7 @@ public class OAuth2Options {
     private static final String SCOPE_SEPARATOR = " ";
     private static final boolean VALIDATE_ISSUER = true;
     private static final long JWK_DEFAULT_AGE = -1L; // seconds of JWK default age (-1 means no rotation)
-    private static final Pattern TENANT_PATTERN = Pattern.compile("\\{(tenant|realm)}");
+    private static final Pattern TENANT_PATTERN = Pattern.compile("\\{(tenant|tenantid|realm)}");
 
     private OAuth2Flow flow;
     private List<String> supportedResponseTypes;
