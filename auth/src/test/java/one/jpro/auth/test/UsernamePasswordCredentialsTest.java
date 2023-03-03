@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UsernamePasswordCredentialsTest {
 
     @Test
-    public void nullUsernameShouldMakeValidationThrowException() {
+    public void nullUsernameShouldMakeValidationThrowsException() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(null, "password");
 
         Exception exception = Assertions.assertThrowsExactly(CredentialValidationException.class,
@@ -29,7 +29,7 @@ public class UsernamePasswordCredentialsTest {
     }
 
     @Test
-    public void blankUsernameShouldMakeValidationThrowException() {
+    public void blankUsernameShouldMakeValidationThrowsException() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(" ", "password");
 
         Exception exception = Assertions.assertThrowsExactly(CredentialValidationException.class,
@@ -38,7 +38,7 @@ public class UsernamePasswordCredentialsTest {
     }
 
     @Test
-    public void missingPasswordShouldMakeValidationThrowException() {
+    public void missingPasswordShouldMakeValidationThrowsException() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("username", null);
 
         Exception exception = Assertions.assertThrowsExactly(CredentialValidationException.class,
