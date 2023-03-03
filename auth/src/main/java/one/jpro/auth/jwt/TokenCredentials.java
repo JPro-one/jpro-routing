@@ -29,11 +29,21 @@ public class TokenCredentials implements Credentials {
     @Nullable
     private List<String> scopes;
 
+    /**
+     * Creates a token credentials with the given token.
+     *
+     * @param token the token string
+     */
     public TokenCredentials(@NotNull final String token) {
         this.token = token;
     }
 
-    // token credentials from json
+    /**
+     * Creates a token credentials from a json object.
+     *
+     * @param json the json object
+     * @throws IllegalStateException if the json object is <code>null</code>
+     */
     public TokenCredentials(@NotNull final JSONObject json) {
         if (json == null) {
             throw new IllegalStateException("json object cannot be null");
