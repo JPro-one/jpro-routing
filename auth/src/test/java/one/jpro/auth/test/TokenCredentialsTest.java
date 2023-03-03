@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * TokenCredentials tests.
@@ -84,12 +83,12 @@ public class TokenCredentialsTest {
         json.put("token", credentials.getToken());
 
         // test without scopes
-        assertEquals(json.toString(), credentials.toJSON().toString());
+        assertTrue(credentials.toJSON().similar(json));
 
         credentials.addScopes("email", "profile");
         json.put("scopes", new JSONArray(List.of("email", "profile")));
 
         // test with scopes
-        assertEquals(json.toString(), credentials.toJSON().toString());
+        assertTrue(credentials.toJSON().similar(json));
     }
 }

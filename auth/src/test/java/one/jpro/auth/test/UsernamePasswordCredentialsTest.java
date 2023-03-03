@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import static one.jpro.auth.utils.AuthUtils.BASE64_ENCODER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UsernamePasswordCredentials tests.
@@ -81,6 +82,6 @@ public class UsernamePasswordCredentialsTest {
         json.put("username", credentials.getUsername());
         json.put("password", credentials.getPassword());
 
-        assertEquals(json.toString(), credentials.toJSON().toString());
+        assertTrue(credentials.toJSON().similar(json));
     }
 }
