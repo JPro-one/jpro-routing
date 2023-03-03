@@ -24,10 +24,15 @@ public enum OAuth2Flow {
 
     public static OAuth2Flow getFlow(String grantType) {
         for (var flow : values()) {
-            if (flow.getGrantType().equals(grantType.toUpperCase())) {
+            if (flow.getGrantType().equals(grantType)) {
                 return flow;
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return name() + " [" + grantType + "]";
     }
 }
