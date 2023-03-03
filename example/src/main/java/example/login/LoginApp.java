@@ -3,6 +3,7 @@ package example.login;
 import com.jpro.routing.Filters;
 import com.jpro.routing.Route;
 import com.jpro.routing.RouteApp;
+import example.auth.AuthFilters;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.HPos;
@@ -18,7 +19,6 @@ import one.jpro.auth.AuthAPI;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
-import one.jpro.auth.utils.AuthFilters;
 
 import java.util.List;
 
@@ -37,9 +37,6 @@ public class LoginApp extends RouteApp {
     private static final String AZURE_CLIENT_ID = System.getenv("AZURE_TEST_CLIENT_ID");
     private static final String AZURE_CLIENT_SECRET = System.getenv("AZURE_TEST_CLIENT_SECRET");
 //    private static final String AZURE_TENANT = System.getenv("AZURE_TEST_CLIENT_TENANT");
-
-    public static final String GITHUB_CLIENT_ID = System.getenv("GITHUB_TEST_CLIENT_ID");
-    public static final String GITHUB_CLIENT_SECRET = System.getenv("GITHUB_TEST_CLIENT_SECRET");
 
     private final StringProperty nameProperty = new SimpleStringProperty(this, "name");
     private final StringProperty attributesProperty = new SimpleStringProperty(this, "attributes");
@@ -81,14 +78,13 @@ public class LoginApp extends RouteApp {
                 .and(getNode("/auth/microsoft", (r) -> loginDataView()))
                 .filter(Filters.FullscreenFilter(true))
                 .filter(AuthFilters.create(googleAuth, googleCredentials, user -> {
-                    nameProperty.set("name: " + googleCredentials.getUsername());
+                    nameProperty.set("name: " + user.getName());
                     attributesProperty.set("attributes: " + user.getAttributes());
                 }))
                 .filter(AuthFilters.create(microsoftAuth, microsoftCredentials, user -> {
-                    nameProperty.set("name: " + microsoftCredentials.getUsername());
+                    nameProperty.set("name: " + user.getName());
                     attributesProperty.set("attributes: " + user.getAttributes());
                 }));
-
     }
 
     public Node initView(GoogleAuthenticationProvider googleAuth,
@@ -101,7 +97,6 @@ public class LoginApp extends RouteApp {
         gridPane.setVgap(12.0);
         gridPane.setMaxWidth(600.0);
         gridPane.setPadding(new Insets(36.0));
-        gridPane.setStyle("");
 
         ColumnConstraints columnConstraints1 = new ColumnConstraints();
         columnConstraints1.setMinWidth(80.0);
