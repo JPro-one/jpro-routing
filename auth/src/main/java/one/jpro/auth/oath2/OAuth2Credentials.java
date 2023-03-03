@@ -157,19 +157,19 @@ public class OAuth2Credentials implements Credentials {
         // when there's no access token, validation shall be performed according to each flow
         switch (flow) {
             case AUTH_CODE:
-                if (code == null || code.length() == 0) {
-                    throw new CredentialValidationException("code cannot be null or empty");
+                if (code == null || code.isBlank()) {
+                    throw new CredentialValidationException("code cannot be null or blank");
                 }
-                if (redirectUri != null && redirectUri.length() == 0) {
-                    throw new CredentialValidationException("redirectUri cannot be empty");
+                if (redirectUri != null && redirectUri.isBlank()) {
+                    throw new CredentialValidationException("redirectUri cannot be blank");
                 }
                 break;
             case PASSWORD:
-                if (username == null || username.length() == 0) {
-                    throw new CredentialValidationException("username cannot be null or empty");
+                if (username == null || username.isBlank()) {
+                    throw new CredentialValidationException("username cannot be null or blank");
                 }
-                if (password == null || password.length() == 0) {
-                    throw new CredentialValidationException("password cannot be null or empty");
+                if (password == null || password.isBlank()) {
+                    throw new CredentialValidationException("password cannot be null or blank");
                 }
                 break;
             case CLIENT:
