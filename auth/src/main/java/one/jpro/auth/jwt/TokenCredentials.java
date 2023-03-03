@@ -114,7 +114,7 @@ public class TokenCredentials implements Credentials {
         Optional.of(getToken()).ifPresent(token -> json.put("token", token));
         Optional.ofNullable(Stream.ofNullable(getScopes())
                         .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
-                        .filter(scopes -> !scopes.isEmpty())
+                .filter(scopes -> !scopes.isEmpty())
                 .ifPresent(jsonArray -> json.put("scopes", jsonArray));
         return json;
     }
