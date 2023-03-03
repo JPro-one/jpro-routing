@@ -20,7 +20,6 @@ dependencies {
     api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     api "SANDEC:jnodes:$JNODES_VERSION"
     api "de.sandec:JMemoryBuddy:$JMEMORYBUDDY_VERSION"
-    api project(':core')
 
     implementation "org.jetbrains:annotations:$JETBRAINS_ANNOTATIONS_VERSION"
     api "jakarta.inject:jakarta.inject-api:$JAKARTA_INJECT_VERSION"
