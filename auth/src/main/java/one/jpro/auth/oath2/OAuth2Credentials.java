@@ -184,13 +184,14 @@ public class OAuth2Credentials implements Credentials {
         Optional.ofNullable(getCode()).ifPresent(code -> json.put("code", code));
         Optional.ofNullable(getCodeVerifier()).ifPresent(codeVerifier -> json.put("code_verifier", codeVerifier));
         Optional.ofNullable(getNormalizedRedirectUri()).ifPresent(redirectUri -> json.put("redirect_uri", redirectUri));
-        Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow.toString().toLowerCase()));
+        Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow.getGrantType()));
         Optional.ofNullable(getJwt()).ifPresent(jwt -> json.put("jwt", jwt));
         Optional.ofNullable(getAssertion()).ifPresent(assertion -> json.put("assertion", assertion));
         Optional.ofNullable(getPassword()).ifPresent(password -> json.put("password", password));
         Optional.ofNullable(getUsername()).ifPresent(username -> json.put("username", username));
         Optional.ofNullable(Stream.ofNullable(getScopes())
                 .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
                 .ifPresent(jsonArray -> json.put("scopes", jsonArray));
         Optional.ofNullable(getNonce()).ifPresent(nonce -> json.put("nonce", nonce));
         return json;
