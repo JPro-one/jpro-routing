@@ -35,8 +35,12 @@ public class TokenCredentials implements Credentials {
 
     // token credentials from json
     public TokenCredentials(@NotNull final JSONObject json) {
+        if (json == null) {
+            throw new IllegalStateException("json object cannot be null");
+        }
+
         // token
-        this.token = json.getString("token");
+        this.token = json.optString("token");
         // scopes
         if (json.has("scope")) {
             addScopes(json.getString("scope"));
@@ -100,6 +104,7 @@ public class TokenCredentials implements Credentials {
         Optional.of(getToken()).ifPresent(token -> json.put("token", token));
         Optional.ofNullable(Stream.ofNullable(getScopes())
                         .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                        .filter(scopes -> !scopes.isEmpty())
                 .ifPresent(jsonArray -> json.put("scopes", jsonArray));
         return json;
     }
