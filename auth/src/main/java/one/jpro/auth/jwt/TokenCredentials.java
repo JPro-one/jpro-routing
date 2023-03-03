@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -71,6 +72,19 @@ public class TokenCredentials implements Credentials {
         }
         this.scopes.addAll(List.of(scopes));
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TokenCredentials that = (TokenCredentials) o;
+        return token.equals(that.token) && Objects.equals(scopes, that.scopes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(token, scopes);
     }
 
     @Override
