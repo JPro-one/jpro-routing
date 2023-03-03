@@ -30,7 +30,7 @@ trait Route {
   }
   def path(path: String, route: Route): Route = and((r: Request) => {
     if(r.path.startsWith(path + "/")) {
-      val r2 = r.copy(path = r.path.drop(path.length))
+      val r2 = r.copy(path = r.path.drop(path.length), directory = r.resolve(path))
       route.apply(r2)
     } else {
       null

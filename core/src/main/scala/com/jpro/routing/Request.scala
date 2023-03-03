@@ -11,10 +11,27 @@ case class Request (
   domain: String,
   origPath: String,
   path: String,
+  directory: String,
   queryParameters: Map[String,String],
   origOldContent: WeakReference[Node],
   oldContent: WeakReference[Node]
 ) {
+
+  assert(resolve(path) == origPath, s"resolve path: ${resolve(path)} != origPath: ${origPath}")
+  def resolve(path: String): String = {
+    assert(path.startsWith("/") || path.startsWith("./") || path.startsWith("../"), s"Path must start with / or ./ or ../ but was: ${path}")
+
+    if(directory == "/") {
+      path
+    } else {
+      if(path.startsWith(".")) {
+        directory + "/" + path
+      } else {
+        directory + path
+      }
+    }
+  }
+
   def mapContent(f: Node => Node) = {
     val oldContentV = oldContent.get()
     val oldContentVW = if(oldContentV eq null) {
@@ -37,7 +54,7 @@ object Request {
       a -> b
     }).toMap
     val path = uri.getPath
-    val res = Request(x, uri.getHost,path,path,query,wref_null,wref_null)
+    val res = Request(x, uri.getHost,path,path,"/", query,wref_null,wref_null)
     res
   }
 }

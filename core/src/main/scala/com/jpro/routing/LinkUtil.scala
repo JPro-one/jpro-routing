@@ -14,7 +14,17 @@ import org.apache.commons.validator.routines.UrlValidator
 
 object LinkUtil {
 
-  private val urlValidator = new UrlValidator()
+  private var openLinkExternalFun: String => Unit = { link =>
+    // Open link with awt
+    import java.awt.Desktop
+    import java.net.URI
+    Desktop.getDesktop.browse(new URI(link))
+  }
+  def setOpenLinkExternalFun(x: String => Unit): Unit = {
+    openLinkExternalFun = x
+  }
+
+  private val urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS)
   private[routing] def isValidLink(x: String): Boolean = {
     if(x.startsWith("http")) {
       urlValidator.isValid(x)
@@ -37,6 +47,8 @@ object LinkUtil {
     setLink(node,url,Some(text), children)
   }
   def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null): Unit = {
+    assert(url != "", s"Empty link: ''")
+    assert(isValidLink(url), s"Invalid link: '$url''")
     node.getProperties.put("link",url)
     text.map {desc =>
       node.getProperties.put("description",desc)
@@ -127,10 +139,7 @@ object LinkUtil {
         def isExternalLink(x: String) = x.startsWith("http") || x.startsWith("mailto")
         if(e.isStillSincePress) {
           if(isExternalLink(link)) {
-            // Open link with awt
-            import java.awt.Desktop
-            import java.net.URI
-            Desktop.getDesktop.browse(new URI(link))
+            openLinkExternalFun(link)
           } else {
             LinkUtil.getSessionManager(node).gotoURL(link)
           }

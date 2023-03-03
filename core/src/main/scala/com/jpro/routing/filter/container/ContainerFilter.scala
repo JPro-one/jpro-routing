@@ -12,11 +12,11 @@ object ContainerFilter {
   def create(supplier: Supplier[Container]): Filter = {
     create(new ContainerFactory {
       override def isContainer(x:  Node): Boolean = {
-        x.getProperties.get(factoryKey) == this
+        x.getProperties.get(factoryKey) == this.getClass
       }
       override def createContainer(): _root_.javafx.scene.Node = {
         val res = supplier.get().asInstanceOf[Node]
-        res.getProperties.put(factoryKey, this)
+        res.getProperties.put(factoryKey, this.getClass)
         res
       }
       override def setContent(c:  _root_.javafx.scene.Node, x:  _root_.javafx.scene.Node): Unit = {
@@ -35,10 +35,13 @@ object ContainerFilter {
     var container: Node = null
     val request2: Request = {
       val oldContentV = request.oldContent.get()
+      println("oldContentV = " + oldContentV)
       if (oldContentV != null && containerLogic.isContainer(oldContentV)) {
+        println("Found old container")
         container = oldContentV
         request.mapContent(x => containerLogic.getContent(container))
       } else {
+        println("No old container")
         request
       }
     }
