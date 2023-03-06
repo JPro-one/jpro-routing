@@ -1,4 +1,4 @@
-package com.jpro.routing.popup;
+package one.jpro.routing.popup;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -9,7 +9,7 @@ import javafx.scene.layout.StackPane;
 import simplefx.experimental.parts.FXFuture;
 
 /**
- * The popupContext is usually a StackPane. Typically the "RouteNode" of the Routing API, which is a StackPane.
+ * The popupContext is usually a StackPane. Typically, the "RouteNode" of the Routing API, which is a StackPane.
  */
 public class PopupAPI {
 

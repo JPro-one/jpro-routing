@@ -1,7 +1,7 @@
-package com.jpro.routing.popup.simplepopup;
+package one.jpro.routing.popup.simplepopup;
 
 
-import com.jpro.routing.popup.PopupAPI;
+import one.jpro.routing.popup.PopupAPI;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -34,7 +34,7 @@ public class SimplePopup extends StackPane {
     }
 
     public String getCSSFile() {
-        return "/com/jpro/routing/popup/simplepopup/simplepopup.css";
+        return "/one/jpro/routing/popup/simplepopup/simplepopup.css";
     }
 
     public Node createTopArea(String title, boolean closable) {
