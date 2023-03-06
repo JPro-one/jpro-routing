@@ -1,9 +1,9 @@
-module com.jpro.routing.core {
+module one.jpro.routing.core {
 
     requires transitive simplefx.extended;
     requires transitive javafx.graphics;
     requires transitive javafx.controls;
 
-    exports com.jpro.routing;
-    exports com.jpro.routing.filter.container;
+    exports one.jpro.routing;
+    exports one.jpro.routing.filter.container;
 }
