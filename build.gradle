@@ -52,7 +52,7 @@ configure([project(':core'),project(':example'), project(':dev'), project(':core
   }
 }
 
-configure([project(':core'), project(':dev'), project(':auth'), project(':popup')]) {
+configure([project(':core'), project(':dev'), project(':popup')]) {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
 
