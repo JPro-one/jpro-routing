@@ -1,6 +1,6 @@
-package com.jpro.routing.crawl
+package one.jpro.routing.crawl
 
-import com.jpro.routing.{LinkUtil, View}
+import one.jpro.routing.{LinkUtil, View}
 import simplefx.all._
 
 object TestUtils {

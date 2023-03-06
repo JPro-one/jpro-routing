@@ -1,5 +1,6 @@
- package com.jpro.routing
+ package one.jpro.routing
 
+import one.jpro.routing.LinkUtil
 import org.junit.jupiter.api.Test
 
 class TestLinkUtil {
