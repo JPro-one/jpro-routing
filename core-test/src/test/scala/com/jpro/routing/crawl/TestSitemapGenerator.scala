@@ -1,4 +1,4 @@
-package com.jpro.routing.crawler
+package com.jpro.routing.crawl
 
 import com.jpro.routing.{Redirect, Route, RouteNode}
 import TestUtils._

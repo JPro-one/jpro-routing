@@ -1,4 +1,4 @@
-package com.jpro.routing.crawler
+package com.jpro.routing.crawl
 
 import com.jpro.routing.crawl.AppCrawler
 import com.jpro.routing.crawl.AppCrawler._
@@ -9,6 +9,7 @@ import TestUtils._
 import com.jpro.routing.RouteUtils._
 import simplefx.all
 import org.junit.jupiter.api.Test
+import simplefx.util.Predef.intercept
 
 class TestAppCrawler {
 
@@ -29,8 +30,7 @@ class TestAppCrawler {
   @Test
   def nullFails(): Unit = inFX {
     val page = pageWithLink(List(null))
-    val result = AppCrawler.crawlPage(page)
-    assert(result.links.isEmpty, result.links)
+    intercept[NullPointerException](AppCrawler.crawlPage(page))
   }
 
   @Test
