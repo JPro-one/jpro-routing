@@ -18,7 +18,7 @@ buildscript {
   }
 }
 
-configure([project(':core'),project(':example'), project(':dev')]) {
+configure([project(':core'),project(':example'), project(':dev'), project(':core-test')]) {
   repositories {
     mavenCentral()
     maven {
@@ -98,7 +98,6 @@ configure([project(':core'), project(':dev'), project(':auth'), project(':popup'
       }
     }
   }
-
 }
 
 configure([project(':core')]) {
@@ -115,6 +114,14 @@ configure([project(':dev')]) {
     api "org.kordamp.ikonli:ikonli-ionicons4-pack:$IKONLI_VERSION"
     implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
     implementation 'org.scenic-view:scenic-view:11.0.3-SNAPSHOT-FORK'
+  }
+}
+configure([project(':core-test')]) {
+  dependencies {
+    implementation project(':core')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"
   }
 }
 
