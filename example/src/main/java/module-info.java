@@ -3,5 +3,5 @@ module jpro.routing.example.main {
     requires javafx.graphics;
     requires javafx.controls;
     requires com.jpro.routing.core;
-    requires jpro.routing.auth;
+    requires one.jpro.auth;
 }
