@@ -17,17 +17,13 @@ repositories {
 }
 
 dependencies {
-    api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
-    api "SANDEC:jnodes:$JNODES_VERSION"
-    api "de.sandec:JMemoryBuddy:$JMEMORYBUDDY_VERSION"
-
+    implementation "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     implementation "org.jetbrains:annotations:$JETBRAINS_ANNOTATIONS_VERSION"
+    implementation "com.auth0:java-jwt:$AUTH0_JAVAJWT_VERSION"
+    implementation "com.auth0:jwks-rsa:$AUTH0_JWKSRSA_VERSION"
     api "jakarta.inject:jakarta.inject-api:$JAKARTA_INJECT_VERSION"
     api "org.slf4j:slf4j-api:$SLF4J_VERSION"
     api "org.json:json:$JSON_VERSION"
-
-    implementation "com.auth0:java-jwt:$AUTH0_JAVAJWT_VERSION"
-    implementation "com.auth0:jwks-rsa:$AUTH0_JWKSRSA_VERSION"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"
@@ -41,8 +37,8 @@ java {
 
 javafx {
     version = "$JAVAFX_VERSION"
-     configurations = ["compileOnly", "testImplementation"]
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
+    configurations = ["compileOnly", "testImplementation"]
+    modules = ['javafx.graphics', 'javafx.controls']
 }
 
 test {
