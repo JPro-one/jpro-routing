@@ -1,8 +1,8 @@
 package example.login;
 
-import com.jpro.routing.Filters;
-import com.jpro.routing.Route;
-import com.jpro.routing.RouteApp;
+import one.jpro.routing.Filters;
+import one.jpro.routing.Route;
+import one.jpro.routing.RouteApp;
 import example.auth.AuthFilters;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -22,7 +22,7 @@ import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 
 import java.util.List;
 
-import static com.jpro.routing.RouteUtils.getNode;
+import static one.jpro.routing.RouteUtils.getNode;
 
 /**
  * Login example application.

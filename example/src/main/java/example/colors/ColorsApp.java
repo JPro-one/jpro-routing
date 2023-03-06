@@ -1,9 +1,9 @@
 package example.colors;
 
 
-import com.jpro.routing.*;
-import com.jpro.routing.dev.DevFilter;
-import com.jpro.routing.filter.container.ContainerFilter;
+import one.jpro.routing.*;
+import one.jpro.routing.dev.DevFilter;
+import one.jpro.routing.filter.container.ContainerFilter;
 import example.filters.SimpleContainer;
 import example.filters.SimpleHamburgerMenu;
 import javafx.scene.Node;
@@ -11,13 +11,15 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import one.jpro.routing.Route;
+import one.jpro.routing.RouteApp;
 import org.apache.commons.validator.UrlValidator;
 import simplefx.experimental.parts.FXFuture;
 
 import java.util.List;
 
-import static com.jpro.routing.RouteUtils.redirect;
-import static com.jpro.routing.RouteUtils.getNode;
+import static one.jpro.routing.RouteUtils.redirect;
+import static one.jpro.routing.RouteUtils.getNode;
 
 public class ColorsApp extends RouteApp {
   public static void main(String[] args) {

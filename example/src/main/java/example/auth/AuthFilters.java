@@ -1,8 +1,8 @@
 package example.auth;
 
-import com.jpro.routing.Filter;
-import com.jpro.routing.ResponseUtils;
-import com.jpro.routing.Route;
+import one.jpro.routing.Filter;
+import one.jpro.routing.ResponseUtils;
+import one.jpro.routing.Route;
 import one.jpro.auth.authentication.User;
 import one.jpro.auth.jwt.JWTAuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
