@@ -1,14 +1,14 @@
-package  com.jpro.routing.dev
+package one.jpro.routing.dev
 
 import simplefx.core._
 import simplefx.all._
 import simplefx.experimental._
 import org.scenicview.ScenicView
-import com.jpro.routing.RouteUtils
-import com.jpro.routing.Filter
+import one.jpro.routing.RouteUtils
+import one.jpro.routing.Filter
 import fr.brouillard.oss.cssfx.CSSFX
-import com.jpro.routing.LinkUtil
-import com.jpro.routing.filter.container.ContainerFilter
+import one.jpro.routing.LinkUtil
+import one.jpro.routing.filter.container.ContainerFilter
 import com.jpro.webapi.WebAPI
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
 import org.kordamp.ikonli.javafx.FontIcon
@@ -20,7 +20,7 @@ object DevFilter {
     override def isContainer(x: Node): Boolean = x.isInstanceOf[MyContainer]
     override def createContainer() = new MyContainer
     class MyContainer extends VBox with Container { CONTAINER =>
-      stylesheets <++ "/com/jpro/routing/dev/devfilter.css"
+      stylesheets <++ "/one/jpro/routing/dev/devfilter.css"
 
       styleClass <++ "devfilter-vbox"
       override def toString(): String = s"DevFilter(content=$content)"
@@ -32,7 +32,7 @@ object DevFilter {
         System.gc()
         report = JMemoryBuddyLive.getReport()
       }
-  
+
       this <++ new HBox {
         styleClass <++ "devfilter-hbox"
         this <++ new Button() {
@@ -56,7 +56,7 @@ object DevFilter {
             LinkUtil.refresh(this)
           }
         }
-        
+
         this <++ new TextField {
           request --> {
             if(request != null) {
