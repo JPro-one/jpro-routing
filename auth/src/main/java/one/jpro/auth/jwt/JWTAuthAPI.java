@@ -1,6 +1,6 @@
 package one.jpro.auth.jwt;
 
-import one.jpro.auth.utils.HttpMethod;
+import one.jpro.auth.http.HttpMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;

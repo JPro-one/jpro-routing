@@ -1,4 +1,4 @@
-package one.jpro.auth.utils;
+package one.jpro.auth.http;
 
 /**
  * Represents an HTTP method. Intended for use

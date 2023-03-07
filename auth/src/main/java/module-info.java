@@ -21,5 +21,6 @@ module one.jpro.auth {
     exports one.jpro.auth.jwt;
     exports one.jpro.auth.oath2;
     exports one.jpro.auth.oath2.provider;
+    exports one.jpro.auth.http;
     exports one.jpro.auth.utils;
 }
