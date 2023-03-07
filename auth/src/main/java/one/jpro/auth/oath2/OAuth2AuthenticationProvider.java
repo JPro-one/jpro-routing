@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
@@ -393,7 +393,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 case "RS256":
                     JwkProvider jwkProvider;
                     try {
-                        jwkProvider = new UrlJwkProvider(new URL(options.getJwkPath()));
+                        jwkProvider = new UrlJwkProvider(URI.create(options.getJwkPath()).toURL());
 //                        jwkProvider = new JwkProviderBuilder(options.getJwkPath())
 //                                .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
 //                                .build();
