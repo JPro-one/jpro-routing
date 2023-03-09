@@ -68,8 +68,7 @@ configure([project(':core'), project(':dev'), project(':popup')]) {
     api group: 'commons-validator', name: 'commons-validator', version: '1.7'
   }
 
-
-  group = 'com.sandec.jpro'
+  group = 'one.jpro'
   version = "$JPRO_WEB_VERSION"
 
   java {
