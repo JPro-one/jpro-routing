@@ -13,6 +13,7 @@ import one.jpro.auth.authentication.*;
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.jwt.TokenCredentials;
 import one.jpro.auth.jwt.TokenExpiredException;
+import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,10 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -37,7 +35,9 @@ import java.util.stream.Collectors;
  */
 public class OAuth2AuthenticationProvider implements AuthenticationProvider<Credentials> {
 
-    private final Logger log = LoggerFactory.getLogger(OAuth2AuthenticationProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(OAuth2AuthenticationProvider.class);
+
+    private static final Base64.Decoder BASE64_DECODER = AuthUtils.BASE64_DECODER;
 
     @NotNull
     private final WebAPI webAPI;
@@ -495,8 +495,16 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         // Decoded JWT info
         json.put("token", jwt.getToken());
         json.put("token_type", tokenType);
-        Optional.ofNullable(jwt.getHeader()).ifPresent(header -> json.put("header", header));
-        Optional.ofNullable(jwt.getPayload()).ifPresent(payload -> json.put("payload", payload));
+        Optional.ofNullable(jwt.getHeader())
+                .ifPresent(header -> {
+                    final String decodedHeader = new String(BASE64_DECODER.decode(header));
+                    json.put("header", new JSONObject(decodedHeader));
+                });
+        Optional.ofNullable(jwt.getPayload())
+                .ifPresent(payload -> {
+                    final String decodedPayload = new String(BASE64_DECODER.decode(payload));
+                    json.put("payload", new JSONObject(decodedPayload));
+                });
         Optional.ofNullable(jwt.getSignature()).ifPresent(signature -> json.put("signature", signature));
 
         // Payload info
