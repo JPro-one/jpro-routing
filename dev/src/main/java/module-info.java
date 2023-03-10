@@ -4,7 +4,6 @@
  * @author Besmir Beqiri
  */
 module one.jpro.routing.dev {
-
     requires transitive simplefx.extended;
     requires transitive javafx.controls;
     requires one.jpro.routing.core;
