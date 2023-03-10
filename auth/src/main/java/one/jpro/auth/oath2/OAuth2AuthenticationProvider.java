@@ -7,6 +7,7 @@ import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.*;
@@ -337,13 +338,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             // verify if the user is not expired
             // this may happen if the user tokens have been issued for future use for example
-            final JSONObject jwtJSON = verifyToken(token, false);
-            // Store JWT authorization
-            params.put("jwt", jwtJSON);
-
-            final String email = jwtJSON.getJSONObject("claims").getString("email");
-            // Set principal name
-            params.put(Authentication.KEY_NAME, email);
+            final JSONObject jwtJSON;
+            try {
+                jwtJSON = verifyToken(token, false);
+                // Store JWT authorization
+                params.put("jwt", jwtJSON);
+            } catch (JWTDecodeException | IllegalStateException ex) {
+                log.trace("Cannot decode access token:", ex);
+            }
         }
 
         if (json.has("id_token")) {
@@ -352,9 +354,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             // verify if the user is not expired
             // this may happen if the user tokens have been issued for future use for example
-            final JSONObject jwtJSON = verifyToken(token, true);
-            // Store JWT authorization
-            params.put("jwt", jwtJSON);
+            final JSONObject jwtJSON;
+            try {
+                jwtJSON = verifyToken(token, true);
+                // Store JWT authorization
+                params.put("jwt", jwtJSON);
+            } catch (JWTDecodeException | IllegalStateException ex) {
+                log.trace("Cannot decode id token:", ex);
+            }
         }
 
         JSONObject authJSON = new JSONObject(params, JSONObject.getNames(params));
