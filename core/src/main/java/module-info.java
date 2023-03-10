@@ -1,7 +1,5 @@
 module one.jpro.routing.core {
-
     requires transitive simplefx.extended;
-    requires transitive javafx.graphics;
     requires transitive javafx.controls;
 
     exports one.jpro.routing;
