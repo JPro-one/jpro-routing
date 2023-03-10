@@ -3,6 +3,7 @@ package one.jpro.auth.jwt;
 import one.jpro.auth.authentication.AuthenticationProvider;
 import one.jpro.auth.authentication.CredentialValidationException;
 import one.jpro.auth.authentication.Credentials;
+import one.jpro.auth.authentication.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -58,6 +59,18 @@ public class TokenCredentials implements Credentials {
             final JSONArray scopes = json.getJSONArray("scopes");
             setScopes(scopes.toList().stream().map(Object::toString).collect(Collectors.toList()));
         }
+    }
+
+    /**
+     * Creates a token credentials from a user object.
+     * <p>
+     * This constructor should be called only if the user object is obtained from
+     * a {@link AuthenticationProvider} that uses tokens.
+     *
+     * @param user the user object
+     */
+    public TokenCredentials(@NotNull final User user) {
+        this(user.toJSON().optJSONObject("attributes").optJSONObject("jwt"));
     }
 
     @NotNull

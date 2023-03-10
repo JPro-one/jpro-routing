@@ -1,6 +1,7 @@
 package one.jpro.auth.test;
 
 import one.jpro.auth.authentication.CredentialValidationException;
+import one.jpro.auth.authentication.User;
 import one.jpro.auth.jwt.TokenCredentials;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,6 +53,16 @@ public class TokenCredentialsTest {
         Exception exception = assertThrowsExactly(CredentialValidationException.class,
                 () -> credentials.validate(null));
         assertEquals("token cannot be null or blank", exception.getMessage());
+    }
+
+    @Test
+    public void nonTokenBasedUserOnConstructorShouldMakeValidationThrowsException() {
+        Exception exception = assertThrowsExactly(IllegalStateException.class,
+                () -> {
+                    User user = new User("Username", null, null);
+                    new TokenCredentials(user);
+                });
+        assertEquals("json object cannot be null", exception.getMessage());
     }
 
     @Test
