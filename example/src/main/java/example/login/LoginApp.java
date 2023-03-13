@@ -2,7 +2,6 @@ package example.login;
 
 import atlantafx.base.theme.PrimerLight;
 import com.sandec.mdfx.MarkdownView;
-import example.auth.AuthFilters;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -14,9 +13,11 @@ import javafx.scene.layout.VBox;
 import one.jpro.auth.AuthAPI;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
+import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import one.jpro.routing.Route;
 import one.jpro.routing.dev.DevFilter;
+import org.json.JSONObject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -24,10 +25,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import static example.auth.AuthFilters.oauth2;
 import static one.jpro.routing.RouteUtils.getNode;
 
 /**
- * Login example application.
+ * An example application to show how to use the Authorization module in general
+ * combined with the Routing module and various supported authentication providers.
  *
  * @author Besmir Beqiri
  */
@@ -64,23 +67,41 @@ public class LoginApp extends BaseAuthApp {
                 .setScopes(List.of("openid", "email"))
                 .setRedirectUri("/auth/microsoft");
 
+        // Keycloak Auth provider
+        final var keycloakAuth = new KeycloakAuthenticationProvider(getWebAPI(),
+                new JSONObject()
+                        .put("auth-server-url", "http://localhost:8080")
+                        .put("resource", "myclient")
+                        .put("realm", "myrealm"));
+
+        final var keycloakCredentials = new OAuth2Credentials()
+                .setUsername("myuser")
+                .setPassword("somepass")
+                .setScopes(List.of("openid", "email"))
+                .setRedirectUri("/auth/keycloak");
+
         return Route.empty()
                 .and(getNode("/", (r) ->
                         loginView(googleAuth, googleCredentials,
-                                microsoftAuth, microsoftCredentials)))
+                                microsoftAuth, microsoftCredentials,
+                                keycloakAuth, keycloakCredentials)))
                 .and(getNode("/auth/google", (r) -> authInfoView()))
                 .and(getNode("/auth/microsoft", (r) -> authInfoView()))
+                .and(getNode("/auth/keycloak", (r) -> authInfoView()))
                 .and(getNode("/auth/error", (r) -> errorView()))
 //                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
-                .filter(AuthFilters.oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
-                .filter(AuthFilters.oauth2(microsoftAuth, microsoftCredentials, this::setUser, this::setError));
+                .filter(oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
+                .filter(oauth2(microsoftAuth, microsoftCredentials, this::setUser, this::setError))
+                .filter(oauth2(keycloakAuth, keycloakCredentials, this::setUser, this::setError));
     }
 
     public Node loginView(GoogleAuthenticationProvider googleAuth,
                           OAuth2Credentials googleCredentials,
                           MicrosoftAuthenticationProvider microsoftAuth,
-                          OAuth2Credentials microsoftCredentials) {
+                          OAuth2Credentials microsoftCredentials,
+                          KeycloakAuthenticationProvider keycloakAuth,
+                          OAuth2Credentials keycloakCredentials) {
         final var headerLabel = new Label("Authentication Module");
         headerLabel.getStyleClass().add("header-label");
 
@@ -95,7 +116,11 @@ public class LoginApp extends BaseAuthApp {
         microsoftLoginButton.setOnAction(event ->
                 getWebAPI().openURL(microsoftAuth.authorizeUrl(microsoftCredentials)));
 
-        final var tilePane = new TilePane(googleLoginButton, microsoftLoginButton);
+        final var keycloakLoginButton = createLoginButton("Keycloak");
+        keycloakLoginButton.setOnAction(event ->
+                getWebAPI().openURL(keycloakAuth.authorizeUrl(keycloakCredentials)));
+
+        final var tilePane = new TilePane(googleLoginButton, microsoftLoginButton, keycloakLoginButton);
         tilePane.getStyleClass().add("tile-pane");
         VBox.setVgrow(tilePane, Priority.ALWAYS);
 
