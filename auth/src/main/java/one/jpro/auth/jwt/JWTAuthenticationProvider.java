@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class JWTAuthenticationProvider implements AuthenticationProvider<TokenCredentials> {
 
-    private final Logger log = LoggerFactory.getLogger(JWTAuthenticationProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(JWTAuthenticationProvider.class);
 
     private static final Base64.Decoder BASE64_DECODER = AuthUtils.BASE64_DECODER;
 

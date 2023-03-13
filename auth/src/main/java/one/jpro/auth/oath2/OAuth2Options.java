@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class OAuth2Options {
 
-    private final Logger log = LoggerFactory.getLogger(OAuth2Options.class);
+    private static final Logger log = LoggerFactory.getLogger(OAuth2Options.class);
 
     // Defaults
     private static final OAuth2Flow FLOW = OAuth2Flow.AUTH_CODE;
