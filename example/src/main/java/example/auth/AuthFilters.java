@@ -28,14 +28,17 @@ public final class AuthFilters {
      * @param authProvider the OAuth2 authentication provider
      * @param credentials  the OAuth2 credentials
      * @param userConsumer operation on the given user argument
+     * @param errorConsumer operation on the given error argument
      * @return a {@link Filter} object
      */
-    public static Filter create(OAuth2AuthenticationProvider authProvider,
+    public static Filter oauth2(OAuth2AuthenticationProvider authProvider,
                                 OAuth2Credentials credentials,
-                                Consumer<? super User> userConsumer) {
+                                Consumer<? super User> userConsumer,
+                                Consumer<? super Throwable> errorConsumer) {
         Objects.requireNonNull(authProvider, "auth provider can not be null");
         Objects.requireNonNull(credentials, "credentials can not be null");
         Objects.requireNonNull(userConsumer, "user consumer can not be null");
+        Objects.requireNonNull(errorConsumer, "error consumer cannot be null");
         return (route) -> (request) -> {
             if (request.path().equals(credentials.getRedirectUri())) {
                 return FXFuture.fromJava(authProvider.authenticate(credentials))
@@ -44,7 +47,10 @@ public final class AuthFilters {
                             return user;
                         })
                         .flatMap(user -> route.apply(request))
-                        .recover(ex -> ResponseUtils.redirect("/auth/error"));
+                        .recover(ex -> {
+                            errorConsumer.accept(ex);
+                            return ResponseUtils.redirect("/auth/error");
+                        });
             } else {
                 return route.apply(request);
             }
@@ -60,18 +66,20 @@ public final class AuthFilters {
      * @param tokenPath    the token path
      * @param credentials  a JSON object with the authentication information
      * @param userConsumer operation on the given user argument
+     * @param errorConsumer operation on the given error argument
      * @return a {@link Filter} object
      */
     public static Filter jwt(JWTAuthenticationProvider authProvider,
                              String tokenPath,
                              JSONObject credentials,
-                             Consumer<? super User> userConsumer) {
+                             Consumer<? super User> userConsumer,
+                             Consumer<? super Throwable> errorConsumer) {
         Objects.requireNonNull(authProvider, "auth provider cannot be null");
         Objects.requireNonNull(tokenPath, "token path cannot be null");
         Objects.requireNonNull(credentials, "credentials cannot be null");
         Objects.requireNonNull(userConsumer, "user consumer cannot be null");
+        Objects.requireNonNull(errorConsumer, "error consumer cannot be null");
         return (route) -> (request) -> {
-            System.out.println("request.path() = " + request.path());
             if (request.path().equals("/jwt/token")) {
                 return FXFuture.fromJava(authProvider.token(tokenPath, credentials)
                                 .thenCompose(authProvider::authenticate))
@@ -80,7 +88,10 @@ public final class AuthFilters {
                             return user;
                         })
                         .flatMap(user -> route.apply(request))
-                        .recover(ex -> ResponseUtils.redirect("/auth/error"));
+                        .recover(ex -> {
+                            errorConsumer.accept(ex);
+                            return ResponseUtils.redirect("/auth/error");
+                        });
             } else {
                 return route.apply(request);
             }
