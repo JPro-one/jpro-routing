@@ -160,7 +160,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             // Wrap the Query Parameters in a JSONObject for easy access
             final JSONObject queryParams = new JSONObject(webAPI.getURLQueryParams());
-            log.debug("Query parameters: {}", queryParams);
+            log.debug("URL query parameters: {}", queryParams);
 
             // Retrieve the authorization code
             if (queryParams.has("code")) {
@@ -343,6 +343,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         Objects.requireNonNull(json, "json can not be null");
         Objects.requireNonNull(params, "params can not be null");
 
+        log.debug("User json: {}", json);
+        log.debug("Params: {}", params);
+        log.debug("Scope: {}", json.optString("scope"));
+
         if (json.has("access_token")) {
             // attempt to create a user from the json object
             final String token = json.getString("access_token");
@@ -354,6 +358,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 jwtJSON = verifyToken(token, false);
                 // Store JWT authorization
                 params.put("jwt", jwtJSON);
+
+                // Set principal name
+                final JSONObject payload = jwtJSON.getJSONObject("payload");
+                if (payload.has("name")) {
+                    params.put(Authentication.KEY_NAME, payload.getString("name"));
+                } else if (payload.has("email")) {
+                    params.put(Authentication.KEY_NAME, payload.getString("email"));
+                }
             } catch (JWTDecodeException | IllegalStateException ex) {
                 log.trace("Cannot decode access token:", ex);
             }
@@ -370,6 +382,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 jwtJSON = verifyToken(token, true);
                 // Store JWT authorization
                 params.put("jwt", jwtJSON);
+
+                // Set principal name
+                final JSONObject payload = jwtJSON.getJSONObject("payload");
+                if (payload.has("name")) {
+                    params.put(Authentication.KEY_NAME, payload.getString("name"));
+                } else if (payload.has("email")) {
+                    params.put(Authentication.KEY_NAME, payload.getString("email"));
+                }
             } catch (JWTDecodeException | IllegalStateException ex) {
                 log.trace("Cannot decode id token:", ex);
             }
