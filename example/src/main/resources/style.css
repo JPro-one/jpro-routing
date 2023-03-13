@@ -1,5 +1,38 @@
 .header-label {
-    -fx-font: 24px "RobotoBold";
+    -fx-font: 32px "RobotoBold";
+}
+
+.header2-label {
+     -fx-font: 22px "Roboto";
+}
+
+.page {
+    -fx-padding: 36px;
+}
+
+.login-pane {
+    -fx-max-width: 1080px;
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 16px;
+    -fx-background-radius: 16px;
+    -fx-alignment: center;
+    -fx-spacing: 24px;
+    -fx-padding: 36px;
+}
+
+.login-pane > .tile-pane {
+    -fx-hgap: 24px;
+    -fx-vgap: 24px;
+    -fx-alignment: center;
+}
+
+.login-pane > .tile-pane > .login-button {
+    -fx-pref-width: 148px;
+    -fx-pref-height: 148px;
+    -fx-content-display: top;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
 }
 
 .auth-info-pane {

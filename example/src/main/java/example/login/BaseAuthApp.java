@@ -1,11 +1,17 @@
 package example.login;
 
+import atlantafx.base.theme.Styles;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import one.jpro.auth.authentication.User;
 import one.jpro.routing.RouteApp;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Optional;
 
 /**
  * Base class for all authentication applications.
@@ -66,6 +72,19 @@ public abstract class BaseAuthApp extends RouteApp {
     /*  Extra methods                                                                   */
     /*                                                                                  */
     /************************************************************************************/
+
+    Button createLoginButton(String text) {
+        ImageView iconView = new ImageView();
+        iconView.setFitWidth(56);
+        iconView.setFitHeight(56);
+        Optional.ofNullable(getClass().getResourceAsStream("/images/" + text + "_Logo.png"))
+                .map(inputStream -> new Image(inputStream, 0, 0, true, true))
+                .ifPresent(iconView::setImage);
+
+        Button loginButton = new Button("Login with\n" + text, iconView);
+        loginButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED, Styles.ACCENT, "login-button");
+        return loginButton;
+    }
 
     String jsonToMarkdown(JSONObject json) {
         return jsonToMarkdown(json, 0);

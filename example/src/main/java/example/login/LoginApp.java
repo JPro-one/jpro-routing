@@ -4,16 +4,13 @@ import atlantafx.base.theme.PrimerLight;
 import com.sandec.mdfx.MarkdownView;
 import example.auth.AuthFilters;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import one.jpro.auth.AuthAPI;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
@@ -84,64 +81,28 @@ public class LoginApp extends BaseAuthApp {
                           OAuth2Credentials googleCredentials,
                           MicrosoftAuthenticationProvider microsoftAuth,
                           OAuth2Credentials microsoftCredentials) {
-        GridPane gridPane = new GridPane();
-        gridPane.setAlignment(Pos.CENTER);
-        gridPane.setHgap(12.0);
-        gridPane.setVgap(12.0);
-        gridPane.setMaxWidth(600.0);
-        gridPane.setPadding(new Insets(36.0));
+        final var headerLabel = new Label("Authentication Module");
+        headerLabel.getStyleClass().add("header-label");
 
-        ColumnConstraints columnConstraints1 = new ColumnConstraints();
-        columnConstraints1.setMinWidth(80.0);
-        columnConstraints1.setPrefWidth(80.0);
-        columnConstraints1.setMaxWidth(Double.POSITIVE_INFINITY);
-        columnConstraints1.setHalignment(HPos.RIGHT);
+        final var selectLabel = new Label("Select an authentication provider:");
+        selectLabel.getStyleClass().add("header2-label");
 
-        ColumnConstraints columnConstraints2 = new ColumnConstraints();
-        columnConstraints2.setMinWidth(120.0);
-        columnConstraints2.setPrefWidth(120.0);
-        columnConstraints2.setMaxWidth(Double.POSITIVE_INFINITY);
-        columnConstraints2.setHgrow(Priority.ALWAYS);
-
-        gridPane.getColumnConstraints().addAll(columnConstraints1, columnConstraints2);
-
-        Label headerLabel = new Label("Login Form");
-        headerLabel.setFont(Font.font("RobotoBold", 24.0));
-        GridPane.setMargin(headerLabel, new Insets(20, 0, 20, 0));
-        GridPane.setHalignment(headerLabel, HPos.CENTER);
-        gridPane.add(headerLabel, 0, 0, 2, 1);
-
-        Label usernameLabel = new Label("Username : ");
-        gridPane.add(usernameLabel, 0, 2);
-        TextField usernameField = new TextField();
-        gridPane.add(usernameField, 1, 2);
-
-        Label passwordLabel = new Label("Password : ");
-        gridPane.add(passwordLabel, 0, 3);
-        TextField passwordField = new TextField();
-        gridPane.add(passwordField, 1, 3);
-
-        Button submitButton = new Button("Login with JPro");
-        submitButton.setDefaultButton(true);
-        gridPane.add(submitButton, 0, 4, 2, 1);
-        GridPane.setHalignment(submitButton, HPos.CENTER);
-        GridPane.setMargin(submitButton, new Insets(12, 0, 12, 0));
-
-        Button googleLoginButton = new Button("Login with Google");
-        gridPane.add(googleLoginButton, 0, 5, 2, 1);
-        GridPane.setMargin(googleLoginButton, new Insets(12, 0, 12, 0));
-        GridPane.setHalignment(googleLoginButton, HPos.CENTER);
+        final var googleLoginButton = createLoginButton("Google");
         googleLoginButton.setOnAction(event ->
                 getWebAPI().openURL(googleAuth.authorizeUrl(googleCredentials)));
 
-        Button microsoftLoginButton = new Button("Login with Microsoft");
-        gridPane.add(microsoftLoginButton, 0, 6, 2, 1);
-        GridPane.setMargin(microsoftLoginButton, new Insets(12, 0, 12, 0));
-        GridPane.setHalignment(microsoftLoginButton, HPos.CENTER);
+        final var microsoftLoginButton = createLoginButton("Microsoft");
         microsoftLoginButton.setOnAction(event ->
                 getWebAPI().openURL(microsoftAuth.authorizeUrl(microsoftCredentials)));
 
-        final var stackPane = new StackPane(gridPane);
+        final var tilePane = new TilePane(googleLoginButton, microsoftLoginButton);
+        tilePane.getStyleClass().add("tile-pane");
+        VBox.setVgrow(tilePane, Priority.ALWAYS);
+
+        final var pane = new VBox(headerLabel, selectLabel, tilePane);
+        pane.getStyleClass().add("login-pane");
+
+        final var stackPane = new StackPane(pane);
         stackPane.getStyleClass().add("page");
         return stackPane;
     }
