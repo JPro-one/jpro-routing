@@ -1,0 +1,27 @@
+.header-label {
+    -fx-font: 24px "RobotoBold";
+}
+
+.auth-info-pane {
+    -fx-max-width: 600px;
+    -fx-max-height: 480px;
+    -fx-background-color: LightGreen;
+    -fx-background-radius: 16px;
+    -fx-alignment: center_left;
+    -fx-spacing: 24px;
+    -fx-padding: 36px;
+}
+
+.error-pane {
+    -fx-max-width: 600px;
+    -fx-max-height: 480px;
+    -fx-background-color: LightCoral;
+    -fx-background-radius: 16px;
+    -fx-alignment: center_left;
+    -fx-spacing: 24px;
+    -fx-padding: 36px;
+}
+
+.error-pane > .error-label {
+    -fx-text-fill: white;
+}
