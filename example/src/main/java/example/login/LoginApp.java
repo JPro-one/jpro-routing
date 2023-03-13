@@ -1,5 +1,6 @@
 package example.login;
 
+import atlantafx.base.theme.PrimerLight;
 import example.auth.AuthFilters;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -54,6 +55,7 @@ public class LoginApp extends RouteApp {
         Optional.ofNullable(LoginApp.class.getResource("/style.css"))
                 .map(URL::toExternalForm)
                 .ifPresent(css -> getScene().getStylesheets().add(css));
+        getScene().setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
         // Google Auth provider
         final var googleAuth = AuthAPI.googleAuth()

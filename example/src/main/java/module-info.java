@@ -11,4 +11,5 @@ module one.jpro.routing.example {
     requires scala.library;
     requires commons.validator;
     requires simplefx.extended;
+    requires atlantafx.base;
 }

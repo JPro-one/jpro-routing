@@ -130,8 +130,8 @@ configure([project(':example')]) {
 //  mainClassName = "example.scala.TestExtensions"
 //  mainClassName = "example.scala.ColorTransitionApp"
 //  mainClassName = "example.colors.ColorsApp"
-    mainClassName = "example.popup.PopupApp"
-//  mainClassName = "example.login.LoginApp"
+//    mainClassName = "example.popup.PopupApp"
+  mainClassName = "example.login.LoginApp"
   
   dependencies {
     implementation project(":auth")
@@ -140,6 +140,7 @@ configure([project(':example')]) {
     implementation project(':dev')
     implementation "org.controlsfx:controlsfx:$CONTROLSFX_VERSION"
     implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
+    implementation "io.github.mkpaz:atlantafx-base:$ATLANTAFX_VERSION"
   }
 
   javafx {
