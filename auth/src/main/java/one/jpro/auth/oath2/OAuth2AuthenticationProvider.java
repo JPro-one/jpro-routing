@@ -554,7 +554,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         Optional.ofNullable(jwt.getNotBefore()).map(Date::getTime).ifPresent(nbr -> json.put("nbr", nbr));
         Optional.ofNullable(jwt.getId()).ifPresent(kid -> json.put("kid", kid));
         Optional.ofNullable(jwt.getClaim("azp")).ifPresent(azp -> json.put("azp", azp.asString()));
-        Optional.ofNullable(jwt.getClaims()).ifPresent(claimMap -> json.put("claims", new JSONObject(claimMap)));
+        Optional.ofNullable(jwt.getClaims()).ifPresent(claimMap -> json.put("claims", new JSONArray(claimMap.keySet())));
         return json;
     }
 
