@@ -1,10 +1,9 @@
 package example.login;
 
 import atlantafx.base.theme.PrimerLight;
+import com.sandec.mdfx.MarkdownView;
 import example.auth.AuthFilters;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,13 +15,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import one.jpro.auth.AuthAPI;
-import one.jpro.auth.authentication.User;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
-import one.jpro.routing.Filters;
 import one.jpro.routing.Route;
-import one.jpro.routing.RouteApp;
 import one.jpro.routing.dev.DevFilter;
 
 import java.io.PrintWriter;
@@ -38,17 +34,7 @@ import static one.jpro.routing.RouteUtils.getNode;
  *
  * @author Besmir Beqiri
  */
-public class LoginApp extends RouteApp {
-
-    private static final String GOOGLE_CLIENT_ID = System.getenv("GOOGLE_TEST_CLIENT_ID");
-    private static final String GOOGLE_CLIENT_SECRET = System.getenv("GOOGLE_TEST_CLIENT_SECRET");
-
-    private static final String AZURE_CLIENT_ID = System.getenv("AZURE_TEST_CLIENT_ID");
-    private static final String AZURE_CLIENT_SECRET = System.getenv("AZURE_TEST_CLIENT_SECRET");
-//    private static final String AZURE_TENANT = System.getenv("AZURE_TEST_CLIENT_TENANT");
-
-    private final ObjectProperty<User> userProperty = new SimpleObjectProperty<>(this, "user");
-    private final ObjectProperty<Throwable> errorProperty = new SimpleObjectProperty<>(this, "error");
+public class LoginApp extends BaseAuthApp {
 
     @Override
     public Route createRoute() {
@@ -88,10 +74,10 @@ public class LoginApp extends RouteApp {
                 .and(getNode("/auth/google", (r) -> authInfoView()))
                 .and(getNode("/auth/microsoft", (r) -> authInfoView()))
                 .and(getNode("/auth/error", (r) -> errorView()))
-                .filter(Filters.FullscreenFilter(true))
+//                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
-                .filter(AuthFilters.oauth2(googleAuth, googleCredentials, userProperty::set, errorProperty::set))
-                .filter(AuthFilters.oauth2(microsoftAuth, microsoftCredentials, userProperty::set, errorProperty::set));
+                .filter(AuthFilters.oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
+                .filter(AuthFilters.oauth2(microsoftAuth, microsoftCredentials, this::setUser, this::setError));
     }
 
     public Node loginView(GoogleAuthenticationProvider googleAuth,
@@ -164,19 +150,14 @@ public class LoginApp extends RouteApp {
         final var headerLabel = new Label("User information:");
         headerLabel.getStyleClass().add("header-label");
 
-        Label nameLabel = new Label();
-        nameLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-            final var user = userProperty.get();
-            return user == null ? "" : user.getName();
-        }, userProperty));
-        Label attributesLabel = new Label();
-        attributesLabel.setWrapText(true);
-        attributesLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-            final var user = userProperty.get();
-            return user == null ? "" : user.getAttributes().toString();
-        }, userProperty));
+        MarkdownView userView = new MarkdownView();
+        userView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        userView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+            final var user = getUser();
+            return user == null ? "" : jsonToMarkdown(user.toJSON());
+        }, userProperty()));
 
-        final var pane = new VBox(headerLabel, nameLabel, attributesLabel);
+        final var pane = new VBox(headerLabel, userView);
         pane.getStyleClass().add("auth-info-pane");
 
         return new StackPane(pane);
@@ -190,15 +171,15 @@ public class LoginApp extends RouteApp {
         errorLabel.setWrapText(true);
         errorLabel.getStyleClass().add("error-label");
         errorLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-            final Throwable throwable = errorProperty.get();
+            final Throwable throwable = getError();
             return throwable == null ? "" : throwable.getMessage();
-        }, errorProperty));
+        }, errorProperty()));
 
         final var errorTextArea = new TextArea();
         errorTextArea.getStyleClass().add("error-text-area");
         VBox.setVgrow(errorTextArea, Priority.ALWAYS);
         errorTextArea.textProperty().bind(Bindings.createStringBinding(() -> {
-            final Throwable throwable = errorProperty.get();
+            final Throwable throwable = getError();
             if (throwable == null) {
                 return "";
             } else {
@@ -207,7 +188,7 @@ public class LoginApp extends RouteApp {
                 throwable.printStackTrace(pw);
                 return sw.toString();
             }
-        }, errorProperty));
+        }, errorProperty()));
 
         final var pane = new VBox(headerLabel, errorLabel, errorTextArea);
         pane.getStyleClass().add("error-pane");

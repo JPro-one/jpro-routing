@@ -138,6 +138,7 @@ configure([project(':example')]) {
     implementation project(':core')
     implementation project(':popup')
     implementation project(':dev')
+    implementation "com.sandec:mdfx:$MDFX_VERSION"
     implementation "org.controlsfx:controlsfx:$CONTROLSFX_VERSION"
     implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
     implementation "io.github.mkpaz:atlantafx-base:$ATLANTAFX_VERSION"

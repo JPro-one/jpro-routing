@@ -3,9 +3,10 @@
 }
 
 .auth-info-pane {
-    -fx-max-width: 600px;
-    -fx-max-height: 480px;
-    -fx-background-color: LightGreen;
+    -fx-max-width: 1080px;
+    -fx-background-color: -color-success-subtle;
+    -fx-border-color: -color-success-emphasis;
+    -fx-border-radius: 16px;
     -fx-background-radius: 16px;
     -fx-alignment: center_left;
     -fx-spacing: 24px;
