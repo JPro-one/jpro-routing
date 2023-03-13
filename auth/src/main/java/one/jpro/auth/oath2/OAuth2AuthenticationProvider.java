@@ -158,20 +158,31 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
             // from this point, the only allowed credentials subtype is OAuth2Credentials
             OAuth2Credentials oauth2Credentials = (OAuth2Credentials) credentials;
 
+            // Wrap the Query Parameters in a JSONObject for easy access
+            final JSONObject queryParams = new JSONObject(webAPI.getURLQueryParams());
+            log.debug("Query parameters: {}", queryParams);
+
+            // Retrieve the authorization code
+            if (queryParams.has("code")) {
+                oauth2Credentials.setCode(queryParams.getString("code"));
+                if (oauth2Credentials.getCode() == null || oauth2Credentials.getCode().isBlank()) {
+                    return CompletableFuture.failedFuture(new RuntimeException("Authorization code is missing"));
+                }
+            }
+
+            // Retrieve scopes
+            if (queryParams.has("scope")) {
+                final String[] scopes = queryParams.getString("scope").split("\\+");
+                oauth2Credentials.setScopes(List.of(scopes));
+            }
+
+            // Create a new JSONObject to hold the parameters
             final JSONObject params = new JSONObject();
             final OAuth2Flow flow;
             if (oauth2Credentials.getFlow() != null) {
                 flow = oauth2Credentials.getFlow();
             } else {
                 flow = options.getFlow();
-            }
-
-            // TODO: handle possible exceptions
-
-            // Retrieve the authorization code
-            oauth2Credentials.setCode(webAPI.getURLQueryParams().get("code"));
-            if (oauth2Credentials.getCode() == null || oauth2Credentials.getCode().isBlank()) {
-                return CompletableFuture.failedFuture(new RuntimeException("Authorization code is missing"));
             }
 
             // Validate credentials
