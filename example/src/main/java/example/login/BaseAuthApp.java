@@ -198,17 +198,16 @@ public abstract class BaseAuthApp extends RouteApp {
         return sb.toString();
     }
 
-    String providerNameString(String prefix, final OAuth2AuthenticationProvider authProvider) {
-        var providerName = "Unknown";
+    String getAuthProviderName(OAuth2AuthenticationProvider authProvider) {
+        String result = "Unknown";
         if (authProvider instanceof GoogleAuthenticationProvider) {
-            providerName = "Google";
+            result = "Google";
         } else if (authProvider instanceof MicrosoftAuthenticationProvider) {
-            providerName = "Microsoft";
+            result = "Microsoft";
         } else if (authProvider instanceof KeycloakAuthenticationProvider) {
-            providerName = "Keycloak";
+            result = "Keycloak";
         }
-
-        return prefix + providerName;
+        return result;
     }
 
     /**

@@ -14,9 +14,6 @@ import javafx.scene.layout.VBox;
 import one.jpro.auth.AuthAPI;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Credentials;
-import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
-import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
-import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import one.jpro.routing.Route;
 import one.jpro.routing.dev.DevFilter;
 import simplefx.experimental.parts.FXFuture;
@@ -130,8 +127,9 @@ public class LoginApp extends BaseAuthApp {
         return stackPane;
     }
 
-    public Node authProviderView(final OAuth2AuthenticationProvider authProvider, final OAuth2Credentials authCredentials) {
-        final var headerLabel = new Label(providerNameString("Authentication Provider: ", authProvider));
+    public Node authProviderView(final OAuth2AuthenticationProvider authProvider,
+                                 final OAuth2Credentials authCredentials) {
+        final var headerLabel = new Label("Authentication Provider: " + getAuthProviderName(authProvider));
         headerLabel.getStyleClass().add("header-label");
 
         final var pane = new VBox(headerLabel);
@@ -191,13 +189,8 @@ public class LoginApp extends BaseAuthApp {
                                 .map(provider -> {
                                     final var options = provider.getOptions();
                                     setAuthOptions(options);
-                                    if (authProvider instanceof GoogleAuthenticationProvider) {
-                                        gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH + "/google");
-                                    } else if (authProvider instanceof MicrosoftAuthenticationProvider) {
-                                        gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH + "/microsoft");
-                                    } else if (authProvider instanceof KeycloakAuthenticationProvider) {
-                                        gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH + "/keycloak");
-                                    }
+                                    gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH +
+                                            "/" + getAuthProviderName(authProvider).toLowerCase());
                                     return provider;
                                 })
                                 .recover(throwable -> {
@@ -211,7 +204,7 @@ public class LoginApp extends BaseAuthApp {
     }
 
     public Node providerDiscoveryView(final OAuth2AuthenticationProvider authProvider) {
-        final var headerLabel = new Label(providerNameString("OpenID Provider Discovery: ", authProvider));
+        final var headerLabel = new Label("OpenID Connect Discovery: " + getAuthProviderName(authProvider));
         headerLabel.getStyleClass().add("header-label");
 
         MarkdownView providerDiscoveryView = new MarkdownView();
