@@ -15,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import one.jpro.auth.authentication.Options;
 import one.jpro.auth.authentication.User;
 import one.jpro.auth.jwt.JWTAuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
@@ -53,6 +54,7 @@ public abstract class BaseAuthApp extends RouteApp {
     static final String KEYCLOAK_REDIRECT_PATH = "/auth/keycloak";
     static final String AUTH_ERROR_PATH = "/auth/error";
     static final String GOOGLE_PROVIDER_PATH = "/provider/google";
+    static final String PROVIDER_DISCOVERY_PATH = "/provider/discovery";
 
     // User property
     private ObjectProperty<User> userProperty;
@@ -122,6 +124,29 @@ public abstract class BaseAuthApp extends RouteApp {
             authCredentials = new SimpleObjectProperty<>(this, "authCredentials");
         }
         return authCredentials;
+    }
+
+    // Auth options property
+    private ObjectProperty<Options> authOptions;
+
+    final Options getAuthOptions() {
+        return authOptions == null ? null : authOptions.get();
+    }
+
+    final void setAuthOptions(Options value) {
+        authOptionsProperty().set(value);
+    }
+
+    /**
+     * The options property contains the configuration for the authentication provider.
+     *
+     * @return the options property
+     */
+    final ObjectProperty<Options> authOptionsProperty() {
+        if (authOptions == null) {
+            authOptions = new SimpleObjectProperty<>(this, "providerOptions");
+        }
+        return authOptions;
     }
 
     // Error property

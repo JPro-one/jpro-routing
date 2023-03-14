@@ -18,6 +18,7 @@ import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import one.jpro.routing.Route;
 import one.jpro.routing.dev.DevFilter;
+import simplefx.experimental.parts.FXFuture;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -89,6 +90,7 @@ public class LoginApp extends BaseAuthApp {
                 .and(getNode(KEYCLOAK_REDIRECT_PATH, (r) -> authInfoView()))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
                 .and(getNode(GOOGLE_PROVIDER_PATH, (r) -> authProviderView()))
+                .and(getNode(PROVIDER_DISCOVERY_PATH, (r) -> providerDiscoveryView()))
 //                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
                 .filter(oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
@@ -182,8 +184,42 @@ public class LoginApp extends BaseAuthApp {
                     final var signInBox = createButtonWithDescription(
                             "Sign in with the selected authentication provider.", "Sign In",
                             event -> getWebAPI().openURL(authProvider.authorizeUrl(authCredentials)));
-                    pane.getChildren().addAll(signInBox);
+
+                    final var discoveryBox = createButtonWithDescription(
+                            "The OpenID Connect Discovery provides a client with configuration details.",
+                            "Discovery", event ->
+                                    FXFuture.fromJava(authProvider.discover())
+                                            .map(provider -> {
+                                                final var options = provider.getOptions();
+                                                setAuthOptions(options);
+                                                gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH);
+                                                return provider;
+                                            })
+                                            .recover(throwable -> {
+                                                setError(throwable);
+                                                gotoPage(headerLabel, AUTH_ERROR_PATH);
+                                                return null;
+                                            }));
+                    pane.getChildren().addAll(signInBox, discoveryBox);
                 }));
+
+        return new StackPane(pane);
+    }
+
+    public Node providerDiscoveryView() {
+        final var headerLabel = new Label("OpenID Provider Discovery:");
+        headerLabel.getStyleClass().add("header-label");
+        headerLabel.textProperty().bind(providerNameBinding("OpenID Provider Discovery: ", authProviderProperty()));
+
+        MarkdownView providerDiscoveryView = new MarkdownView();
+        providerDiscoveryView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        providerDiscoveryView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+            final var authOptions = getAuthOptions();
+            return authOptions == null ? "" : jsonToMarkdown(authOptions.toJSON());
+        }, authOptionsProperty()));
+
+        final var pane = new VBox(headerLabel, providerDiscoveryView);
+        pane.getStyleClass().add("openid-provider-discovery-pane");
 
         return new StackPane(pane);
     }
