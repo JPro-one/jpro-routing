@@ -57,64 +57,72 @@ public class JWTOptions implements Options {
         return issuer;
     }
 
-    public void setIssuer(String issuer) {
+    public JWTOptions setIssuer(String issuer) {
         this.issuer = issuer;
+        return this;
     }
 
     public String getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public JWTOptions setSubject(String subject) {
         this.subject = subject;
+        return this;
     }
 
     public List<String> getAudience() {
         return audience;
     }
 
-    public void setAudience(List<String> audience) {
+    public JWTOptions setAudience(List<String> audience) {
         this.audience = audience;
+        return this;
     }
 
     public List<String> getClaims() {
         return claims;
     }
 
-    public void setClaims(List<String> claims) {
+    public JWTOptions setClaims(List<String> claims) {
         this.claims = claims;
+        return this;
     }
 
     public long getLeeway() {
         return leeway;
     }
 
-    public void setLeeway(long leeway) {
+    public JWTOptions setLeeway(long leeway) {
         this.leeway = leeway;
+        return this;
     }
 
     public boolean isIgnoreIssuedAt() {
         return ignoreIssuedAt;
     }
 
-    public void setIgnoreIssuedAt(boolean ignoreIssuedAt) {
+    public JWTOptions setIgnoreIssuedAt(boolean ignoreIssuedAt) {
         this.ignoreIssuedAt = ignoreIssuedAt;
+        return this;
     }
 
     public long getCacheSize() {
         return cacheSize;
     }
 
-    public void setCacheSize(long cacheSize) {
+    public JWTOptions setCacheSize(long cacheSize) {
         this.cacheSize = cacheSize;
+        return this;
     }
 
     public Duration getExpiresIn() {
         return expiresIn;
     }
 
-    public void setExpiresIn(Duration expiresIn) {
+    public JWTOptions setExpiresIn(Duration expiresIn) {
         this.expiresIn = expiresIn;
+        return this;
     }
 
     public String getNonceAlgorithm() {
