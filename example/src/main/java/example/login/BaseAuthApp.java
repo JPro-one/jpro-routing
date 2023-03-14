@@ -105,29 +105,6 @@ public abstract class BaseAuthApp extends RouteApp {
         return authProvider;
     }
 
-    // Auth credentials property
-    private ObjectProperty<OAuth2Credentials> authCredentials;
-
-    final OAuth2Credentials getAuthCredentials() {
-        return authCredentials == null ? null : authCredentials.get();
-    }
-
-    final void setAuthCredentials(OAuth2Credentials value) {
-        authCredentialsProperty().set(value);
-    }
-
-    /**
-     * The auth credentials property contains the authentication credentials.
-     *
-     * @return the auth credentials property
-     */
-    final ObjectProperty<OAuth2Credentials> authCredentialsProperty() {
-        if (authCredentials == null) {
-            authCredentials = new SimpleObjectProperty<>(this, "authCredentials");
-        }
-        return authCredentials;
-    }
-
     // Auth options property
     private ObjectProperty<Options> authOptions;
 
@@ -246,6 +223,19 @@ public abstract class BaseAuthApp extends RouteApp {
             }
         }
         return sb.toString();
+    }
+
+    String providerNameString(String prefix, final OAuth2AuthenticationProvider authProvider) {
+        var providerName = "Unknown";
+        if (authProvider instanceof GoogleAuthenticationProvider) {
+            providerName = "Google";
+        } else if (authProvider instanceof MicrosoftAuthenticationProvider) {
+            providerName = "Microsoft";
+        } else if (authProvider instanceof KeycloakAuthenticationProvider) {
+            providerName = "Keycloak";
+        }
+
+        return prefix + providerName;
     }
 
     StringBinding providerNameBinding(String prefix, Property<?> property) {
