@@ -50,10 +50,6 @@
     -fx-padding: 36px;
 }
 
-.auth-provider-pane > .text-field {
-    -fx-editable: false;
-}
-
 .openid-provider-discovery-pane {
     -fx-max-width: 800px;
     -fx-background-color: -color-accent-subtle;
@@ -66,7 +62,7 @@
 }
 
 .auth-info-pane {
-    -fx-max-width: 1080px;
+    -fx-max-width: 800px;
     -fx-background-color: -color-success-subtle;
     -fx-border-color: -color-success-emphasis;
     -fx-border-radius: 16px;

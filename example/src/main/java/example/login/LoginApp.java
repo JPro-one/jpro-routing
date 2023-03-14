@@ -141,35 +141,42 @@ public class LoginApp extends BaseAuthApp {
 
         final var siteLabel = new Label("Site:");
         final var siteField = new TextField(authOptions.getSite());
+        siteField.setEditable(false);
         pane.getChildren().addAll(siteLabel, siteField);
 
         Optional.ofNullable(authOptions.getTenant()).ifPresent(tenant -> {
             final var tenantLabel = new Label("Tenant:");
             final var tenantField = new TextField(tenant);
+            tenantField.setEditable(false);
             pane.getChildren().addAll(tenantLabel, tenantField);
         });
 
         final var clientIdLabel = new Label("Client ID:");
         final var clientIdField = new TextField(authOptions.getClientId());
+        clientIdField.setEditable(false);
         pane.getChildren().addAll(clientIdLabel, clientIdField);
 
         Optional.ofNullable(authOptions.getClientSecret()).ifPresent(clientSecret -> {
             final var clientSecretLabel = new Label("Client Secret:");
             final var clientSecretField = new TextField(clientSecret);
+            clientSecretField.setEditable(false);
             pane.getChildren().addAll(clientSecretLabel, clientSecretField);
         });
 
         final var scopesLabel = new Label("Scopes:");
         final var scopesField = new TextField(String.join(", ", authCredentials.getScopes()));
+        scopesField.setEditable(false);
         pane.getChildren().addAll(scopesLabel, scopesField);
 
         final var redirectUriLabel = new Label("Redirect URI:");
         final var redirectUriField = new TextField(authCredentials.getRedirectUri());
+        redirectUriField.setEditable(false);
         pane.getChildren().addAll(redirectUriLabel, redirectUriField);
 
         Optional.ofNullable(authCredentials.getNonce()).ifPresent(nonce -> {
             final var nonceLabel = new Label("Nonce:");
             final var nonceField = new TextField(nonce);
+            nonceField.setEditable(false);
             pane.getChildren().addAll(nonceLabel, nonceField);
         });
 
