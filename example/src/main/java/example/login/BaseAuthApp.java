@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * Base class for all authentication applications.
+ * Base class for the authentication example application.
  *
  * @author Besmir Beqiri
  */
@@ -41,11 +41,6 @@ public abstract class BaseAuthApp extends RouteApp {
     static final String KEYCLOAK_REDIRECT_PATH = "/auth/keycloak";
     static final String AUTH_ERROR_PATH = "/auth/error";
 
-    /*                                                                                  */
-    /*  Properties                                                                      */
-    /*                                                                                  */
-    /************************************************************************************/
-
     // User property
     private ObjectProperty<User> userProperty;
 
@@ -57,6 +52,11 @@ public abstract class BaseAuthApp extends RouteApp {
         userProperty().set(value);
     }
 
+    /**
+     * The user property contains the currently logged-in user.
+     *
+     * @return the user property
+     */
     final ObjectProperty<User> userProperty() {
         if (userProperty == null) {
             userProperty = new SimpleObjectProperty<>(this, "user");
@@ -75,6 +75,11 @@ public abstract class BaseAuthApp extends RouteApp {
         errorProperty().set(value);
     }
 
+    /**
+     * The error property contains the last error that occurred.
+     *
+     * @return the error property
+     */
     final ObjectProperty<Throwable> errorProperty() {
         if (errorProperty == null) {
             errorProperty = new SimpleObjectProperty<>(this, "error");
@@ -82,11 +87,12 @@ public abstract class BaseAuthApp extends RouteApp {
         return errorProperty;
     }
 
-    /*                                                                                  */
-    /*  Extra methods                                                                   */
-    /*                                                                                  */
-    /************************************************************************************/
-
+    /**
+     * Create a login button for the given provider.
+     *
+     * @param text the provider name
+     * @return a button node
+     */
     Button createLoginButton(String text) {
         ImageView iconView = new ImageView();
         iconView.setFitWidth(56);
@@ -100,6 +106,12 @@ public abstract class BaseAuthApp extends RouteApp {
         return loginButton;
     }
 
+    /**
+     * Convert a JSON object to Markdown format.
+     *
+     * @param json the JSON object
+     * @return a formatted string
+     */
     String jsonToMarkdown(JSONObject json) {
         return jsonToMarkdown(json, 0);
     }
@@ -135,21 +147,22 @@ public abstract class BaseAuthApp extends RouteApp {
         }
         return sb.toString();
     }
+
     /**
      * Creates {@link Route} filter from a given {@link OAuth2AuthenticationProvider},
      * {@link OAuth2Credentials} and an operation a given user if the authentication
      * is successful.
      *
-     * @param authProvider the OAuth2 authentication provider
-     * @param credentials  the OAuth2 credentials
-     * @param userConsumer operation on the given user argument
+     * @param authProvider  the OAuth2 authentication provider
+     * @param credentials   the OAuth2 credentials
+     * @param userConsumer  operation on the given user argument
      * @param errorConsumer operation on the given error argument
      * @return a {@link Filter} object
      */
     public Filter oauth2(OAuth2AuthenticationProvider authProvider,
-                                OAuth2Credentials credentials,
-                                Consumer<? super User> userConsumer,
-                                Consumer<? super Throwable> errorConsumer) {
+                         OAuth2Credentials credentials,
+                         Consumer<? super User> userConsumer,
+                         Consumer<? super Throwable> errorConsumer) {
         Objects.requireNonNull(authProvider, "auth provider can not be null");
         Objects.requireNonNull(credentials, "credentials can not be null");
         Objects.requireNonNull(userConsumer, "user consumer can not be null");
@@ -177,18 +190,18 @@ public abstract class BaseAuthApp extends RouteApp {
      * {@link OAuth2Credentials} and an operation a given user if the authentication
      * is successful.
      *
-     * @param authProvider the JWT authentication provider
-     * @param tokenPath    the token path
-     * @param credentials  a JSON object with the authentication information
-     * @param userConsumer operation on the given user argument
+     * @param authProvider  the JWT authentication provider
+     * @param tokenPath     the token path
+     * @param credentials   a JSON object with the authentication information
+     * @param userConsumer  operation on the given user argument
      * @param errorConsumer operation on the given error argument
      * @return a {@link Filter} object
      */
     public Filter jwt(JWTAuthenticationProvider authProvider,
-                             String tokenPath,
-                             JSONObject credentials,
-                             Consumer<? super User> userConsumer,
-                             Consumer<? super Throwable> errorConsumer) {
+                      String tokenPath,
+                      JSONObject credentials,
+                      Consumer<? super User> userConsumer,
+                      Consumer<? super Throwable> errorConsumer) {
         Objects.requireNonNull(authProvider, "auth provider cannot be null");
         Objects.requireNonNull(tokenPath, "token path cannot be null");
         Objects.requireNonNull(credentials, "credentials cannot be null");
