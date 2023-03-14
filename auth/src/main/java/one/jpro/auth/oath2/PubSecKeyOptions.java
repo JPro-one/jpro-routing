@@ -1,15 +1,19 @@
 package one.jpro.auth.oath2;
 
+import one.jpro.auth.authentication.Options;
+import org.json.JSONObject;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 /**
  * Options describing Key stored in PEM format.
  *
  * @author Besmir Beqiri
  */
-public class PubSecKeyOptions {
+public class PubSecKeyOptions implements Options {
 
     private String id;
     private String algorithm;
@@ -107,5 +111,13 @@ public class PubSecKeyOptions {
     public PubSecKeyOptions setBuffer(Buffer buffer) {
         this.buffer = buffer;
         return this;
+    }
+
+    public JSONObject toJSON() {
+        final JSONObject json = new JSONObject();
+        Optional.ofNullable(getId()).ifPresent(id -> json.put("id", id));
+        Optional.ofNullable(getAlgorithm()).ifPresent(algorithm -> json.put("algorithm", algorithm));
+        Optional.ofNullable(getBuffer()).ifPresent(buffer -> json.put("buffer", buffer));
+        return json;
     }
 }

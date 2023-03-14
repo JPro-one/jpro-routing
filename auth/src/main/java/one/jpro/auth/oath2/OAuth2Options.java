@@ -1,8 +1,10 @@
 package one.jpro.auth.oath2;
 
+import one.jpro.auth.authentication.Options;
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,15 +12,18 @@ import org.slf4j.LoggerFactory;
 import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 /**
  * Options describing how an OAuth2 {@link HttpClient} will make connection.
  *
  * @author Besmir Beqiri
  */
-public class OAuth2Options {
+public class OAuth2Options implements Options {
 
     private static final Logger log = LoggerFactory.getLogger(OAuth2Options.class);
 
@@ -727,5 +732,90 @@ public class OAuth2Options {
                 }
                 break;
         }
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        final JSONObject json = new JSONObject();
+        Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow.getGrantType()));
+        Optional.ofNullable(getSite()).ifPresent(site -> json.put("site", site));
+        Optional.ofNullable(getClientId()).ifPresent(clientId -> json.put("client_id", clientId));
+        Optional.ofNullable(getClientSecret()).ifPresent(clientSecret -> json.put("client_secret", clientSecret));
+        Optional.ofNullable(getTenant()).ifPresent(tenant -> json.put("tenant", tenant));
+        Optional.ofNullable(Stream.ofNullable(getSupportedResponseTypes())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_response_types", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedResponseModes())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_response_modes", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedGrantTypes())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_grant_types", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedSubjectTypes())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_subject_types", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedScopes())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_scopes", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedIdTokenSigningAlgValues())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_id_token_signing_alg_values", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedTokenEndpointAuthMethods())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_token_endpoint_auth_methods", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedClaims())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_claims", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedCodeChallengeMethods())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_code_challenge_methods", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedIntrospectionEndpointAuthMethods())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_introspection_endpoint_auth_methods", jsonArray));
+        Optional.ofNullable(Stream.ofNullable(getSupportedRevocationEndpointAuthMethods())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_revocation_endpoint_auth_methods", jsonArray));
+        json.put("supported_request_parameter", isSupportedRequestParameter());
+        Optional.ofNullable(Stream.ofNullable(getSupportedRequestObjectSigningAlgValues())
+                        .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
+                .ifPresent(jsonArray -> json.put("supported_request_object_signing_alg_values", jsonArray));
+        Optional.ofNullable(getAuthorizationPath())
+                .ifPresent(authorizationPath -> json.put("authorization_path", authorizationPath));
+        Optional.ofNullable(getTokenPath()).ifPresent(tokenPath -> json.put("token_path", tokenPath));
+        Optional.ofNullable(getRevocationPath())
+                .ifPresent(revocationPath -> json.put("revocation_path", revocationPath));
+        Optional.ofNullable(getScopeSeparator())
+                .ifPresent(scopeSeparator -> json.put("scope_separator", scopeSeparator));
+        json.put("validate_issuer", isValidateIssuer());
+        Optional.ofNullable(getLogoutPath()).ifPresent(logoutPath -> json.put("logout_path", logoutPath));
+        Optional.ofNullable(getUserInfoParams()).ifPresent(logoutPath -> json.put("logout_path", logoutPath));
+        Optional.ofNullable(getUserInfoPath()).ifPresent(userInfoPath -> json.put("user_info_path", userInfoPath));
+        Optional.ofNullable(getIntrospectionPath())
+                .ifPresent(introspectionPath -> json.put("introspection_path", introspectionPath));
+        Optional.ofNullable(getJwkPath()).ifPresent(jwkPath -> json.put("jwk_path", jwkPath));
+        json.put("jwk_max_age", getJwkMaxAge());
+        Optional.ofNullable(getClientAssertion())
+                .ifPresent(clientAssertion -> json.put("client_assertion", clientAssertion));
+        Optional.ofNullable(getClientAssertionType())
+                .ifPresent(clientAssertionType -> json.put("client_assertion_type", clientAssertionType));
+        Optional.ofNullable(getUserAgent()).ifPresent(userAgent -> json.put("user_agent", userAgent));
+        Optional.ofNullable(getPubSecKeys()).ifPresent(pubSecKeyOptions -> json.put("pub_sec_keys", pubSecKeyOptions));
+        Optional.ofNullable(getJWTOptions()).ifPresent(jwtOptions -> json.put("jwt_options", jwtOptions.toJSON()));
+        Optional.ofNullable(getExtraParams()).ifPresent(extraParams -> json.put("extra_params", extraParams));
+        Optional.ofNullable(getHeaders()).ifPresent(headers -> json.put("headers", headers));
+        Optional.ofNullable(getUserInfoPath()).ifPresent(userInfoPath -> json.put("user_info_path", userInfoPath));
+        return json;
     }
 }

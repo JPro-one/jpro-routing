@@ -1,11 +1,16 @@
 package one.jpro.auth.jwt;
 
+import one.jpro.auth.authentication.Options;
+import org.json.JSONObject;
+
+import java.util.Optional;
+
 /**
  * Options describing how an {@link JWTAuthenticationProvider} should behave.
  *
  * @author Besmir Beqiri
  */
-public class JWTAuthOptions {
+public class JWTAuthOptions implements Options {
 
     private static final JWTOptions JWT_OPTIONS = new JWTOptions();
 
@@ -45,5 +50,13 @@ public class JWTAuthOptions {
     public JWTAuthOptions setJWTOptions(JWTOptions jwtOptions) {
         this.jwtOptions = jwtOptions;
         return this;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        final JSONObject json = new JSONObject();
+        Optional.ofNullable(getSite()).ifPresent(site -> json.put("site", site));
+        Optional.ofNullable(getJWTOptions()).ifPresent(jwtOptions -> json.put("jwt_options", jwtOptions.toJSON()));
+        return json;
     }
 }

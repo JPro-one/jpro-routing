@@ -1,14 +1,18 @@
 package one.jpro.auth.jwt;
 
+import one.jpro.auth.authentication.Options;
+import org.json.JSONObject;
+
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Options describing a JWT (Json Web Token).
  *
  * @author Besmir Beqiri
  */
-public class JWTOptions {
+public class JWTOptions implements Options {
 
     private static final long DEFAULT_LEEWAY = 0;
     private static final long DEFAULT_CACHE_SIZE = 5;
@@ -120,5 +124,21 @@ public class JWTOptions {
     public JWTOptions setNonceAlgorithm(String nonceAlgorithm) {
         this.nonceAlgorithm = nonceAlgorithm;
         return this;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        final JSONObject json = new JSONObject();
+        Optional.ofNullable(getIssuer()).ifPresent(issuer -> json.put("issuer", issuer));
+        Optional.ofNullable(getSubject()).ifPresent(subject -> json.put("subject", subject));
+        Optional.ofNullable(getAudience()).ifPresent(audience -> json.put("audience", audience));
+        Optional.ofNullable(getClaims()).ifPresent(claims -> json.put("claims", claims));
+        json.put("leeway", getLeeway());
+        json.put("ignore_issued_at", isIgnoreIssuedAt());
+        json.put("cache_size", getCacheSize());
+        json.put("expires_in", getExpiresIn().getSeconds()); // in seconds
+        Optional.ofNullable(getNonceAlgorithm())
+                .ifPresent(nonceAlgorithm -> json.put("nonceAlgorithm", nonceAlgorithm));
+        return json;
     }
 }
