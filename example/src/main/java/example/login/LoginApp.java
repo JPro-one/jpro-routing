@@ -25,7 +25,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import static example.auth.AuthFilters.oauth2;
 import static one.jpro.routing.RouteUtils.getNode;
 
 /**
@@ -52,7 +51,7 @@ public class LoginApp extends BaseAuthApp {
 
         final var googleCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
-                .setRedirectUri("/auth/google")
+                .setRedirectUri(GOOGLE_REDIRECT_PATH)
                 .setNonce("0394852-3190485-2490358");
 
         // Microsoft Auth provider
@@ -65,28 +64,27 @@ public class LoginApp extends BaseAuthApp {
 
         final var microsoftCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
-                .setRedirectUri("/auth/microsoft");
+                .setRedirectUri(MICROSOFT_REDIRECT_PATH);
 
         // Keycloak Auth provider
-        final var keycloakAuth = new KeycloakAuthenticationProvider(getWebAPI(),
-                new JSONObject()
-                        .put("auth-server-url", "http://localhost:8080")
+        final var keycloakAuth = new KeycloakAuthenticationProvider(getWebAPI(), new JSONObject()
+                        .put("auth-server-url", "http://192.168.1.80:8080")
                         .put("resource", "myclient")
                         .put("realm", "myrealm"));
 
         final var keycloakCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
-                .setRedirectUri("/auth/keycloak");
+                .setRedirectUri(KEYCLOAK_REDIRECT_PATH);
 
         return Route.empty()
                 .and(getNode("/", (r) ->
                         loginView(googleAuth, googleCredentials,
                                 microsoftAuth, microsoftCredentials,
                                 keycloakAuth, keycloakCredentials)))
-                .and(getNode("/auth/google", (r) -> authInfoView()))
-                .and(getNode("/auth/microsoft", (r) -> authInfoView()))
-                .and(getNode("/auth/keycloak", (r) -> authInfoView()))
-                .and(getNode("/auth/error", (r) -> errorView()))
+                .and(getNode(GOOGLE_REDIRECT_PATH, (r) -> authInfoView()))
+                .and(getNode(MICROSOFT_REDIRECT_PATH, (r) -> authInfoView()))
+                .and(getNode(KEYCLOAK_REDIRECT_PATH, (r) -> authInfoView()))
+                .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
 //                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
                 .filter(oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
