@@ -75,8 +75,6 @@ public class LoginApp extends BaseAuthApp {
                         .put("realm", "myrealm"));
 
         final var keycloakCredentials = new OAuth2Credentials()
-                .setUsername("myuser")
-                .setPassword("somepass")
                 .setScopes(List.of("openid", "email"))
                 .setRedirectUri("/auth/keycloak");
 
