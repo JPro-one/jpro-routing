@@ -1,10 +1,7 @@
 package example.login;
 
 import atlantafx.base.theme.Styles;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -79,30 +76,6 @@ public abstract class BaseAuthApp extends RouteApp {
             userProperty = new SimpleObjectProperty<>(this, "user");
         }
         return userProperty;
-    }
-
-    // Auth provider property
-    private ObjectProperty<OAuth2AuthenticationProvider> authProvider;
-
-    final OAuth2AuthenticationProvider getAuthProvider() {
-        return authProvider == null ? null : authProvider.get();
-    }
-
-    final void setAuthProvider(OAuth2AuthenticationProvider value) {
-        authProviderProperty().set(value);
-    }
-
-    /**
-     * The auth provider property contains the authentication provider.
-     *
-     * @return the auth provider property
-     */
-
-    final ObjectProperty<OAuth2AuthenticationProvider> authProviderProperty() {
-        if (authProvider == null) {
-            authProvider = new SimpleObjectProperty<>(this, "authProvider");
-        }
-        return authProvider;
     }
 
     // Auth options property
@@ -236,22 +209,6 @@ public abstract class BaseAuthApp extends RouteApp {
         }
 
         return prefix + providerName;
-    }
-
-    StringBinding providerNameBinding(String prefix, Property<?> property) {
-        return Bindings.createStringBinding(() -> {
-            final var authProvider = getAuthProvider();
-            var providerName = "Unknown";
-            if (authProvider instanceof GoogleAuthenticationProvider) {
-                providerName = "Google";
-            } else if (authProvider instanceof MicrosoftAuthenticationProvider) {
-                providerName = "Microsoft";
-            } else if (authProvider instanceof KeycloakAuthenticationProvider) {
-                providerName = "Keycloak";
-            }
-
-            return prefix + providerName;
-        }, property);
     }
 
     /**

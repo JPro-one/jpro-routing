@@ -82,15 +82,19 @@ public class LoginApp extends BaseAuthApp {
                 .setRedirectUri(KEYCLOAK_REDIRECT_PATH);
 
         return Route.empty()
-                .and(getNode("/", (r) -> loginView(googleAuth, microsoftAuth, keycloakAuth)))
+                .and(getNode("/", (r) -> loginView()))
                 .and(getNode(GOOGLE_REDIRECT_PATH, (r) -> authInfoView()))
                 .and(getNode(MICROSOFT_REDIRECT_PATH, (r) -> authInfoView()))
                 .and(getNode(KEYCLOAK_REDIRECT_PATH, (r) -> authInfoView()))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
-                .and(getNode(GOOGLE_PROVIDER_PATH, (r) -> authProviderView(googleAuth, googleCredentials)))
-                .and(getNode(MICROSOFT_PROVIDER_PATH, (r) -> authProviderView(microsoftAuth, microsoftCredentials)))
-                .and(getNode(KEYCLOAK_PROVIDER_PATH, (r) -> authProviderView(keycloakAuth, keycloakCredentials)))
-                .and(getNode(PROVIDER_DISCOVERY_PATH, (r) -> providerDiscoveryView()))
+                .path("/provider", Route.empty()
+                        .and(getNode("/google", (r) -> authProviderView(googleAuth, googleCredentials)))
+                        .and(getNode("/microsoft", (r) -> authProviderView(microsoftAuth, microsoftCredentials)))
+                        .and(getNode("/keycloak", (r) -> authProviderView(keycloakAuth, keycloakCredentials)))
+                        .path("/discovery", Route.empty()
+                                .and(getNode("/google", (r) -> providerDiscoveryView(googleAuth)))
+                                .and(getNode("/microsoft", (r) -> providerDiscoveryView(microsoftAuth)))
+                                .and(getNode("/keycloak", (r) -> providerDiscoveryView(keycloakAuth)))))
 //                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
                 .filter(oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
@@ -98,9 +102,7 @@ public class LoginApp extends BaseAuthApp {
                 .filter(oauth2(keycloakAuth, keycloakCredentials, this::setUser, this::setError));
     }
 
-    public Node loginView(GoogleAuthenticationProvider googleAuth,
-                          MicrosoftAuthenticationProvider microsoftAuth,
-                          KeycloakAuthenticationProvider keycloakAuth) {
+    public Node loginView() {
         final var headerLabel = new Label("Authentication Module");
         headerLabel.getStyleClass().add("header-label");
 
@@ -108,22 +110,13 @@ public class LoginApp extends BaseAuthApp {
         selectLabel.getStyleClass().add("header2-label");
 
         final var googleLoginButton = createLoginButton("Google");
-        googleLoginButton.setOnAction(event -> {
-            setAuthProvider(googleAuth);
-            gotoPage(googleLoginButton, GOOGLE_PROVIDER_PATH);
-        });
+        googleLoginButton.setOnAction(event -> gotoPage(googleLoginButton, GOOGLE_PROVIDER_PATH));
 
         final var microsoftLoginButton = createLoginButton("Microsoft");
-        microsoftLoginButton.setOnAction(event -> {
-            setAuthProvider(microsoftAuth);
-            gotoPage(microsoftLoginButton, MICROSOFT_PROVIDER_PATH);
-        });
+        microsoftLoginButton.setOnAction(event -> gotoPage(microsoftLoginButton, MICROSOFT_PROVIDER_PATH));
 
         final var keycloakLoginButton = createLoginButton("Keycloak");
-        keycloakLoginButton.setOnAction(event -> {
-            setAuthProvider(keycloakAuth);
-            gotoPage(keycloakLoginButton, KEYCLOAK_PROVIDER_PATH);
-        });
+        keycloakLoginButton.setOnAction(event -> gotoPage(keycloakLoginButton, KEYCLOAK_PROVIDER_PATH));
 
         final var tilePane = new TilePane(googleLoginButton, microsoftLoginButton, keycloakLoginButton);
         tilePane.getStyleClass().add("tile-pane");
@@ -191,7 +184,13 @@ public class LoginApp extends BaseAuthApp {
                                 .map(provider -> {
                                     final var options = provider.getOptions();
                                     setAuthOptions(options);
-                                    gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH);
+                                    if (authProvider instanceof GoogleAuthenticationProvider) {
+                                        gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH + "/google");
+                                    } else if (authProvider instanceof MicrosoftAuthenticationProvider) {
+                                        gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH + "/microsoft");
+                                    } else if (authProvider instanceof KeycloakAuthenticationProvider) {
+                                        gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH + "/keycloak");
+                                    }
                                     return provider;
                                 })
                                 .recover(throwable -> {
@@ -204,10 +203,9 @@ public class LoginApp extends BaseAuthApp {
         return new StackPane(pane);
     }
 
-    public Node providerDiscoveryView() {
-        final var headerLabel = new Label("OpenID Provider Discovery:");
+    public Node providerDiscoveryView(final OAuth2AuthenticationProvider authProvider) {
+        final var headerLabel = new Label(providerNameString("OpenID Provider Discovery: ", authProvider));
         headerLabel.getStyleClass().add("header-label");
-        headerLabel.textProperty().bind(providerNameBinding("OpenID Provider Discovery: ", authProviderProperty()));
 
         MarkdownView providerDiscoveryView = new MarkdownView();
         providerDiscoveryView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
