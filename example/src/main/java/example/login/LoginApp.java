@@ -6,6 +6,7 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
@@ -24,6 +25,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import static one.jpro.routing.LinkUtil.gotoPage;
 import static one.jpro.routing.RouteUtils.getNode;
 
 /**
@@ -68,7 +70,7 @@ public class LoginApp extends BaseAuthApp {
         // Keycloak Auth provider
         final var keycloakAuth = AuthAPI.keycloakAuth()
                 .webAPI(getWebAPI())
-                .site("http://localhost:8080/realms/{realm}")
+                .site("http://192.168.1.80:8080/realms/{realm}")
                 .clientId("myclient")
                 .realm("myrealm")
                 .create();
@@ -86,6 +88,7 @@ public class LoginApp extends BaseAuthApp {
                 .and(getNode(MICROSOFT_REDIRECT_PATH, (r) -> authInfoView()))
                 .and(getNode(KEYCLOAK_REDIRECT_PATH, (r) -> authInfoView()))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
+                .and(getNode(GOOGLE_PROVIDER_PATH, (r) -> authProviderView()))
 //                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
                 .filter(oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
@@ -106,8 +109,11 @@ public class LoginApp extends BaseAuthApp {
         selectLabel.getStyleClass().add("header2-label");
 
         final var googleLoginButton = createLoginButton("Google");
-        googleLoginButton.setOnAction(event ->
-                getWebAPI().openURL(googleAuth.authorizeUrl(googleCredentials)));
+        googleLoginButton.setOnAction(event -> {
+            setAuthProvider(googleAuth);
+            setAuthCredentials(googleCredentials);
+            gotoPage(googleLoginButton, GOOGLE_PROVIDER_PATH);
+        });
 
         final var microsoftLoginButton = createLoginButton("Microsoft");
         microsoftLoginButton.setOnAction(event ->
@@ -127,6 +133,59 @@ public class LoginApp extends BaseAuthApp {
         final var stackPane = new StackPane(pane);
         stackPane.getStyleClass().add("page");
         return stackPane;
+    }
+
+    public Node authProviderView() {
+        final var headerLabel = new Label("Authentication Provider:");
+        headerLabel.getStyleClass().add("header-label");
+        headerLabel.textProperty().bind(providerNameBinding("Authentication Provider: ", authProviderProperty()));
+
+        final var pane = new VBox(headerLabel);
+        pane.getStyleClass().add("auth-provider-pane");
+
+        Optional.ofNullable(getAuthProvider()).ifPresent(authProvider ->
+                Optional.ofNullable(getAuthCredentials()).ifPresent(authCredentials -> {
+                    final var authOptions = authProvider.getOptions();
+
+                    final var siteLabel = new Label("Site:");
+                    final var siteField = new TextField(authOptions.getSite());
+                    pane.getChildren().addAll(siteLabel, siteField);
+
+                    Optional.ofNullable(authOptions.getTenant()).ifPresent(tenant -> {
+                        final var tenantLabel = new Label("Tenant:");
+                        final var tenantField = new TextField(tenant);
+                        pane.getChildren().addAll(tenantLabel, tenantField);
+                    });
+
+                    final var clientIdLabel = new Label("Client ID:");
+                    final var clientIdField = new TextField(authOptions.getClientId());
+                    pane.getChildren().addAll(clientIdLabel, clientIdField);
+
+                    final var clientSecretLabel = new Label("Client Secret:");
+                    final var clientSecretField = new TextField(authOptions.getClientSecret());
+                    pane.getChildren().addAll(clientSecretLabel, clientSecretField);
+
+                    final var scopesLabel = new Label("Scopes:");
+                    final var scopesField = new TextField(String.join(", ", authCredentials.getScopes()));
+                    pane.getChildren().addAll(scopesLabel, scopesField);
+
+                    final var redirectUriLabel = new Label("Redirect URI:");
+                    final var redirectUriField = new TextField(authCredentials.getRedirectUri());
+                    pane.getChildren().addAll(redirectUriLabel, redirectUriField);
+
+                    Optional.ofNullable(authCredentials.getNonce()).ifPresent(nonce -> {
+                        final var nonceLabel = new Label("Nonce:");
+                        final var nonceField = new TextField(nonce);
+                        pane.getChildren().addAll(nonceLabel, nonceField);
+                    });
+
+                    final var signInBox = createButtonWithDescription(
+                            "Sign in with the selected authentication provider.", "Sign In",
+                            event -> getWebAPI().openURL(authProvider.authorizeUrl(authCredentials)));
+                    pane.getChildren().addAll(signInBox);
+                }));
+
+        return new StackPane(pane);
     }
 
     public Node authInfoView() {

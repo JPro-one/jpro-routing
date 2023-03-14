@@ -1,15 +1,27 @@
 package example.login;
 
 import atlantafx.base.theme.Styles;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import one.jpro.auth.authentication.User;
 import one.jpro.auth.jwt.JWTAuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Credentials;
+import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
+import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
+import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import one.jpro.routing.Filter;
 import one.jpro.routing.ResponseUtils;
 import one.jpro.routing.Route;
@@ -40,6 +52,7 @@ public abstract class BaseAuthApp extends RouteApp {
     static final String MICROSOFT_REDIRECT_PATH = "/auth/microsoft";
     static final String KEYCLOAK_REDIRECT_PATH = "/auth/keycloak";
     static final String AUTH_ERROR_PATH = "/auth/error";
+    static final String GOOGLE_PROVIDER_PATH = "/provider/google";
 
     // User property
     private ObjectProperty<User> userProperty;
@@ -62,6 +75,53 @@ public abstract class BaseAuthApp extends RouteApp {
             userProperty = new SimpleObjectProperty<>(this, "user");
         }
         return userProperty;
+    }
+
+    // Auth provider property
+    private ObjectProperty<OAuth2AuthenticationProvider> authProvider;
+
+    final OAuth2AuthenticationProvider getAuthProvider() {
+        return authProvider == null ? null : authProvider.get();
+    }
+
+    final void setAuthProvider(OAuth2AuthenticationProvider value) {
+        authProviderProperty().set(value);
+    }
+
+    /**
+     * The auth provider property contains the authentication provider.
+     *
+     * @return the auth provider property
+     */
+
+    final ObjectProperty<OAuth2AuthenticationProvider> authProviderProperty() {
+        if (authProvider == null) {
+            authProvider = new SimpleObjectProperty<>(this, "authProvider");
+        }
+        return authProvider;
+    }
+
+    // Auth credentials property
+    private ObjectProperty<OAuth2Credentials> authCredentials;
+
+    final OAuth2Credentials getAuthCredentials() {
+        return authCredentials == null ? null : authCredentials.get();
+    }
+
+    final void setAuthCredentials(OAuth2Credentials value) {
+        authCredentialsProperty().set(value);
+    }
+
+    /**
+     * The auth credentials property contains the authentication credentials.
+     *
+     * @return the auth credentials property
+     */
+    final ObjectProperty<OAuth2Credentials> authCredentialsProperty() {
+        if (authCredentials == null) {
+            authCredentials = new SimpleObjectProperty<>(this, "authCredentials");
+        }
+        return authCredentials;
     }
 
     // Error property
@@ -106,6 +166,19 @@ public abstract class BaseAuthApp extends RouteApp {
         return loginButton;
     }
 
+    HBox createButtonWithDescription(String description, String buttonText, EventHandler<ActionEvent> action) {
+        final var descriptionLabel = new Label(description);
+        final var spacer = new Region();
+        spacer.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        final var button = new Button(buttonText);
+        button.setOnAction(action);
+        final var hbox = new HBox(descriptionLabel, spacer, button);
+        hbox.getStyleClass().add("description-box");
+        return hbox;
+    }
+
     /**
      * Convert a JSON object to Markdown format.
      *
@@ -146,6 +219,22 @@ public abstract class BaseAuthApp extends RouteApp {
             }
         }
         return sb.toString();
+    }
+
+    StringBinding providerNameBinding(String prefix, Property<?> property) {
+        return Bindings.createStringBinding(() -> {
+            final var authProvider = getAuthProvider();
+            var providerName = "Unknown";
+            if (authProvider instanceof GoogleAuthenticationProvider) {
+                providerName = "Google";
+            } else if (authProvider instanceof MicrosoftAuthenticationProvider) {
+                providerName = "Microsoft";
+            } else if (authProvider instanceof KeycloakAuthenticationProvider) {
+                providerName = "Keycloak";
+            }
+
+            return prefix + providerName;
+        }, property);
     }
 
     /**
