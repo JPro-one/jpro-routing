@@ -13,6 +13,10 @@ public interface AuthAPI {
         return new FluentGoogleAuthAPI();
     }
 
+    static FluentKeycloakAuth.FluentWebAPI keycloakAuth() {
+        return new FluentKeycloakAuthAPI();
+    }
+
     static FluentMicrosoftAuth.FluentWebAPI microsoftAuth() {
         return new FluentMicrosoftAuthAPI();
     }

@@ -17,7 +17,6 @@ import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import one.jpro.routing.Route;
 import one.jpro.routing.dev.DevFilter;
-import org.json.JSONObject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -67,10 +66,12 @@ public class LoginApp extends BaseAuthApp {
                 .setRedirectUri(MICROSOFT_REDIRECT_PATH);
 
         // Keycloak Auth provider
-        final var keycloakAuth = new KeycloakAuthenticationProvider(getWebAPI(), new JSONObject()
-                        .put("auth-server-url", "http://192.168.1.80:8080")
-                        .put("resource", "myclient")
-                        .put("realm", "myrealm"));
+        final var keycloakAuth = AuthAPI.keycloakAuth()
+                .webAPI(getWebAPI())
+                .site("http://192.168.1.80:8080")
+                .clientId("myclient")
+                .realm("myrealm")
+                .create();
 
         final var keycloakCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
