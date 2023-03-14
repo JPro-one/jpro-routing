@@ -90,6 +90,8 @@ public class LoginApp extends BaseAuthApp {
                 .and(getNode(KEYCLOAK_REDIRECT_PATH, (r) -> authInfoView()))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
                 .and(getNode(GOOGLE_PROVIDER_PATH, (r) -> authProviderView()))
+                .and(getNode(MICROSOFT_PROVIDER_PATH, (r) -> authProviderView()))
+                .and(getNode(KEYCLOAK_PROVIDER_PATH, (r) -> authProviderView()))
                 .and(getNode(PROVIDER_DISCOVERY_PATH, (r) -> providerDiscoveryView()))
 //                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
@@ -118,12 +120,18 @@ public class LoginApp extends BaseAuthApp {
         });
 
         final var microsoftLoginButton = createLoginButton("Microsoft");
-        microsoftLoginButton.setOnAction(event ->
-                getWebAPI().openURL(microsoftAuth.authorizeUrl(microsoftCredentials)));
+        microsoftLoginButton.setOnAction(event -> {
+            setAuthProvider(microsoftAuth);
+            setAuthCredentials(microsoftCredentials);
+            gotoPage(microsoftLoginButton, MICROSOFT_PROVIDER_PATH);
+        });
 
         final var keycloakLoginButton = createLoginButton("Keycloak");
-        keycloakLoginButton.setOnAction(event ->
-                getWebAPI().openURL(keycloakAuth.authorizeUrl(keycloakCredentials)));
+        keycloakLoginButton.setOnAction(event -> {
+            setAuthProvider(keycloakAuth);
+            setAuthCredentials(keycloakCredentials);
+            gotoPage(keycloakLoginButton, KEYCLOAK_PROVIDER_PATH);
+        });
 
         final var tilePane = new TilePane(googleLoginButton, microsoftLoginButton, keycloakLoginButton);
         tilePane.getStyleClass().add("tile-pane");
@@ -163,9 +171,11 @@ public class LoginApp extends BaseAuthApp {
                     final var clientIdField = new TextField(authOptions.getClientId());
                     pane.getChildren().addAll(clientIdLabel, clientIdField);
 
-                    final var clientSecretLabel = new Label("Client Secret:");
-                    final var clientSecretField = new TextField(authOptions.getClientSecret());
-                    pane.getChildren().addAll(clientSecretLabel, clientSecretField);
+                    Optional.ofNullable(authOptions.getClientSecret()).ifPresent(clientSecret -> {
+                        final var clientSecretLabel = new Label("Client Secret:");
+                        final var clientSecretField = new TextField(clientSecret);
+                        pane.getChildren().addAll(clientSecretLabel, clientSecretField);
+                    });
 
                     final var scopesLabel = new Label("Scopes:");
                     final var scopesField = new TextField(String.join(", ", authCredentials.getScopes()));
