@@ -75,17 +75,18 @@ public class KeycloakAuthenticationProvider extends OAuth2AuthenticationProvider
 
         if (config.has("realm")) {
             final String realm = config.getString("realm");
+            options.setTenant(realm); // realm has the same role as the tenant
 
-            options.setAuthorizationPath("/realms/" + realm + "/protocol/openid-connect/auth");
-            options.setTokenPath("/realms/" + realm + "/protocol/openid-connect/token");
+            options.setAuthorizationPath("/protocol/openid-connect/auth");
+            options.setTokenPath("/protocol/openid-connect/token");
             // no revocation path
             options.setRevocationPath(null);
-            options.setUserInfoPath("/realms/" + realm + "/protocol/openid-connect/userinfo");
-            options.setLogoutPath("/realms/" + realm + "/protocol/openid-connect/logout");
+            options.setUserInfoPath("/protocol/openid-connect/userinfo");
+            options.setLogoutPath("/protocol/openid-connect/logout");
             // keycloak follows the RFC7662 (https://www.rfc-editor.org/rfc/rfc7662)
-            options.setIntrospectionPath("/realms/" + realm + "/protocol/openid-connect/token/introspect");
+            options.setIntrospectionPath("/protocol/openid-connect/token/introspect");
             // keycloak follows the RFC7517 (https://www.rfc-editor.org/rfc/rfc7517)
-            options.setJwkPath("/realms/" + realm + "/protocol/openid-connect/certs");
+            options.setJwkPath("/protocol/openid-connect/certs");
         }
 
         if (config.has("realm-public-key")) {

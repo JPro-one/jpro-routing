@@ -31,7 +31,7 @@ public class FluentKeycloakAuthAPI implements FluentKeycloakAuth, FluentKeycloak
     @Override
     public FluentKeycloakAuth clientId(String clientId) {
         this.clientId = clientId;
-        return null;
+        return this;
     }
 
     @Override
