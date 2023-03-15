@@ -146,6 +146,11 @@ public abstract class BaseAuthApp extends RouteApp {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         final var button = new Button(buttonText);
+        if (buttonText.equalsIgnoreCase("Sign In")) {
+            button.getStyleClass().addAll(Styles.BUTTON_OUTLINED, Styles.ACCENT);
+        } else if (buttonText.equalsIgnoreCase("Sign Out")) {
+            button.getStyleClass().addAll(Styles.BUTTON_OUTLINED, Styles.DANGER);
+        }
         button.setOnAction(action);
         final var hbox = new HBox(descriptionLabel, spacer, button);
         hbox.getStyleClass().add("description-box");
