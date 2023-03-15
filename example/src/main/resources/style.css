@@ -1,5 +1,7 @@
 .header-label {
     -fx-font: 32px "RobotoBold";
+    -fx-alignment: center;
+    -fx-max-width: infinity;
 }
 
 .header2-label {
@@ -50,6 +52,17 @@
     -fx-padding: 36px;
 }
 
+.signed-in-user-pane {
+    -fx-max-width: 800px;
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 16px;
+    -fx-background-radius: 16px;
+    -fx-alignment: center_left;
+    -fx-spacing: 24px;
+    -fx-padding: 36px;
+}
+
 .openid-provider-discovery-pane {
     -fx-max-width: 800px;
     -fx-background-color: -color-accent-subtle;
@@ -62,6 +75,17 @@
 }
 
 .auth-info-pane {
+    -fx-max-width: 1080px;
+    -fx-background-color: -color-success-subtle;
+    -fx-border-color: -color-success-emphasis;
+    -fx-border-radius: 16px;
+    -fx-background-radius: 16px;
+    -fx-alignment: center_left;
+    -fx-spacing: 24px;
+    -fx-padding: 36px;
+}
+
+.user-info-pane {
     -fx-max-width: 800px;
     -fx-background-color: -color-success-subtle;
     -fx-border-color: -color-success-emphasis;

@@ -74,6 +74,29 @@ public abstract class BaseAuthApp extends RouteApp {
         return userProperty;
     }
 
+    // User info property
+    private ObjectProperty<JSONObject> userInfoProperty;
+
+    final JSONObject getUserInfo() {
+        return userInfoProperty == null ? null : userInfoProperty.get();
+    }
+
+    final void setUserInfo(JSONObject value) {
+        userInfoProperty().set(value);
+    }
+
+    /**
+     * The user info property contains the user info of the currently logged-in user.
+     *
+     * @return the user info property
+     */
+    final ObjectProperty<JSONObject> userInfoProperty() {
+        if (userInfoProperty == null) {
+            userInfoProperty = new SimpleObjectProperty<>(this, "userInfo");
+        }
+        return userInfoProperty;
+    }
+
     // Auth options property
     private ObjectProperty<Options> authOptions;
 

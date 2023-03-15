@@ -88,6 +88,7 @@ public class LoginApp extends BaseAuthApp {
                         .and(getNode("/keycloak", (r) -> signedInUserView(keycloakAuth)))
                         .path("/user", Route.empty()
                                 .and(getNode("/auth-info", (r) -> authInfoView()))
+                                .and(getNode("/user-info", (r) -> userInfoView()))
                         ))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
                 .path("/provider", Route.empty()
@@ -280,6 +281,31 @@ public class LoginApp extends BaseAuthApp {
                             });
                 });
 
+        final var userInfoBox = createButtonWithDescription(
+                "Get more user information from the provider.", "User Info",
+                event -> {
+                    final var user = getUser();
+                    if (user == null) {
+                        setError(new IllegalStateException("User is not signed in."));
+                        gotoPage(headerLabel, AUTH_ERROR_PATH);
+                        return;
+                    }
+
+                    FXFuture.fromJava(authProvider.userInfo(user))
+                            .map(json -> {
+                                // User information comes in JSON format.
+                                setUserInfo(json);
+                                // Go to the user info page.
+                                gotoPage(headerLabel, "/auth/user/user-info");
+                                return json;
+                            })
+                            .recover(throwable -> {
+                                setError(throwable);
+                                gotoPage(headerLabel, AUTH_ERROR_PATH);
+                                return null;
+                            });
+                });
+
         final var logoutBox = createButtonWithDescription(
                 "Sign out from the provider.", "Sign Out",
                 event -> {
@@ -308,7 +334,7 @@ public class LoginApp extends BaseAuthApp {
                             });
                 });
 
-        final var pane = new VBox(headerLabel, authInfoBox, refreshTokenBox, revokeTokenBox, logoutBox);
+        final var pane = new VBox(headerLabel, authInfoBox, refreshTokenBox, revokeTokenBox, userInfoBox, logoutBox);
         pane.getStyleClass().add("signed-in-user-pane");
 
         return new StackPane(pane);
@@ -327,6 +353,23 @@ public class LoginApp extends BaseAuthApp {
 
         final var pane = new VBox(headerLabel, userView);
         pane.getStyleClass().add("auth-info-pane");
+
+        return new StackPane(pane);
+    }
+
+    public Node userInfoView() {
+        final var headerLabel = new Label("User information:");
+        headerLabel.getStyleClass().add("header-label");
+
+        MarkdownView userView = new MarkdownView();
+        userView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        userView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+            final var userInfo = getUserInfo();
+            return userInfo == null ? "" : jsonToMarkdown(userInfo);
+        }, userProperty()));
+
+        final var pane = new VBox(headerLabel, userView);
+        pane.getStyleClass().add("user-info-pane");
 
         return new StackPane(pane);
     }
