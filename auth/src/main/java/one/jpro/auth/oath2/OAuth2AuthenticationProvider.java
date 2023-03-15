@@ -271,12 +271,13 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     public CompletableFuture<User> refresh(User user) {
-        final Object refreshToken = user.getAttributes().get("refresh_token");
-        if (refreshToken == null || refreshToken.toString().isBlank()) {
+        final String refreshToken = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES)
+                .optJSONObject("auth").optString("refresh_token");
+        if (refreshToken == null || refreshToken.isBlank()) {
             return CompletableFuture.failedFuture(new RuntimeException("refresh_token is null or missing"));
         }
 
-        return api.token("refresh_token", new JSONObject().put("refresh_token", refreshToken.toString()))
+        return api.token("refresh_token", new JSONObject().put("refresh_token", refreshToken))
                 .thenCompose(json -> {
                     // attempt to create a user from the json object
                     try {
@@ -304,14 +305,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      */
     public CompletableFuture<JSONObject> userInfo(User user) {
         Objects.requireNonNull(user, "User must not be null");
-        final JSONObject userJSON = user.toJSON();
-        final JSONObject attributesJSON = userJSON.getJSONObject(User.KEY_ATTRIBUTES);
+        final JSONObject authJSON = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES).optJSONObject("auth");
 
-        return api.userInfo(attributesJSON.getString("access_token"))
+        return api.userInfo(authJSON.getString("access_token"))
                 .thenCompose(json -> {
                     // validate if the subject of this token match the user subject
-                    if (user.hasAttribute("sub")) {
-                        final String userSub = attributesJSON.getJSONObject("jwt").getString("sub");
+                    final JSONObject accessTokenJSON = authJSON.optJSONObject("accessToken");
+                    if (accessTokenJSON != null && accessTokenJSON.has("sub")) {
+                        final String userSub = accessTokenJSON.getString("sub");
                         final JSONObject userInfoPayload = json.getJSONObject("payload");
                         if (!userSub.equals(userInfoPayload.getString("sub"))) {
                             return CompletableFuture.failedFuture(
