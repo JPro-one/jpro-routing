@@ -737,6 +737,7 @@ public class OAuth2Options implements Options {
     @Override
     public JSONObject toJSON() {
         final JSONObject json = new JSONObject();
+
         Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow.getGrantType()));
         Optional.ofNullable(getSite()).ifPresent(site -> json.put("site", site));
         Optional.ofNullable(getClientId()).ifPresent(clientId -> json.put("client_id", clientId));
@@ -799,12 +800,11 @@ public class OAuth2Options implements Options {
         Optional.ofNullable(getScopeSeparator())
                 .ifPresent(scopeSeparator -> json.put("scope_separator", scopeSeparator));
         json.put("validate_issuer", isValidateIssuer());
-        Optional.ofNullable(getLogoutPath()).ifPresent(logoutPath -> json.put("logout_path", logoutPath));
-        Optional.ofNullable(getUserInfoParams()).ifPresent(logoutPath -> json.put("logout_path", logoutPath));
+        Optional.ofNullable(getLogoutPath()).ifPresent(logoutPath -> json.put("end_session_endpoint", logoutPath));
         Optional.ofNullable(getUserInfoPath()).ifPresent(userInfoPath -> json.put("user_info_path", userInfoPath));
         Optional.ofNullable(getIntrospectionPath())
                 .ifPresent(introspectionPath -> json.put("introspection_path", introspectionPath));
-        Optional.ofNullable(getJwkPath()).ifPresent(jwkPath -> json.put("jwk_path", jwkPath));
+        Optional.ofNullable(getJwkPath()).ifPresent(jwks_uri -> json.put("jwks_uri", jwks_uri));
         json.put("jwk_max_age", getJwkMaxAge());
         Optional.ofNullable(getClientAssertion())
                 .ifPresent(clientAssertion -> json.put("client_assertion", clientAssertion));
@@ -815,7 +815,7 @@ public class OAuth2Options implements Options {
         Optional.ofNullable(getJWTOptions()).ifPresent(jwtOptions -> json.put("jwt_options", jwtOptions.toJSON()));
         Optional.ofNullable(getExtraParams()).ifPresent(extraParams -> json.put("extra_params", extraParams));
         Optional.ofNullable(getHeaders()).ifPresent(headers -> json.put("headers", headers));
-        Optional.ofNullable(getUserInfoPath()).ifPresent(userInfoPath -> json.put("user_info_path", userInfoPath));
+        Optional.ofNullable(getUserInfoParams()).ifPresent(userInfoParams -> json.put("user_info_params", userInfoParams));
         return json;
     }
 }
