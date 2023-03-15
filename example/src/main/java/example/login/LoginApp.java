@@ -12,10 +12,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import one.jpro.auth.AuthAPI;
+import one.jpro.auth.authentication.User;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.routing.Route;
 import one.jpro.routing.dev.DevFilter;
+import org.json.JSONObject;
 import simplefx.experimental.parts.FXFuture;
 
 import java.io.PrintWriter;
@@ -81,9 +83,12 @@ public class LoginApp extends BaseAuthApp {
         return Route.empty()
                 .and(getNode("/", (r) -> loginView()))
                 .path("/auth", Route.empty()
-                        .and(getNode("/google", (r) -> authInfoView()))
-                        .and(getNode("/microsoft", (r) -> authInfoView()))
-                        .and(getNode("/keycloak", (r) -> authInfoView())))
+                        .and(getNode("/google", (r) -> signedInUserView(googleAuth)))
+                        .and(getNode("/microsoft", (r) -> signedInUserView(microsoftAuth)))
+                        .and(getNode("/keycloak", (r) -> signedInUserView(keycloakAuth)))
+                        .path("/user", Route.empty()
+                                .and(getNode("/auth-info", (r) -> authInfoView()))
+                        ))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
                 .path("/provider", Route.empty()
                         .and(getNode("/google", (r) -> authProviderView(googleAuth, googleCredentials)))
@@ -217,6 +222,94 @@ public class LoginApp extends BaseAuthApp {
 
         final var pane = new VBox(headerLabel, providerDiscoveryView);
         pane.getStyleClass().add("openid-provider-discovery-pane");
+
+        return new StackPane(pane);
+    }
+
+    public Node signedInUserView(final OAuth2AuthenticationProvider authProvider) {
+        final var headerLabel = new Label("Signed in user: " + (getUser() == null ? "" : getUser().getName()));
+        headerLabel.getStyleClass().add("header-label");
+
+        final var authInfoBox = createButtonWithDescription(
+                "Show authentication information about this user.", "Auth Info",
+                event -> gotoPage(headerLabel, "/auth/user/auth-info"));
+
+        final var refreshTokenBox = createButtonWithDescription(
+                "Use refresh token to get a new access token.", "Refresh Token",
+                event -> {
+                    final var user = getUser();
+                    if (user == null) {
+                        setError(new IllegalStateException("User is not signed in."));
+                        gotoPage(headerLabel, AUTH_ERROR_PATH);
+                        return;
+                    }
+
+                    FXFuture.fromJava(authProvider.refresh(user))
+                            .map(newUser -> {
+                                setUser(newUser);
+                                gotoPage(headerLabel, "/auth/user/refresh-token");
+                                return newUser;
+                            })
+                            .recover(throwable -> {
+                                setError(throwable);
+                                gotoPage(headerLabel, AUTH_ERROR_PATH);
+                                return null;
+                            });
+                });
+
+        final var revokeTokenBox = createButtonWithDescription(
+                "Revoke the access token.", "Revoke Token",
+                event -> {
+                    final var user = getUser();
+                    if (user == null) {
+                        setError(new IllegalStateException("User is not signed in."));
+                        gotoPage(headerLabel, AUTH_ERROR_PATH);
+                        return;
+                    }
+
+                    FXFuture.fromJava(authProvider.revoke(user, "access_token"))
+                            .map(unused -> {
+                                // the result can be ignored
+                                gotoPage(headerLabel, "/auth/user/revoke-token");
+                                return unused;
+                            })
+                            .recover(throwable -> {
+                                setError(throwable);
+                                gotoPage(headerLabel, AUTH_ERROR_PATH);
+                                return null;
+                            });
+                });
+
+        final var logoutBox = createButtonWithDescription(
+                "Sign out from the provider.", "Sign Out",
+                event -> {
+                    final var user = getUser();
+                    if (user == null) {
+                        setError(new IllegalStateException("User is not signed in."));
+                        gotoPage(headerLabel, AUTH_ERROR_PATH);
+                        return;
+                    }
+
+                    final var userAttributes = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES);
+                    final var accessToken = userAttributes.optJSONObject("jwt", new JSONObject()).getString("access_token");
+                    final var refreshToken = userAttributes.optJSONObject("jwt", new JSONObject()).getString("refresh_token");
+
+                    FXFuture.fromJava(authProvider.logout(accessToken, refreshToken))
+                            .map(unused -> {
+                                // the result can be ignored
+                                setUser(null);
+                                gotoPage(headerLabel, "/auth/user/logout");
+                                return unused;
+                            })
+                            .recover(throwable -> {
+                                setError(throwable);
+                                gotoPage(headerLabel, AUTH_ERROR_PATH);
+                                return null;
+                            });
+                });
+
+        final var pane = new VBox(headerLabel, authInfoBox, refreshTokenBox, revokeTokenBox, logoutBox);
+        pane.getStyleClass().add("signed-in-user-pane");
 
         return new StackPane(pane);
     }
