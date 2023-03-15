@@ -245,7 +245,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     .thenCompose(json -> {
                         // attempt to create a user from the json object
                         try {
-                            final User newUser = createUser(json, params);
+                            final User newUser = createUser(json);
                             oauth2Credentials.setUsername(newUser.getName());
                             // basic validation passed
                             return CompletableFuture.completedFuture(newUser);
@@ -339,18 +339,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         return api.logout(accessToken, refreshToken);
     }
 
-    private User createUser(@NotNull JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {
-        return createUser(json, new JSONObject());
-    }
-
-    private User createUser(@NotNull JSONObject json, @NotNull JSONObject params) throws JwkException,
+    private User createUser(@NotNull final JSONObject json) throws JwkException,
             TokenExpiredException, IllegalStateException {
         Objects.requireNonNull(json, "json can not be null");
-        Objects.requireNonNull(params, "params can not be null");
 
         log.debug("User json: {}", json);
-        log.debug("Params: {}", params);
-        log.debug("Scope: {}", json.optString("scope"));
+
+        final JSONObject userJSON = new JSONObject();
+        final JSONObject authJSON = new JSONObject(json.toString());
 
         if (json.has("access_token")) {
             // attempt to create a user from the json object
@@ -358,19 +354,21 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             // verify if the user is not expired
             // this may happen if the user tokens have been issued for future use for example
-            final JSONObject jwtJSON;
+            final JSONObject accessToken;
             try {
-                jwtJSON = verifyToken(token, false);
+                accessToken = verifyToken(token, false);
                 // Store JWT authorization
-                params.put("jwt", jwtJSON);
+                authJSON.put("accessToken", accessToken);
 
                 // Set principal name
-                final JSONObject payload = jwtJSON.getJSONObject("payload");
+                final JSONObject payload = accessToken.getJSONObject("payload");
                 if (payload.has("name")) {
-                    params.put(Authentication.KEY_NAME, payload.getString("name"));
+                    userJSON.put(Authentication.KEY_NAME, payload.getString("name"));
                 } else if (payload.has("email")) {
-                    params.put(Authentication.KEY_NAME, payload.getString("email"));
+                    userJSON.put(Authentication.KEY_NAME, payload.getString("email"));
                 }
+
+                authJSON.put("rootToken", "accessToken");
             } catch (JWTDecodeException | IllegalStateException ex) {
                 log.trace("Cannot decode access token:", ex);
             }
@@ -382,31 +380,30 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             // verify if the user is not expired
             // this may happen if the user tokens have been issued for future use for example
-            final JSONObject jwtJSON;
+            final JSONObject verifiedIdToken;
             try {
-                jwtJSON = verifyToken(token, true);
+                verifiedIdToken = verifyToken(token, true);
                 // Store JWT authorization
-                params.put("jwt", jwtJSON);
+                authJSON.put("idToken", verifiedIdToken);
 
                 // Set principal name
-                final JSONObject payload = jwtJSON.getJSONObject("payload");
+                final JSONObject payload = verifiedIdToken.getJSONObject("payload");
                 if (payload.has("name")) {
-                    params.put(Authentication.KEY_NAME, payload.getString("name"));
+                    userJSON.put(Authentication.KEY_NAME, payload.getString("name"));
                 } else if (payload.has("email")) {
-                    params.put(Authentication.KEY_NAME, payload.getString("email"));
+                    userJSON.put(Authentication.KEY_NAME, payload.getString("email"));
                 }
             } catch (JWTDecodeException | IllegalStateException ex) {
                 log.trace("Cannot decode id token:", ex);
             }
         }
 
-        JSONObject authJSON = new JSONObject(params, JSONObject.getNames(params));
-        authJSON.put(Authentication.KEY_ATTRIBUTES, params);
+        userJSON.put(Authentication.KEY_ATTRIBUTES, new JSONObject().put("auth", authJSON));
 
         // TODO: Configure roles
 
         // Create authentication instance
-        return Authentication.create(authJSON);
+        return Authentication.create(userJSON);
     }
 
     /**
@@ -564,8 +561,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     private boolean hasExpired(User user) {
-        if (user.getAttributes().containsKey("jwt")) {
-            JSONObject jwtInfo = (JSONObject) user.getAttributes().get("jwt");
+        if (user.getAttributes().containsKey("auth")) {
+            JSONObject jwtInfo = (JSONObject) user.getAttributes().get("auth");
             if (jwtInfo.has("exp")) {
                 final Instant expiredAt = Instant.ofEpochMilli(jwtInfo.getLong("exp"));
                 return expiredAt.isBefore(Instant.now());
