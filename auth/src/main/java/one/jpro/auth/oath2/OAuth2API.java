@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import static one.jpro.auth.utils.AuthUtils.*;
 
 /**
- * OAuth2 API class.
+ * OAuth2 API provides the required functionalities to interact with an OAuth2 provider.
  *
  * @author Besmir Beqiri
  */
@@ -272,6 +272,7 @@ public class OAuth2API {
      *
      * @param accessToken the access token
      * @return the user information wrapped in a JSON object
+     * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#UserInfo">UserInfo</a>
      */
     public CompletableFuture<JSONObject> userInfo(String accessToken) {
         final JSONObject headers = new JSONObject();
@@ -377,13 +378,15 @@ public class OAuth2API {
      * and attempt to load the well known descriptor.
      *
      * @param config the initial options, it should contain the site url
-     * @return an OAuth2 provider with the discovered option values
+     * @return an OAuth2 provider configured with the discovered option values
+     * @see <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>
      */
     public CompletableFuture<OAuth2AuthenticationProvider> discover(final WebAPI webAPI, final OAuth2Options config) {
         if (config.getSite() == null) {
             CompletableFuture.failedFuture(new RuntimeException("the site url cannot be null"));
         }
 
+        // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
         final String oidc_discovery_path = "/.well-known/openid-configuration";
 
         String issuer = config.getSite();
@@ -606,6 +609,15 @@ public class OAuth2API {
                 });
     }
 
+    /**
+     * Base method to fetch the required information from the OAuth2 provider.
+     *
+     * @param method the HTTP method to use
+     * @param path   the path to fetch
+     * @param headers the headers to send
+     * @param payload the payload to send
+     * @return an asynchronous http response wrapped in a completable future
+     */
     private CompletableFuture<HttpResponse<String>> fetch(HttpMethod method, String path,
                                                           JSONObject headers, String payload) {
         if (path == null || path.length() == 0) {
@@ -643,6 +655,13 @@ public class OAuth2API {
         return makeRequest(requestBuilder, payload);
     }
 
+    /**
+     * Make a request to the OAuth2 provider.
+     *
+     * @param requestBuilder the request builder
+     * @param payload        the payload wrapped in a string
+     * @return an asynchronous http response wrapped in a completable future
+     */
     private CompletableFuture<HttpResponse<String>> makeRequest(HttpRequest.Builder requestBuilder, String payload) {
         // send
         if (payload != null) {
