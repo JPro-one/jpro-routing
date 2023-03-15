@@ -70,7 +70,7 @@ public class TokenCredentials implements Credentials {
      * @param user the user object
      */
     public TokenCredentials(@NotNull final User user) {
-        this(user.toJSON().optJSONObject("attributes").optJSONObject("jwt"));
+        this(user.toJSON().optJSONObject("attributes").optJSONObject("auth"));
     }
 
     @NotNull

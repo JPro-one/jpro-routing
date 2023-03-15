@@ -172,7 +172,7 @@ public class JWTAuthenticationProvider implements AuthenticationProvider<TokenCr
         }
 
         // Store the JWT metadata in the user's attributes
-        userJSON.put(Authentication.KEY_ATTRIBUTES, new JSONObject().put("jwt", jwtJSON));
+        userJSON.put(Authentication.KEY_ATTRIBUTES, new JSONObject().put("auth", jwtJSON));
 
         // Create authentication instance
         return Authentication.create(userJSON);
