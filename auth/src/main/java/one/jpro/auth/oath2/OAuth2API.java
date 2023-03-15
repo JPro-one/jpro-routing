@@ -600,7 +600,7 @@ public class OAuth2API {
 
         return fetch(HttpMethod.POST, options.getLogoutPath(), headers, payload)
                 .thenCompose(response -> {
-                    if (response.statusCode() != 200) {
+                    if (response.statusCode() < 200 || response.statusCode() >= 300) {
                         return CompletableFuture.failedFuture(
                                 new RuntimeException("Bad Response [" + response.statusCode() + "] " + response.body()));
                     }
