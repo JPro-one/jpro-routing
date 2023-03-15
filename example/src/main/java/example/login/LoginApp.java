@@ -107,16 +107,16 @@ public class LoginApp extends BaseAuthApp {
         final var selectLabel = new Label("Select an authentication provider:");
         selectLabel.getStyleClass().add("header2-label");
 
-        final var googleLoginButton = createLoginButton("Google");
-        googleLoginButton.setOnAction(event -> gotoPage(googleLoginButton, GOOGLE_PROVIDER_PATH));
+        final var googleProviderButton = createAuthProviderButton("Google");
+        googleProviderButton.setOnAction(event -> gotoPage(googleProviderButton, GOOGLE_PROVIDER_PATH));
 
-        final var microsoftLoginButton = createLoginButton("Microsoft");
-        microsoftLoginButton.setOnAction(event -> gotoPage(microsoftLoginButton, MICROSOFT_PROVIDER_PATH));
+        final var microsoftProviderButton = createAuthProviderButton("Microsoft");
+        microsoftProviderButton.setOnAction(event -> gotoPage(microsoftProviderButton, MICROSOFT_PROVIDER_PATH));
 
-        final var keycloakLoginButton = createLoginButton("Keycloak");
-        keycloakLoginButton.setOnAction(event -> gotoPage(keycloakLoginButton, KEYCLOAK_PROVIDER_PATH));
+        final var keycloakProviderButton = createAuthProviderButton("Keycloak");
+        keycloakProviderButton.setOnAction(event -> gotoPage(keycloakProviderButton, KEYCLOAK_PROVIDER_PATH));
 
-        final var tilePane = new TilePane(googleLoginButton, microsoftLoginButton, keycloakLoginButton);
+        final var tilePane = new TilePane(googleProviderButton, microsoftProviderButton, keycloakProviderButton);
         tilePane.getStyleClass().add("tile-pane");
         VBox.setVgrow(tilePane, Priority.ALWAYS);
 

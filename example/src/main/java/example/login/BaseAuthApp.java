@@ -121,12 +121,12 @@ public abstract class BaseAuthApp extends RouteApp {
     }
 
     /**
-     * Create a login button for the given provider.
+     * Create a button for the given provider.
      *
      * @param text the provider name
      * @return a button node
      */
-    Button createLoginButton(String text) {
+    Button createAuthProviderButton(String text) {
         ImageView iconView = new ImageView();
         iconView.setFitWidth(56);
         iconView.setFitHeight(56);
