@@ -53,7 +53,6 @@ public abstract class BaseAuthApp extends RouteApp {
     static final String GOOGLE_PROVIDER_PATH = "/provider/google";
     static final String MICROSOFT_PROVIDER_PATH = "/provider/microsoft";
     static final String KEYCLOAK_PROVIDER_PATH = "/provider/keycloak";
-    static final String PROVIDER_DISCOVERY_PATH = "/provider/discovery";
 
     // User property
     private ObjectProperty<User> userProperty;

@@ -189,8 +189,8 @@ public class LoginApp extends BaseAuthApp {
                                 .map(provider -> {
                                     final var options = provider.getOptions();
                                     setAuthOptions(options);
-                                    gotoPage(headerLabel, PROVIDER_DISCOVERY_PATH +
-                                            "/" + getAuthProviderName(authProvider).toLowerCase());
+                                    gotoPage(headerLabel, "/provider/discovery/"
+                                            + getAuthProviderName(authProvider).toLowerCase());
                                     return provider;
                                 })
                                 .recover(throwable -> {
