@@ -46,9 +46,6 @@ public abstract class BaseAuthApp extends RouteApp {
     static final String AZURE_CLIENT_SECRET = System.getenv("AZURE_TEST_CLIENT_SECRET");
 //    private static final String AZURE_TENANT = System.getenv("AZURE_TEST_CLIENT_TENANT");
 
-    static final String GOOGLE_REDIRECT_PATH = "/auth/google";
-    static final String MICROSOFT_REDIRECT_PATH = "/auth/microsoft";
-    static final String KEYCLOAK_REDIRECT_PATH = "/auth/keycloak";
     static final String AUTH_ERROR_PATH = "/auth/error";
     static final String GOOGLE_PROVIDER_PATH = "/provider/google";
     static final String MICROSOFT_PROVIDER_PATH = "/provider/microsoft";

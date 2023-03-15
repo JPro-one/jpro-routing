@@ -51,7 +51,7 @@ public class LoginApp extends BaseAuthApp {
 
         final var googleCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
-                .setRedirectUri(GOOGLE_REDIRECT_PATH)
+                .setRedirectUri("/auth/google")
                 .setNonce("0394852-3190485-2490358");
 
         // Microsoft Auth provider
@@ -64,7 +64,7 @@ public class LoginApp extends BaseAuthApp {
 
         final var microsoftCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
-                .setRedirectUri(MICROSOFT_REDIRECT_PATH);
+                .setRedirectUri("/auth/microsoft");
 
         // Keycloak Auth provider
         final var keycloakAuth = AuthAPI.keycloakAuth()
@@ -76,13 +76,14 @@ public class LoginApp extends BaseAuthApp {
 
         final var keycloakCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
-                .setRedirectUri(KEYCLOAK_REDIRECT_PATH);
+                .setRedirectUri("/auth/keycloak");
 
         return Route.empty()
                 .and(getNode("/", (r) -> loginView()))
-                .and(getNode(GOOGLE_REDIRECT_PATH, (r) -> authInfoView()))
-                .and(getNode(MICROSOFT_REDIRECT_PATH, (r) -> authInfoView()))
-                .and(getNode(KEYCLOAK_REDIRECT_PATH, (r) -> authInfoView()))
+                .path("/auth", Route.empty()
+                        .and(getNode("/google", (r) -> authInfoView()))
+                        .and(getNode("/microsoft", (r) -> authInfoView()))
+                        .and(getNode("/keycloak", (r) -> authInfoView())))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
                 .path("/provider", Route.empty()
                         .and(getNode("/google", (r) -> authProviderView(googleAuth, googleCredentials)))
@@ -221,7 +222,7 @@ public class LoginApp extends BaseAuthApp {
     }
 
     public Node authInfoView() {
-        final var headerLabel = new Label("User information:");
+        final var headerLabel = new Label("Authentication information:");
         headerLabel.getStyleClass().add("header-label");
 
         MarkdownView userView = new MarkdownView();
