@@ -16,6 +16,7 @@ import one.jpro.auth.jwt.TokenCredentials;
 import one.jpro.auth.jwt.TokenExpiredException;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -332,6 +333,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
                     return CompletableFuture.completedFuture(json);
                 });
+    }
+
+    public CompletableFuture<Void> logout(final @NotNull String accessToken, final @Nullable String refreshToken) {
+        return api.logout(accessToken, refreshToken);
     }
 
     private User createUser(@NotNull JSONObject json) throws JwkException, TokenExpiredException, IllegalStateException {

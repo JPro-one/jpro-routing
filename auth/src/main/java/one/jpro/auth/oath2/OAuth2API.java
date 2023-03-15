@@ -8,6 +8,7 @@ import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.http.HttpMethod;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -577,7 +578,7 @@ public class OAuth2API {
      * @param accessToken  the access token
      * @param refreshToken the refresh token
      */
-    public CompletableFuture<Void> logout(String accessToken, String refreshToken) {
+    public CompletableFuture<Void> logout(final @NotNull String accessToken, final @Nullable String refreshToken) {
         final JSONObject headers = new JSONObject();
         headers.put("Authorization", "Bearer " + accessToken);
 
