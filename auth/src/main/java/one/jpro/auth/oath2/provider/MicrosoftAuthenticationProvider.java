@@ -41,10 +41,12 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)
                 .setTenant(tenant)
-                .setSite("https://login.microsoftonline.com/{tenant}")
-                .setTokenPath("/oauth2/v2.0/token")
-                .setAuthorizationPath("/oauth2/v2.0/authorize")
-                .setJwkPath("/discovery/v2.0/keys")
+                .setSite("https://login.microsoftonline.com/{tenant}/v2.0")
+                .setTokenPath("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token")
+                .setAuthorizationPath("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize")
+                .setUserInfoPath("https://graph.microsoft.com/oidc/userinfo")
+                .setJwkPath("https://login.microsoftonline.com/{tenant}/discovery/v2.0/keys")
+                .setLogoutPath("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/logout")
                 .setJWTOptions(new JWTOptions().setNonceAlgorithm("SHA-256")));
     }
 

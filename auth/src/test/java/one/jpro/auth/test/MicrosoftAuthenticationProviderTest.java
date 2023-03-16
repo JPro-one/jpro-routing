@@ -18,15 +18,17 @@ public class MicrosoftAuthenticationProviderTest {
 
     @Test
     public void configWithClientIdAndClientSecretAndTenant() {
-        MicrosoftAuthenticationProvider provider =
-                new MicrosoftAuthenticationProvider(null,
-                        "clientId", "clientSecret", "common");
+        MicrosoftAuthenticationProvider provider = new MicrosoftAuthenticationProvider(null,
+                "clientId", "clientSecret",
+                MicrosoftAuthenticationProvider.COMMON_TENANT);
         OAuth2Options options = provider.getOptions();
 
-        assertEquals("https://login.microsoftonline.com/common", options.getSite());
+        assertEquals("https://login.microsoftonline.com/common/v2.0", options.getSite());
         assertEquals("https://login.microsoftonline.com/common/oauth2/v2.0/token", options.getTokenPath());
         assertEquals("https://login.microsoftonline.com/common/oauth2/v2.0/authorize", options.getAuthorizationPath());
+        assertEquals("https://graph.microsoft.com/oidc/userinfo", options.getUserInfoPath());
         assertEquals("https://login.microsoftonline.com/common/discovery/v2.0/keys", options.getJwkPath());
+        assertEquals("https://login.microsoftonline.com/common/oauth2/v2.0/logout", options.getLogoutPath());
         assertEquals("SHA-256", options.getJWTOptions().getNonceAlgorithm());
     }
 
