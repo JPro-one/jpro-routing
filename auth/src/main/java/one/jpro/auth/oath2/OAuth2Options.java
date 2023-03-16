@@ -681,7 +681,7 @@ public class OAuth2Options implements Options {
      * @param path the path
      * @return the path with the tenant/realm variable replaced
      */
-    private String replaceVariables(@Nullable final String path) {
+    public String replaceVariables(@Nullable final String path) {
         if (path != null) {
             final Matcher matcher = TENANT_PATTERN.matcher(path);
             if (matcher.find()) {

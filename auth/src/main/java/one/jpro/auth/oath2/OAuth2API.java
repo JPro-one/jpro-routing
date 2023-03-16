@@ -237,7 +237,7 @@ public class OAuth2API {
      * @param token     the token to be revoked.
      * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
-    public CompletableFuture<Void> tokenRevocation(String tokenType, String token) {
+    public CompletableFuture<Void> tokenRevocation(final @NotNull String tokenType, final @NotNull String token) {
         if (token == null) {
             return CompletableFuture.failedFuture(new RuntimeException("Cannot revoke null token"));
         }
@@ -427,10 +427,10 @@ public class OAuth2API {
                                 issuerEndpoint = issuerEndpoint.substring(0, issuerEndpoint.length() - 1);
                             }
 
-                            if (!config.getSite().equals(issuerEndpoint)) {
+                            if (!config.getSite().equals(config.replaceVariables(issuerEndpoint))) {
                                 return CompletableFuture.failedFuture(
                                         new RuntimeException("Issuer validation failed: received ["
-                                                + issuerEndpoint + "]"));
+                                                + issuerEndpoint + "]" + " but expected [" + config.getSite() + "]"));
                             }
                         }
                     }
