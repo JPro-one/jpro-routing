@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * OAuth2 authentication provider.
+ * Base class for creating an OAuth2 authentication provider.
  *
  * @author Besmir Beqiri
  */
@@ -48,6 +48,12 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     @NotNull
     private final OAuth2API api;
 
+    /**
+     * Creates a OAuth2 authentication provider.
+     *
+     * @param webAPI the web API
+     * @param options the OAuth2 options
+     */
     public OAuth2AuthenticationProvider(@NotNull final WebAPI webAPI, @NotNull final OAuth2Options options) {
 //        this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
         this.webAPI = webAPI; // Temporary disable null check for testing purpose
@@ -56,11 +62,24 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         this.options.validate();
     }
 
+    /**
+     * Returns the options used to configure this provider.
+     *
+     * @return an OAuth2 options object
+     */
     @NotNull
     public final OAuth2Options getOptions() {
         return options;
     }
 
+    /**
+     * The client sends the end-user's browser to the authorization endpoint.
+     * This endpoint is where the user signs in and grants access.
+     * End-user interaction is required.
+     *
+     * @param credentials the credentials to authenticate
+     * @return the url to be used to authorize the user.
+     */
     public String authorizeUrl(OAuth2Credentials credentials) {
         final String authorizeUrl = api.authorizeURL(credentials
                 .setNormalizedRedirectUri(normalizeUri(credentials.getRedirectUri())));
@@ -270,11 +289,18 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         return api.discover(webAPI, options);
     }
 
-    public CompletableFuture<User> refresh(User user) {
+    /**
+     * Refreshes the user's access token.
+     *
+     * @param user the user
+     * @return a new user instance with the refreshed access token
+     * @throws IllegalStateException if the user does not have a refresh token
+     */
+    public CompletableFuture<User> refresh(User user) throws IllegalStateException {
         final String refreshToken = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES)
                 .optJSONObject("auth").optString("refresh_token");
         if (refreshToken == null || refreshToken.isBlank()) {
-            return CompletableFuture.failedFuture(new RuntimeException("refresh_token is null or missing"));
+            return CompletableFuture.failedFuture(new IllegalStateException("refresh_token is null or missing"));
         }
 
         return api.token("refresh_token", new JSONObject().put("refresh_token", refreshToken))
@@ -292,6 +318,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 });
     }
 
+    /**
+     * Revokes an obtained access or refresh token.
+     * More info at <a href="https://tools.ietf.org/html/rfc7009">RFC 7009</a>.
+     *
+     * @param user      the user to revoke
+     * @param tokenType the token type (either <code>access_token</code> or <code>refresh_token</code>)
+     * @return a {@link CompletableFuture} that completes when the token is revoked.
+     */
     public CompletableFuture<Void> revoke(User user, String tokenType) {
         return api.tokenRevocation(tokenType, user.getAttributes().get(tokenType).toString());
     }
@@ -300,10 +334,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      * Retrieve user information and other attributes for a logged-in end-user.
      *
      * @param user the user (access token) to fetch the user information.
-     * @return a {@link JSONObject} with the user information.
+     * @return a {@link CompletableFuture} with the user information in JSON format.
      * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#UserInfo">OpenID Connect Core 1.0</a>
      */
-    public CompletableFuture<JSONObject> userInfo(User user) {
+    public CompletableFuture<JSONObject> userInfo(final @NotNull User user) {
         Objects.requireNonNull(user, "User must not be null");
         final JSONObject authJSON = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES).optJSONObject("auth");
 
@@ -336,6 +370,13 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                 });
     }
 
+    /**
+     * Logout the user.
+     *
+     * @param accessToken  the access token
+     * @param refreshToken the refresh token
+     * @return a {@link CompletableFuture} that completes when the user is logged out.
+     */
     public CompletableFuture<Void> logout(final @NotNull String accessToken, final @Nullable String refreshToken) {
         return api.logout(accessToken, refreshToken);
     }
@@ -343,8 +384,6 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     private User createUser(@NotNull final JSONObject json) throws JwkException,
             TokenExpiredException, IllegalStateException {
         Objects.requireNonNull(json, "json can not be null");
-
-        log.debug("User json: {}", json);
 
         final JSONObject userJSON = new JSONObject();
         final JSONObject authJSON = new JSONObject(json.toString());
