@@ -97,6 +97,29 @@ public abstract class BaseAuthApp extends RouteApp {
         return userInfoProperty;
     }
 
+    // Auth provider property
+    private ObjectProperty<OAuth2AuthenticationProvider> authProviderProperty;
+
+    final OAuth2AuthenticationProvider getAuthProvider() {
+        return authProviderProperty == null ? null : authProviderProperty.get();
+    }
+
+    final void setAuthProvider(OAuth2AuthenticationProvider value) {
+        authProviderProperty().set(value);
+    }
+
+    /**
+     * The auth provider property contains the authentication provider.
+     *
+     * @return the auth provider property
+     */
+    final ObjectProperty<OAuth2AuthenticationProvider> authProviderProperty() {
+        if (authProviderProperty == null) {
+            authProviderProperty = new SimpleObjectProperty<>(this, "authProvider");
+        }
+        return authProviderProperty;
+    }
+
     // Auth options property
     private ObjectProperty<Options> authOptions;
 
@@ -257,6 +280,7 @@ public abstract class BaseAuthApp extends RouteApp {
             if (request.path().equals(credentials.getRedirectUri())) {
                 return FXFuture.fromJava(authProvider.authenticate(credentials))
                         .map(user -> {
+                            setAuthProvider(authProvider);
                             userConsumer.accept(user);
                             return user;
                         })

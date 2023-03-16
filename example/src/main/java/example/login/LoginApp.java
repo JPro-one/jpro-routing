@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import static one.jpro.routing.LinkUtil.gotoPage;
 import static one.jpro.routing.RouteUtils.getNode;
+import static one.jpro.routing.RouteUtils.redirect;
 
 /**
  * An example application to show how to use the Authorization module in general
@@ -82,17 +83,17 @@ public class LoginApp extends BaseAuthApp {
 
         return Route.empty()
                 .and(getNode("/", (r) -> loginView()))
+                .path("/user", Route.empty()
+                        .and(getNode("/console", (r) -> signedInUserView()))
+                        .and(getNode("/auth-info", (r) -> authInfoView()))
+                        .and(getNode("/refresh-token", (r) -> refreshTokenView()))
+                        .and(getNode("/user-info", (r) -> userInfoView()))
+                        .and(getNode("/logout", (r) -> loginView())))
                 .path("/auth", Route.empty()
-                        .and(getNode("/google", (r) -> signedInUserView(googleAuth)))
-                        .and(getNode("/microsoft", (r) -> signedInUserView(microsoftAuth)))
-                        .and(getNode("/keycloak", (r) -> signedInUserView(keycloakAuth)))
-                        .path("/user", Route.empty()
-                                .and(getNode("/auth-info", (r) -> authInfoView()))
-                                .and(getNode("/refresh-token", (r) -> refreshTokenView()))
-                                .and(getNode("/user-info", (r) -> userInfoView()))
-                                .and(getNode("/logout", (r) -> loginView()))
-                        ))
-                .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
+                        .and(redirect("/google", "/user/console"))
+                        .and(redirect("/microsoft", "/user/console"))
+                        .and(redirect("/keycloak", "/user/console"))
+                        .and(getNode("/error", (r) -> errorView())))
                 .path("/provider", Route.empty()
                         .and(getNode("/google", (r) -> authProviderView(googleAuth, googleCredentials)))
                         .and(getNode("/microsoft", (r) -> authProviderView(microsoftAuth, microsoftCredentials)))
@@ -101,7 +102,6 @@ public class LoginApp extends BaseAuthApp {
                                 .and(getNode("/google", (r) -> providerDiscoveryView(googleAuth)))
                                 .and(getNode("/microsoft", (r) -> providerDiscoveryView(microsoftAuth)))
                                 .and(getNode("/keycloak", (r) -> providerDiscoveryView(keycloakAuth)))))
-//                .filter(Filters.FullscreenFilter(true))
                 .filter(DevFilter.createDevFilter())
                 .filter(oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
                 .filter(oauth2(microsoftAuth, microsoftCredentials, this::setUser, this::setError))
@@ -229,36 +229,34 @@ public class LoginApp extends BaseAuthApp {
         return new StackPane(pane);
     }
 
-    public Node signedInUserView(final OAuth2AuthenticationProvider authProvider) {
-        final var headerLabel = new Label("Signed in user: " + (getUser() == null ? "" : getUser().getName()));
+    public Node signedInUserView() {
+        final var headerLabel = new Label("Not signed in.");
         headerLabel.getStyleClass().add("header-label");
+
+        final var authProvider = getAuthProvider();
+        if (authProvider == null) {
+            return new StackPane(headerLabel);
+        }
+
+        headerLabel.setText("Signed in user: " + (getUser() == null ? "" : getUser().getName()));
 
         final var authInfoBox = createButtonWithDescription(
                 "Show authentication information about this user.", "Auth Info",
-                event -> gotoPage(headerLabel, "/auth/user/auth-info"));
+                event -> gotoPage(headerLabel, "/user/auth-info"));
 
         final var refreshTokenBox = createButtonWithDescription(
                 "Use refresh token to get a new access token.", "Refresh Token",
-                event -> {
-                    final var user = getUser();
-                    if (user == null) {
-                        setError(new IllegalStateException("User is not signed in."));
-                        gotoPage(headerLabel, AUTH_ERROR_PATH);
-                        return;
-                    }
-
-                    FXFuture.fromJava(authProvider.refresh(user))
-                            .map(newUser -> {
-                                setUser(newUser);
-                                gotoPage(headerLabel, "/auth/user/refresh-token");
-                                return newUser;
-                            })
-                            .recover(throwable -> {
-                                setError(throwable);
-                                gotoPage(headerLabel, AUTH_ERROR_PATH);
-                                return null;
-                            });
-                });
+                event -> FXFuture.fromJava(authProvider.refresh(getUser()))
+                        .map(newUser -> {
+                            setUser(newUser);
+                            gotoPage(headerLabel, "/user/refresh-token");
+                            return newUser;
+                        })
+                        .recover(throwable -> {
+                            setError(throwable);
+                            gotoPage(headerLabel, AUTH_ERROR_PATH);
+                            return null;
+                        }));
 
         final var revokeTokenBox = createButtonWithDescription(
                 "Revoke the access token.", "Revoke Token",
@@ -273,7 +271,7 @@ public class LoginApp extends BaseAuthApp {
                     FXFuture.fromJava(authProvider.revoke(user, "access_token"))
                             .map(unused -> {
                                 // the result can be ignored
-                                gotoPage(headerLabel, "/auth/user/revoke-token");
+                                gotoPage(headerLabel, "/user/revoke-token");
                                 return unused;
                             })
                             .recover(throwable -> {
@@ -298,7 +296,7 @@ public class LoginApp extends BaseAuthApp {
                                 // User information comes in JSON format.
                                 setUserInfo(json);
                                 // Go to the user info page.
-                                gotoPage(headerLabel, "/auth/user/user-info");
+                                gotoPage(headerLabel, "/user/user-info");
                                 return json;
                             })
                             .recover(throwable -> {
@@ -328,7 +326,7 @@ public class LoginApp extends BaseAuthApp {
                             .map(unused -> {
                                 // the result can be ignored
                                 setUser(null);
-                                gotoPage(headerLabel, "/auth/user/logout");
+                                gotoPage(headerLabel, "/user/logout");
                                 return unused;
                             })
                             .recover(throwable -> {
