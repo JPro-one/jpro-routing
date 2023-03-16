@@ -327,7 +327,8 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      * @return a {@link CompletableFuture} that completes when the token is revoked.
      */
     public CompletableFuture<Void> revoke(User user, String tokenType) {
-        return api.tokenRevocation(tokenType, user.getAttributes().get(tokenType).toString());
+        return api.tokenRevocation(tokenType, user.toJSON().getJSONObject(User.KEY_ATTRIBUTES)
+                .optJSONObject("auth").get(tokenType).toString());
     }
 
     /**
@@ -394,14 +395,14 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
             // verify if the user is not expired
             // this may happen if the user tokens have been issued for future use for example
-            final JSONObject accessToken;
+            final JSONObject verifiedAccessToken;
             try {
-                accessToken = verifyToken(token, false);
+                verifiedAccessToken = verifyToken(token, false);
                 // Store JWT authorization
-                authJSON.put("accessToken", accessToken);
+                authJSON.put("accessToken", verifiedAccessToken);
 
                 // Set principal name
-                final JSONObject payload = accessToken.getJSONObject("payload");
+                final JSONObject payload = verifiedAccessToken.getJSONObject("payload");
                 if (payload.has("name")) {
                     userJSON.put(Authentication.KEY_NAME, payload.getString("name"));
                 } else if (payload.has("email")) {

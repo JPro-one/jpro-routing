@@ -251,8 +251,10 @@ public class OAuth2API {
             headers.put("Authorization", "Basic " + BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
         }
 
-        final JSONObject form = new JSONObject();
-        form.put("token", token).put("token_type_hint", tokenType);
+        final JSONObject form = new JSONObject()
+                .put("token", token)
+                .put("token_type_hint", tokenType);
+
         final String payload = jsonToQuery(form);
         // specify preferred accepted accessToken type
         headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
