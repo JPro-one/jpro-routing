@@ -89,6 +89,7 @@ public class LoginApp extends BaseAuthApp {
                         .path("/user", Route.empty()
                                 .and(getNode("/auth-info", (r) -> authInfoView()))
                                 .and(getNode("/user-info", (r) -> userInfoView()))
+                                .and(getNode("/logout", (r) -> loginView()))
                         ))
                 .and(getNode(AUTH_ERROR_PATH, (r) -> errorView()))
                 .path("/provider", Route.empty()
@@ -317,8 +318,10 @@ public class LoginApp extends BaseAuthApp {
                     }
 
                     final var userAttributes = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES);
-                    final var accessToken = userAttributes.optJSONObject("jwt", new JSONObject()).getString("access_token");
-                    final var refreshToken = userAttributes.optJSONObject("jwt", new JSONObject()).getString("refresh_token");
+                    final var accessToken = userAttributes
+                            .optJSONObject("auth", new JSONObject()).getString("access_token");
+                    final var refreshToken = userAttributes.
+                            optJSONObject("auth", new JSONObject()).optString("refresh_token");
 
                     FXFuture.fromJava(authProvider.logout(accessToken, refreshToken))
                             .map(unused -> {
