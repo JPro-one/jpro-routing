@@ -456,7 +456,7 @@ public class OAuth2Options implements Options {
      * @return an URL as a string
      */
     public String getLogoutPath() {
-        return logoutPath;
+        return computePath(logoutPath);
     }
 
     /**
