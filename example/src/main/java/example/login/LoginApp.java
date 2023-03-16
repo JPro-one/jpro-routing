@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import one.jpro.auth.AuthAPI;
+import one.jpro.auth.authentication.Authentication;
 import one.jpro.auth.authentication.User;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Credentials;
@@ -257,6 +258,15 @@ public class LoginApp extends BaseAuthApp {
                             gotoPage(headerLabel, AUTH_ERROR_PATH);
                             return null;
                         }));
+        refreshTokenBox.setDisable(true);
+
+        // if the user has a refresh token, enable the refresh token button
+        Optional.ofNullable(getUser()).map(Authentication::toJSON)
+                .map(json -> json.getJSONObject(User.KEY_ATTRIBUTES))
+                .map(json -> json.getJSONObject("auth"))
+                .map(json -> json.optString("refresh_token"))
+                .filter(refreshToken -> !refreshToken.isBlank())
+                .ifPresent(refreshToken -> refreshTokenBox.setDisable(false));
 
         final var revokeTokenBox = createButtonWithDescription(
                 "Revoke the access token.", "Revoke Token",
@@ -280,6 +290,7 @@ public class LoginApp extends BaseAuthApp {
                                 return null;
                             });
                 });
+        revokeTokenBox.setDisable(true);
 
         final var userInfoBox = createButtonWithDescription(
                 "Get more user information from the provider.", "User Info",
