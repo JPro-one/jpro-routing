@@ -79,8 +79,7 @@ public class KeycloakAuthenticationProvider extends OAuth2AuthenticationProvider
 
             options.setAuthorizationPath("/protocol/openid-connect/auth");
             options.setTokenPath("/protocol/openid-connect/token");
-            // no revocation path
-            options.setRevocationPath(null);
+            options.setRevocationPath("/protocol/openid-connect/revoke");
             options.setUserInfoPath("/protocol/openid-connect/userinfo");
             options.setLogoutPath("/protocol/openid-connect/logout");
             // keycloak follows the RFC7662 (https://www.rfc-editor.org/rfc/rfc7662)
