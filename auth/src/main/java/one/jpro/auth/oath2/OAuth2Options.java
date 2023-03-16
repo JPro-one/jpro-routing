@@ -381,7 +381,7 @@ public class OAuth2Options implements Options {
      * @return an URL as a string
      */
     public String getAuthorizationPath() {
-        return getCompletePath(authorizationPath);
+        return computePath(authorizationPath);
     }
 
     /**
@@ -400,7 +400,7 @@ public class OAuth2Options implements Options {
      * @return an URL as a string
      */
     public String getTokenPath() {
-        return getCompletePath(tokenPath);
+        return computePath(tokenPath);
     }
 
     /**
@@ -419,7 +419,7 @@ public class OAuth2Options implements Options {
      * @return an URL as a string
      */
     public String getRevocationPath() {
-        return getCompletePath(revocationPath);
+        return computePath(revocationPath);
     }
 
     /**
@@ -475,7 +475,7 @@ public class OAuth2Options implements Options {
      * @return an URL as a string
      */
     public String getUserInfoPath() {
-        return getCompletePath(userInfoPath);
+        return computePath(userInfoPath);
     }
 
     /**
@@ -503,7 +503,7 @@ public class OAuth2Options implements Options {
      * @return an URL as a string
      */
     public String getIntrospectionPath() {
-        return getCompletePath(introspectionPath);
+        return computePath(introspectionPath);
     }
 
     /**
@@ -522,7 +522,7 @@ public class OAuth2Options implements Options {
      * @return an URL as a string
      */
     public String getJwkPath() {
-        return getCompletePath(jwkPath);
+        return computePath(jwkPath);
     }
 
     /**
@@ -661,8 +661,8 @@ public class OAuth2Options implements Options {
      * @param path the path
      * @return the complete path as a string
      */
-    private String getCompletePath(String path) {
-        if (path != null && !path.isBlank() && path.charAt(0) == '/') {
+    private String computePath(String path) {
+        if (path != null && path.charAt(0) == '/') {
             if (site != null) {
                 // remove trailing slash if present
                 if (site.endsWith("/")) {
@@ -670,10 +670,9 @@ public class OAuth2Options implements Options {
                 }
                 path = site + path;
             }
-
-            return replaceVariables(path);
         }
-        return path;
+
+        return replaceVariables(path);
     }
 
     /**
@@ -692,6 +691,7 @@ public class OAuth2Options implements Options {
                 return matcher.replaceAll(tenant);
             }
         }
+
         return path;
     }
 
