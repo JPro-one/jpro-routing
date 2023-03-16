@@ -324,6 +324,13 @@ public class LoginApp extends BaseAuthApp {
                                 return null;
                             });
                 });
+        userInfoBox.setDisable(true);
+
+        Optional.ofNullable(getAuthProvider())
+                .map(OAuth2AuthenticationProvider::getOptions)
+                .map(OAuth2Options::getUserInfoPath)
+                .filter(userInfopath -> !userInfopath.isBlank())
+                .ifPresent(refreshToken -> userInfoBox.setDisable(false));
 
         final var logoutBox = createButtonWithDescription(
                 "Sign out from the provider.", "Sign Out",
@@ -354,6 +361,13 @@ public class LoginApp extends BaseAuthApp {
                                 return null;
                             });
                 });
+        logoutBox.setDisable(true);
+
+        Optional.ofNullable(getAuthProvider())
+                .map(OAuth2AuthenticationProvider::getOptions)
+                .map(OAuth2Options::getLogoutPath)
+                .filter(logoutPath -> !logoutPath.isBlank())
+                .ifPresent(logoutPath -> logoutBox.setDisable(false));
 
         final var pane = new VBox(headerLabel, authInfoBox, refreshTokenBox, revokeTokenBox, userInfoBox, logoutBox);
         pane.getStyleClass().add("signed-in-user-pane");
