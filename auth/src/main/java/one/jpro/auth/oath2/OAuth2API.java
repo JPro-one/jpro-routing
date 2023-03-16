@@ -417,24 +417,6 @@ public class OAuth2API {
                         return CompletableFuture.failedFuture(new RuntimeException(extractErrorDescription(json)));
                     }
 
-                    // issuer validation
-                    if (config.isValidateIssuer()) {
-                        String issuerEndpoint = json.getString("issuer");
-                        if (issuerEndpoint != null) {
-                            // the provider is letting the user know the issuer endpoint, so we need to validate it
-                            // by removing the trailing slash (if present) and comparing it to the received endpoint
-                            if (issuerEndpoint.endsWith("/")) {
-                                issuerEndpoint = issuerEndpoint.substring(0, issuerEndpoint.length() - 1);
-                            }
-
-                            if (!config.getSite().equals(config.replaceVariables(issuerEndpoint))) {
-                                return CompletableFuture.failedFuture(
-                                        new RuntimeException("Issuer validation failed: received ["
-                                                + issuerEndpoint + "]" + " but expected [" + config.getSite() + "]"));
-                            }
-                        }
-                    }
-
                     config.setAuthorizationPath(json.optString("authorization_endpoint", null));
                     config.setTokenPath(json.optString("token_endpoint", null));
                     config.setLogoutPath(json.optString("end_session_endpoint", null));
@@ -455,6 +437,25 @@ public class OAuth2API {
 
                         // set the issuer
                         jwtOptions.setIssuer(json.getString("issuer"));
+                    }
+
+                    // issuer validation
+                    if (config.isValidateIssuer()) {
+                        String issuerEndpoint = json.getString("issuer");
+                        if (issuerEndpoint != null) {
+                            // the provider is letting the user know the issuer endpoint, so we need to validate it
+                            // by removing the trailing slash (if present) and comparing it to the received endpoint
+                            if (issuerEndpoint.endsWith("/")) {
+                                issuerEndpoint = issuerEndpoint.substring(0, issuerEndpoint.length() - 1);
+                            }
+
+                            if (!issuerEndpoint.equals(config.getJWTOptions().getIssuer())) {
+                                return CompletableFuture.failedFuture(
+                                        new RuntimeException("Issuer validation failed: received ["
+                                                + issuerEndpoint + "]" + " but expected ["
+                                                + config.getJWTOptions().getIssuer() + "]"));
+                            }
+                        }
                     }
 
                     // reset supported response types
