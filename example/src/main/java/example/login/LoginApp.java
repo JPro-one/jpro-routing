@@ -16,6 +16,7 @@ import one.jpro.auth.authentication.Authentication;
 import one.jpro.auth.authentication.User;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Credentials;
+import one.jpro.auth.oath2.OAuth2Options;
 import one.jpro.routing.Route;
 import one.jpro.routing.dev.DevFilter;
 import org.json.JSONObject;
@@ -88,6 +89,7 @@ public class LoginApp extends BaseAuthApp {
                         .and(getNode("/console", (r) -> signedInUserView()))
                         .and(getNode("/auth-info", (r) -> authInfoView()))
                         .and(getNode("/refresh-token", (r) -> refreshTokenView()))
+                        .and(getNode("/revoke-token", (r) -> loginView()))
                         .and(getNode("/user-info", (r) -> userInfoView()))
                         .and(getNode("/logout", (r) -> loginView())))
                 .path("/auth", Route.empty()
@@ -291,6 +293,12 @@ public class LoginApp extends BaseAuthApp {
                             });
                 });
         revokeTokenBox.setDisable(true);
+
+        Optional.ofNullable(getAuthProvider())
+                .map(OAuth2AuthenticationProvider::getOptions)
+                .map(OAuth2Options::getRevocationPath)
+                .filter(revocationPath -> !revocationPath.isBlank())
+                .ifPresent(refreshToken -> revokeTokenBox.setDisable(false));
 
         final var userInfoBox = createButtonWithDescription(
                 "Get more user information from the provider.", "User Info",
