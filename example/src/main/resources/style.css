@@ -1,6 +1,7 @@
 .header-label {
     -fx-font: 32px "RobotoBold";
     -fx-alignment: center;
+    -fx-text-alignment: center;
     -fx-max-width: infinity;
 }
 

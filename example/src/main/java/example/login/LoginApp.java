@@ -88,6 +88,7 @@ public class LoginApp extends BaseAuthApp {
                         .and(getNode("/keycloak", (r) -> signedInUserView(keycloakAuth)))
                         .path("/user", Route.empty()
                                 .and(getNode("/auth-info", (r) -> authInfoView()))
+                                .and(getNode("/refresh-token", (r) -> refreshTokenView()))
                                 .and(getNode("/user-info", (r) -> userInfoView()))
                                 .and(getNode("/logout", (r) -> loginView()))
                         ))
@@ -345,6 +346,24 @@ public class LoginApp extends BaseAuthApp {
 
     public Node authInfoView() {
         final var headerLabel = new Label("Authentication information:");
+        headerLabel.getStyleClass().add("header-label");
+
+        MarkdownView userView = new MarkdownView();
+        userView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        userView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+            final var user = getUser();
+            return user == null ? "" : jsonToMarkdown(user.toJSON());
+        }, userProperty()));
+
+        final var pane = new VBox(headerLabel, userView);
+        pane.getStyleClass().add("auth-info-pane");
+
+        return new StackPane(pane);
+    }
+
+    public Node refreshTokenView() {
+        final var headerLabel = new Label("Authentication information\n" +
+                "after refreshing the access token:");
         headerLabel.getStyleClass().add("header-label");
 
         MarkdownView userView = new MarkdownView();
