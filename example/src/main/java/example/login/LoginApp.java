@@ -74,7 +74,7 @@ public class LoginApp extends BaseAuthApp {
         // Keycloak Auth provider
         final var keycloakAuth = AuthAPI.keycloakAuth()
                 .webAPI(getWebAPI())
-                .site("http://192.168.1.80:8080/realms/{realm}")
+                .site("http://localhost:8080/realms/{realm}")
                 .clientId("myclient")
                 .realm("myrealm")
                 .create();
