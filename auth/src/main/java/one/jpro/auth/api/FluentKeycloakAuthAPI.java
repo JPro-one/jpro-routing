@@ -1,6 +1,7 @@
 package one.jpro.auth.api;
 
 import com.jpro.webapi.WebAPI;
+import javafx.stage.Stage;
 import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
 import org.json.JSONObject;
 
@@ -9,18 +10,11 @@ import org.json.JSONObject;
  *
  * @author Besmir Beqiri
  */
-public class FluentKeycloakAuthAPI implements FluentKeycloakAuth, FluentKeycloakAuth.FluentWebAPI {
+public class FluentKeycloakAuthAPI implements FluentKeycloakAuth {
 
-    private WebAPI webAPI;
     private String site;
     private String clientId;
     private String realm;
-
-    @Override
-    public FluentKeycloakAuth webAPI(WebAPI webAPI) {
-        this.webAPI = webAPI;
-        return this;
-    }
 
     @Override
     public FluentKeycloakAuth site(String site) {
@@ -41,10 +35,14 @@ public class FluentKeycloakAuthAPI implements FluentKeycloakAuth, FluentKeycloak
     }
 
     @Override
-    public KeycloakAuthenticationProvider create() {
-        return new KeycloakAuthenticationProvider(webAPI, new JSONObject()
-                .put("auth-server-url", site)
-                .put("resource", clientId)
-                .put("realm", realm));
+    public KeycloakAuthenticationProvider create(Stage stage) {
+        if (WebAPI.isBrowser()) {
+            return new KeycloakAuthenticationProvider(WebAPI.getWebAPI(stage), new JSONObject()
+                    .put("auth-server-url", site)
+                    .put("resource", clientId)
+                    .put("realm", realm));
+        }
+        else throw new UnsupportedOperationException("Keycloak authentication is currently supported " +
+                "only when running the application via JPro server.");
     }
 }

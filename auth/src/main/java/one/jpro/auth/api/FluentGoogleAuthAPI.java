@@ -1,6 +1,7 @@
 package one.jpro.auth.api;
 
 import com.jpro.webapi.WebAPI;
+import javafx.stage.Stage;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 
 /**
@@ -8,17 +9,10 @@ import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
  *
  * @author Besmir Beqiri
  */
-public class FluentGoogleAuthAPI implements FluentGoogleAuth, FluentGoogleAuth.FluentWebAPI {
+public class FluentGoogleAuthAPI implements FluentGoogleAuth {
 
-    private WebAPI webAPI;
     private String clientId;
     private String clientSecret;
-
-    @Override
-    public FluentGoogleAuth webAPI(WebAPI webAPI) {
-        this.webAPI = webAPI;
-        return this;
-    }
 
     @Override
     public FluentGoogleAuth clientId(String clientId) {
@@ -33,7 +27,11 @@ public class FluentGoogleAuthAPI implements FluentGoogleAuth, FluentGoogleAuth.F
     }
 
     @Override
-    public GoogleAuthenticationProvider create() {
-        return new GoogleAuthenticationProvider(webAPI, clientId, clientSecret);
+    public GoogleAuthenticationProvider create(Stage stage) {
+        if (WebAPI.isBrowser()) {
+            return new GoogleAuthenticationProvider(WebAPI.getWebAPI(stage), clientId, clientSecret);
+        }
+        else throw new UnsupportedOperationException("Keycloak authentication is currently supported " +
+                "only when running the application via JPro server.");
     }
 }
