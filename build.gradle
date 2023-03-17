@@ -132,6 +132,7 @@ configure([project(':example')]) {
 //  mainClassName = "example.colors.ColorsApp"
 //    mainClassName = "example.popup.PopupApp"
   mainClassName = "example.login.LoginApp"
+  application.mainModule = "one.jpro.routing.example"
   
   dependencies {
     implementation project(":auth")
