@@ -55,8 +55,7 @@ public class LoginApp extends BaseAuthApp {
 
         final var googleCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
-                .setRedirectUri("/auth/google")
-                .setNonce("0394852-3190485-2490358");
+                .setRedirectUri("/auth/google");
 
         // Microsoft Auth provider
         final var microsoftAuth = AuthAPI.microsoftAuth()
