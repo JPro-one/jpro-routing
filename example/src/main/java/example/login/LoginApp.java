@@ -49,10 +49,9 @@ public class LoginApp extends BaseAuthApp {
 
         // Google Auth provider
         final var googleAuth = AuthAPI.googleAuth()
-                .webAPI(getWebAPI())
                 .clientId(GOOGLE_CLIENT_ID)
                 .clientSecret(GOOGLE_CLIENT_SECRET)
-                .create();
+                .create(getStage());
 
         final var googleCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
@@ -61,11 +60,10 @@ public class LoginApp extends BaseAuthApp {
 
         // Microsoft Auth provider
         final var microsoftAuth = AuthAPI.microsoftAuth()
-                .webAPI(getWebAPI())
                 .clientId(AZURE_CLIENT_ID)
                 .clientSecret(AZURE_CLIENT_SECRET)
                 .tenant("common")
-                .create();
+                .create(getStage());
 
         final var microsoftCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
@@ -73,11 +71,10 @@ public class LoginApp extends BaseAuthApp {
 
         // Keycloak Auth provider
         final var keycloakAuth = AuthAPI.keycloakAuth()
-                .webAPI(getWebAPI())
                 .site("http://localhost:8080/realms/{realm}")
                 .clientId("myclient")
                 .realm("myrealm")
-                .create();
+                .create(getStage());
 
         final var keycloakCredentials = new OAuth2Credentials()
                 .setScopes(List.of("openid", "email"))
