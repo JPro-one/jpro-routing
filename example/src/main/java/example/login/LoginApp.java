@@ -192,20 +192,19 @@ public class LoginApp extends BaseAuthApp {
 
         final var discoveryBox = createButtonWithDescription(
                 "The OpenID Connect Discovery provides a client with configuration details.",
-                "Discovery", event ->
-                        FXFuture.fromJava(authProvider.discover())
-                                .map(provider -> {
-                                    final var options = provider.getOptions();
-                                    setAuthOptions(options);
-                                    gotoPage(headerLabel, "/provider/discovery/"
-                                            + getAuthProviderName(authProvider).toLowerCase());
-                                    return provider;
-                                })
-                                .recover(throwable -> {
-                                    setError(throwable);
-                                    gotoPage(headerLabel, AUTH_ERROR_PATH);
-                                    return null;
-                                }));
+                "Discovery", event -> FXFuture.fromJava(authProvider.discover())
+                        .map(provider -> {
+                            final var options = provider.getOptions();
+                            setAuthOptions(options);
+                            gotoPage(headerLabel, "/provider/discovery/"
+                                    + getAuthProviderName(authProvider).toLowerCase());
+                            return provider;
+                        })
+                        .recover(throwable -> {
+                            setError(throwable);
+                            gotoPage(headerLabel, AUTH_ERROR_PATH);
+                            return null;
+                        }));
         pane.getChildren().addAll(signInBox, discoveryBox);
 
         return new StackPane(pane);
@@ -415,7 +414,7 @@ public class LoginApp extends BaseAuthApp {
         userView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
             final var userInfo = getUserInfo();
             return userInfo == null ? "" : jsonToMarkdown(userInfo);
-        }, userProperty()));
+        }, userInfoProperty()));
 
         final var pane = new VBox(headerLabel, userView);
         pane.getStyleClass().add("user-info-pane");
