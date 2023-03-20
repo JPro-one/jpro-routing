@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import simplefx.experimental.parts.FXFuture;
 
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -231,15 +232,20 @@ public abstract class BaseAuthApp extends RouteApp {
         return sb.toString();
     }
 
-    String jsonToMarkdown(JSONArray json, int level) {
-        StringBuilder sb = new StringBuilder("\n");
-        for (Object object : json) {
+    private String jsonToMarkdown(JSONArray jsonArray, int level) {
+        StringBuilder sb = new StringBuilder();
+        Iterator<Object> iterator = jsonArray.iterator();
+        while (iterator.hasNext()) {
+            Object object = iterator.next();
             if (object instanceof JSONObject) {
-                sb.append(jsonToMarkdown((JSONObject) object, level + 1));
+                sb.append('\n').append(jsonToMarkdown((JSONObject) object, level + 1));
             } else if (object instanceof JSONArray) {
-                sb.append(jsonToMarkdown((JSONArray) object, level + 1));
+                sb.append('\n').append(jsonToMarkdown((JSONArray) object, level + 1));
             } else {
-                sb.append(" ".repeat(level * 4)).append("- ").append(object).append("\n");
+                sb.append(object);
+                if (iterator.hasNext()) {
+                    sb.append(", ");
+                }
             }
         }
         return sb.toString();
