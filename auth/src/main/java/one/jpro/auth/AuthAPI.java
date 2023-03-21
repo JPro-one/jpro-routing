@@ -19,6 +19,15 @@ public interface AuthAPI {
     }
 
     /**
+     * Configure and create a GitHub authentication provider.
+     *
+     * @return fluent style api.
+     */
+    static FluentGitHubAuth.FluentWebAPI githubAuth() {
+        return new FluentGitHubAuthAPI();
+    }
+
+    /**
      * Configure and create a Keycloak authentication provider.
      *
      * @return fluent style api.
