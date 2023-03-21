@@ -85,6 +85,7 @@ public class LoginApp extends BaseAuthApp {
                 .path("/user", Route.empty()
                         .and(getNode("/console", (r) -> signedInUserView()))
                         .and(getNode("/auth-info", (r) -> authInfoView()))
+                        .and(getNode("/introspect-token", (r) -> introspectTokenView()))
                         .and(getNode("/refresh-token", (r) -> refreshTokenView()))
                         .and(getNode("/revoke-token", (r) -> loginView()))
                         .and(getNode("/user-info", (r) -> userInfoView()))
@@ -243,6 +244,27 @@ public class LoginApp extends BaseAuthApp {
                 "Show authentication information about this user.", "Auth Info",
                 event -> gotoPage(headerLabel, "/user/auth-info"));
 
+        final var introspectTokenBox = createButtonWithDescription(
+                "Introspect the access token.", "Introspect Token",
+                event -> FXFuture.fromJava(authProvider.introspect(getUser(), "access_token"))
+                        .map(json -> {
+                            setIntrospectionInfo(json);
+                            gotoPage(headerLabel, "/user/introspect-token");
+                            return json;
+                        })
+                        .recover(throwable -> {
+                            setError(throwable);
+                            gotoPage(headerLabel, AUTH_ERROR_PATH);
+                            return null;
+                        }));
+        introspectTokenBox.setDisable(true);
+
+        Optional.ofNullable(getAuthProvider())
+                .map(OAuth2AuthenticationProvider::getOptions)
+                .map(OAuth2Options::getIntrospectionPath)
+                .filter(introspectPath -> !introspectPath.isBlank())
+                .ifPresent(refreshToken -> introspectTokenBox.setDisable(false));
+
         final var refreshTokenBox = createButtonWithDescription(
                 "Use refresh token to get a new access token.", "Refresh Token",
                 event -> FXFuture.fromJava(authProvider.refresh(getUser()))
@@ -365,7 +387,8 @@ public class LoginApp extends BaseAuthApp {
                 .filter(logoutPath -> !logoutPath.isBlank())
                 .ifPresent(logoutPath -> logoutBox.setDisable(false));
 
-        final var pane = new VBox(headerLabel, authInfoBox, refreshTokenBox, revokeTokenBox, userInfoBox, logoutBox);
+        final var pane = new VBox(headerLabel, authInfoBox, introspectTokenBox, refreshTokenBox,
+                revokeTokenBox, userInfoBox, logoutBox);
         pane.getStyleClass().add("signed-in-user-pane");
 
         return new StackPane(pane);
@@ -375,15 +398,32 @@ public class LoginApp extends BaseAuthApp {
         final var headerLabel = new Label("Authentication information:");
         headerLabel.getStyleClass().add("header-label");
 
-        MarkdownView userView = new MarkdownView();
-        userView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
-        userView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+        MarkdownView markdownView = new MarkdownView();
+        markdownView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        markdownView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
             final var user = getUser();
             return user == null ? "" : jsonToMarkdown(user.toJSON());
         }, userProperty()));
 
-        final var pane = new VBox(headerLabel, userView);
+        final var pane = new VBox(headerLabel, markdownView);
         pane.getStyleClass().add("auth-info-pane");
+
+        return new StackPane(pane);
+    }
+
+    public Node introspectTokenView() {
+        final var headerLabel = new Label("Introspect token:");
+        headerLabel.getStyleClass().add("header-label");
+
+        MarkdownView markdownView = new MarkdownView();
+        markdownView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        markdownView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+            final var introspectionInfo = getIntrospectionInfo();
+            return introspectionInfo == null ? "" : jsonToMarkdown(introspectionInfo);
+        }, introspectionInfoProperty()));
+
+        final var pane = new VBox(headerLabel, markdownView);
+        pane.getStyleClass().add("user-info-pane");
 
         return new StackPane(pane);
     }
@@ -393,31 +433,31 @@ public class LoginApp extends BaseAuthApp {
                 "after refreshing the access token:");
         headerLabel.getStyleClass().add("header-label");
 
-        MarkdownView userView = new MarkdownView();
-        userView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
-        userView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+        MarkdownView markdownView = new MarkdownView();
+        markdownView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        markdownView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
             final var user = getUser();
             return user == null ? "" : jsonToMarkdown(user.toJSON());
         }, userProperty()));
 
-        final var pane = new VBox(headerLabel, userView);
+        final var pane = new VBox(headerLabel, markdownView);
         pane.getStyleClass().add("auth-info-pane");
 
         return new StackPane(pane);
     }
 
     public Node userInfoView() {
-        final var headerLabel = new Label("User information:");
+        final var headerLabel = new Label("UserInfo metadata:");
         headerLabel.getStyleClass().add("header-label");
 
-        MarkdownView userView = new MarkdownView();
-        userView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
-        userView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
+        MarkdownView markdownView = new MarkdownView();
+        markdownView.getStylesheets().add("/com/sandec/mdfx/mdfx-default.css");
+        markdownView.mdStringProperty().bind(Bindings.createStringBinding(() -> {
             final var userInfo = getUserInfo();
             return userInfo == null ? "" : jsonToMarkdown(userInfo);
         }, userInfoProperty()));
 
-        final var pane = new VBox(headerLabel, userView);
+        final var pane = new VBox(headerLabel, markdownView);
         pane.getStyleClass().add("user-info-pane");
 
         return new StackPane(pane);

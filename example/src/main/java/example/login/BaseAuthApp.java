@@ -75,6 +75,29 @@ public abstract class BaseAuthApp extends RouteApp {
         return userProperty;
     }
 
+    // Introspection Info property
+    private ObjectProperty<JSONObject> introspectionInfoProperty;
+
+    final JSONObject getIntrospectionInfo() {
+        return introspectionInfoProperty == null ? null : introspectionInfoProperty.get();
+    }
+
+    final void setIntrospectionInfo(JSONObject value) {
+        introspectionInfoProperty().set(value);
+    }
+
+    /**
+     * The introspection info property contains the introspection info of the currently logged-in user.
+     *
+     * @return the introspection info property
+     */
+    final ObjectProperty<JSONObject> introspectionInfoProperty() {
+        if (introspectionInfoProperty == null) {
+            introspectionInfoProperty = new SimpleObjectProperty<>(this, "introspectionInfo");
+        }
+        return introspectionInfoProperty;
+    }
+
     // User info property
     private ObjectProperty<JSONObject> userInfoProperty;
 
