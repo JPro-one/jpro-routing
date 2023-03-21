@@ -4,8 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationException;
-import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.http.HttpMethod;
+import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -177,11 +177,11 @@ public class OAuth2API {
     }
 
     /**
-     * Validate an access token and retrieve its underlying authorisation (for resource servers).
+     * Determine the active state of an OAuth 2.0 token and to determine meta-information about this token.
      *
      * @param tokenType the type of the token to be introspected.
      * @param token     the token to be introspected.
-     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     * @see <a href="https://tools.ietf.org/html/rfc7662">https://tools.ietf.org/html/rfc7662</a>
      */
     public CompletableFuture<JSONObject> tokenIntrospection(String tokenType, String token) {
         final JSONObject headers = new JSONObject();

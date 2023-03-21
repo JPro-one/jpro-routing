@@ -290,6 +290,18 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     /**
+     * Determine the active state of an OAuth 2.0 token.
+     *
+     * @param user the user
+     * @param tokenType the token type to introspect
+     * @return a {@link CompletableFuture} with the introspection response information in JSON format.
+     */
+    public CompletableFuture<JSONObject> introspect(User user, String tokenType) {
+        return api.tokenIntrospection(tokenType, user.toJSON().getJSONObject(User.KEY_ATTRIBUTES)
+                .optJSONObject("auth").get(tokenType).toString());
+    }
+
+    /**
      * Refreshes the user's access token.
      *
      * @param user the user
