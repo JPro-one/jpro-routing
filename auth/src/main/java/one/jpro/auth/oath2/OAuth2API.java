@@ -187,10 +187,10 @@ public class OAuth2API {
         final JSONObject headers = new JSONObject();
 
         final boolean confidentialClient = options.getClientId() != null && options.getClientSecret() != null;
-
         if (confidentialClient) {
             String basic = options.getClientId() + ":" + options.getClientSecret();
-            headers.put("Authorization", "Basic " + BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
+            headers.put("Authorization", "Basic " +
+                    BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
         }
 
         final JSONObject form = new JSONObject()
@@ -210,7 +210,6 @@ public class OAuth2API {
                     }
 
                     JSONObject json;
-
                     if (containsValue(response.headers(), "application/json")) {
                         json = new JSONObject(response.body());
                     } else if (containsValue(response.headers(), "application/x-www-form-urlencoded") ||
@@ -248,7 +247,8 @@ public class OAuth2API {
         final boolean confidentialClient = options.getClientId() != null && options.getClientSecret() != null;
         if (confidentialClient) {
             String basic = options.getClientId() + ":" + options.getClientSecret();
-            headers.put("Authorization", "Basic " + BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
+            headers.put("Authorization", "Basic " +
+                    BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
         }
 
         final JSONObject form = new JSONObject()
@@ -670,6 +670,13 @@ public class OAuth2API {
         if (payload != null) {
             requestBuilder.POST(HttpRequest.BodyPublishers.ofByteArray(payload.getBytes()));
         }
+
+        final var request = requestBuilder.build();
+        System.out.println();
+        System.out.println("Request method: " + request.method());
+        System.out.println("Request URI: " + request.uri().toString());
+        System.out.println("Request headers: " + request.headers().map().toString());
+        System.out.println("Request body: " + payload);
 
         return httpClient.sendAsync(requestBuilder.build(), HttpResponse.BodyHandlers.ofString())
                 .thenCompose(response -> {
