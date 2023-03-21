@@ -1,6 +1,7 @@
 package one.jpro.auth.api;
 
 import javafx.stage.Stage;
+import one.jpro.auth.oath2.OAuth2Flow;
 import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
 
 /**
@@ -9,6 +10,14 @@ import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
  * @author Besmir Beqiri
  */
 public interface FluentKeycloakAuth {
+
+    /**
+     * Set the OAuth2 flow.
+     *
+     * @param flow the flow
+     * @return self
+     */
+    FluentKeycloakAuth flow(OAuth2Flow flow);
 
     /**
      * Set the site.
@@ -25,6 +34,14 @@ public interface FluentKeycloakAuth {
      * @return self
      */
     FluentKeycloakAuth clientId(String clientId);
+
+    /**
+     * Set the client secret.
+     *
+     * @param clientSecret the client secret
+     * @return self
+     */
+    FluentKeycloakAuth clientSecret(String clientSecret);
 
     /**
      * Set the realm.
