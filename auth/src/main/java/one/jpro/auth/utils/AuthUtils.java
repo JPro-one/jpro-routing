@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public final class AuthUtils {
 
-    public static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder().withoutPadding();
+    public static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder();
     public static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
 
     /**
