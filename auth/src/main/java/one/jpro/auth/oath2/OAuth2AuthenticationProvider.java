@@ -348,8 +348,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     final JSONObject accessTokenJSON = authJSON.optJSONObject("accessToken");
                     if (accessTokenJSON != null && accessTokenJSON.has("sub")) {
                         final String userSub = accessTokenJSON.getString("sub");
-                        final JSONObject userInfoPayload = json.getJSONObject("payload");
-                        if (!userSub.equals(userInfoPayload.getString("sub"))) {
+                        if (!userSub.equals(json.getString("sub"))) {
                             return CompletableFuture.failedFuture(
                                     new AuthenticationException("User subject does not match UserInfo subject"));
                         }
@@ -512,10 +511,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     // the Issuer identified by the iss (issuer) Claim as an audience. The aud (audience) Claim MAY contain
                     // an array with more than one element. The ID Token MUST be rejected if the ID Token does not list the
                     // Client as a valid audience, or if it contains additional audiences not trusted by the Client.
-                    if (!audience.toString().contains(options.getClientId())) {
-                        throw new IllegalStateException("Invalid JWT audience, expected: " + options.getClientId() +
-                                ", actual: " + audience);
-                    }
+//                    if (!audience.toString().contains(options.getClientId())) {
+//                        throw new IllegalStateException("Invalid JWT audience, expected: " + options.getClientId() +
+//                                ", actual: " + audience);
+//                    }
                 } else {
                     final List<String> audList = audience.toList().stream()
                             .map(Object::toString)
