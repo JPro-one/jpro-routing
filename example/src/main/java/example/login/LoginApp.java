@@ -19,7 +19,6 @@ import one.jpro.auth.oath2.OAuth2Credentials;
 import one.jpro.auth.oath2.OAuth2Options;
 import one.jpro.routing.Route;
 import one.jpro.routing.dev.DevFilter;
-import org.json.JSONObject;
 import simplefx.experimental.parts.FXFuture;
 
 import java.io.PrintWriter;
@@ -360,13 +359,7 @@ public class LoginApp extends BaseAuthApp {
                         return;
                     }
 
-                    final var userAttributes = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES);
-                    final var accessToken = userAttributes
-                            .optJSONObject("auth", new JSONObject()).getString("access_token");
-                    final var refreshToken = userAttributes.
-                            optJSONObject("auth", new JSONObject()).optString("refresh_token");
-
-                    FXFuture.fromJava(authProvider.logout(accessToken, refreshToken))
+                    FXFuture.fromJava(authProvider.logout(user))
                             .map(unused -> {
                                 // the result can be ignored
                                 setUser(null);

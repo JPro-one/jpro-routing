@@ -51,7 +51,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     /**
      * Creates a OAuth2 authentication provider.
      *
-     * @param webAPI the web API
+     * @param webAPI  the web API
      * @param options the OAuth2 options
      */
     public OAuth2AuthenticationProvider(@NotNull final WebAPI webAPI, @NotNull final OAuth2Options options) {
@@ -292,7 +292,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     /**
      * Determine the active state of an OAuth 2.0 token.
      *
-     * @param user the user
+     * @param user      the user
      * @param tokenType the token type to introspect
      * @return a {@link CompletableFuture} with the introspection response information in JSON format.
      */
@@ -352,7 +352,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      */
     public CompletableFuture<JSONObject> userInfo(final @NotNull User user) {
         Objects.requireNonNull(user, "User must not be null");
-        final JSONObject authJSON = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES).optJSONObject("auth");
+        final JSONObject authJSON = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES).getJSONObject("auth");
 
         return api.userInfo(authJSON.getString("access_token"))
                 .thenCompose(json -> {
@@ -383,13 +383,26 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     }
 
     /**
-     * Logout the user.
+     * Logout the user from this OAuth2 provider.
      *
-     * @param accessToken  the access token
-     * @param refreshToken the refresh token
+     * @param user the user to logout
      * @return a {@link CompletableFuture} that completes when the user is logged out.
      */
-    public CompletableFuture<Void> logout(final @NotNull String accessToken, final @Nullable String refreshToken) {
+    public CompletableFuture<Void> logout(final @NotNull User user) {
+        return logout(user, null);
+    }
+
+    /**
+     * Logout the user from this OAuth2 provider.
+     * The refresh token is optional and can be <code>null</code>.
+     *
+     * @param user         the user to logout
+     * @param refreshToken the refresh token, if available
+     * @return a {@link CompletableFuture} that completes when the user is logged out.
+     */
+    public CompletableFuture<Void> logout(final @NotNull User user, final @Nullable String refreshToken) {
+        final JSONObject authJSON = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES).getJSONObject("auth");
+        final String accessToken = authJSON.getString("access_token");
         return api.logout(accessToken, refreshToken);
     }
 
