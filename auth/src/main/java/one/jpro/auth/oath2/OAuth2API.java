@@ -671,13 +671,6 @@ public class OAuth2API {
             requestBuilder.POST(HttpRequest.BodyPublishers.ofByteArray(payload.getBytes()));
         }
 
-        final var request = requestBuilder.build();
-        System.out.println();
-        System.out.println("Request method: " + request.method());
-        System.out.println("Request URI: " + request.uri().toString());
-        System.out.println("Request headers: " + request.headers().map().toString());
-        System.out.println("Request body: " + payload);
-
         return httpClient.sendAsync(requestBuilder.build(), HttpResponse.BodyHandlers.ofString())
                 .thenCompose(response -> {
                     // read the body regardless
