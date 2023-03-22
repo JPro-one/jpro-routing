@@ -359,7 +359,10 @@ public class LoginApp extends BaseAuthApp {
                         return;
                     }
 
-                    FXFuture.fromJava(authProvider.logout(user))
+                    final var userAttributes = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES);
+                    final var refreshToken = userAttributes.getJSONObject("auth").optString("refresh_token");
+
+                    FXFuture.fromJava(authProvider.logout(user, refreshToken))
                             .map(unused -> {
                                 // the result can be ignored
                                 setUser(null);
