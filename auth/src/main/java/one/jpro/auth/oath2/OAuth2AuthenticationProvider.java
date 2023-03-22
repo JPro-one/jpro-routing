@@ -16,7 +16,6 @@ import one.jpro.auth.jwt.TokenCredentials;
 import one.jpro.auth.jwt.TokenExpiredException;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -389,20 +388,10 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      * @return a {@link CompletableFuture} that completes when the user is logged out.
      */
     public CompletableFuture<Void> logout(final @NotNull User user) {
-        return logout(user, null);
-    }
-
-    /**
-     * Logout the user from this OAuth2 provider.
-     * The refresh token is optional and can be <code>null</code>.
-     *
-     * @param user         the user to logout
-     * @param refreshToken the refresh token, if available
-     * @return a {@link CompletableFuture} that completes when the user is logged out.
-     */
-    public CompletableFuture<Void> logout(final @NotNull User user, final @Nullable String refreshToken) {
         final JSONObject authJSON = user.toJSON().getJSONObject(User.KEY_ATTRIBUTES).getJSONObject("auth");
         final String accessToken = authJSON.getString("access_token");
+        final String refreshToken = authJSON.optString("refresh_token");
+
         return api.logout(accessToken, refreshToken);
     }
 
