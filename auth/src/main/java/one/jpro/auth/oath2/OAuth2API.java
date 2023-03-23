@@ -1,42 +1,48 @@
 package one.jpro.auth.oath2;
 
-import one.jpro.auth.utils.HttpMethod;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.jpro.webapi.WebAPI;
+import one.jpro.auth.authentication.AuthenticationException;
+import one.jpro.auth.http.HttpMethod;
+import one.jpro.auth.jwt.JWTOptions;
+import one.jpro.auth.utils.AuthUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.net.*;
+import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static one.jpro.auth.utils.AuthUtils.*;
 
 /**
- * OAuth2 API class.
+ * OAuth2 API provides the required functionalities to interact with an OAuth2 provider.
  *
  * @author Besmir Beqiri
  */
 public class OAuth2API {
 
-    private static final Logger log = LoggerFactory.getLogger(OAuth2API.class);
     private static final Pattern MAX_AGE = Pattern.compile("max-age=\"?(\\d+)\"?");
     private static final String CACHE_CONTROL = "cache-control";
-    private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
+    private static final Base64.Encoder BASE64_ENCODER = AuthUtils.BASE64_ENCODER;
 
+    @NotNull
     private final OAuth2Options options;
+    @NotNull
     private final HttpClient httpClient;
 
-    public OAuth2API(OAuth2Options options) {
+    public OAuth2API(@NotNull final OAuth2Options options) {
         this.options = options;
         this.httpClient = HttpClient.newHttpClient();
     }
@@ -44,8 +50,10 @@ public class OAuth2API {
     /**
      * The client sends the end-user's browser to this endpoint to request their authentication and consent.
      * This endpoint is used in the code and implicit OAuth 2.0 flows which require end-user interaction.
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     *
+     * @param credentials the credentials to be used to authorize the user.
+     * @return the url to be used to authorize the user.
+     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public String authorizeURL(OAuth2Credentials credentials) {
         final JSONObject query = credentials.toJSON();
@@ -57,9 +65,12 @@ public class OAuth2API {
             flow = options.getFlow();
         }
 
-        if (flow != OAuth2Flow.AUTH_CODE) {
-            throw new IllegalStateException("authorization URL cannot be computed for non AUTH_CODE flow");
+        if (flow == OAuth2Flow.AUTH_CODE) {
+            query.put("response_type", "code");
         }
+//        else {
+//            throw new IllegalStateException("authorization URL cannot be computed for non AUTH_CODE flow");
+//        }
 
         if (query.has("scopes")) {
             // scopes have been passed as a list so the provider must generate the correct string for it
@@ -68,7 +79,6 @@ public class OAuth2API {
             query.remove("scopes");
         }
 
-        query.put("response_type", "code");
         final String clientId = options.getClientId();
         if (clientId != null) {
             query.put("client_id", clientId);
@@ -87,8 +97,10 @@ public class OAuth2API {
     /**
      * Post an OAuth 2.0 grant (code, refresh token, resource owner password credentials, client credentials)
      * to obtain an ID and / or access token.
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     *
+     * @param grantType the grant type.
+     * @param params    the parameters to be sent.
+     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
     public CompletableFuture<JSONObject> token(String grantType, JSONObject params) {
         if (grantType == null) {
@@ -108,7 +120,7 @@ public class OAuth2API {
         // Send authorization params in the body
         final JSONObject form = new JSONObject(params.toString());
         if (options.getExtraParams() != null) {
-            for(String key : JSONObject.getNames(options.getExtraParams())){
+            for (String key : JSONObject.getNames(options.getExtraParams())) {
                 form.put(key, options.getExtraParams().get(key));
             }
         }
@@ -143,10 +155,10 @@ public class OAuth2API {
 
                     JSONObject json;
                     final var header = response.headers();
-                    if (containsValue(header,"application/json")) {
+                    if (containsValue(header, "application/json")) {
                         json = new JSONObject(response.body());
-                    } else if (containsValue(header,"application/x-www-form-urlencoded")
-                            || containsValue(header,"text/plain")) {
+                    } else if (containsValue(header, "application/x-www-form-urlencoded")
+                            || containsValue(header, "text/plain")) {
                         json = queryToJson(response.body());
                     } else {
                         return CompletableFuture.failedFuture(
@@ -165,18 +177,20 @@ public class OAuth2API {
     }
 
     /**
-     * Validate an access token and retrieve its underlying authorisation (for resource servers).
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     * Determine the active state of an OAuth 2.0 token and to determine meta-information about this token.
+     *
+     * @param tokenType the type of the token to be introspected.
+     * @param token     the token to be introspected.
+     * @see <a href="https://tools.ietf.org/html/rfc7662">https://tools.ietf.org/html/rfc7662</a>
      */
     public CompletableFuture<JSONObject> tokenIntrospection(String tokenType, String token) {
         final JSONObject headers = new JSONObject();
 
         final boolean confidentialClient = options.getClientId() != null && options.getClientSecret() != null;
-
         if (confidentialClient) {
             String basic = options.getClientId() + ":" + options.getClientSecret();
-            headers.put("Authorization", "Basic " + BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
+            headers.put("Authorization", "Basic " +
+                    BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
         }
 
         final JSONObject form = new JSONObject()
@@ -196,15 +210,14 @@ public class OAuth2API {
                     }
 
                     JSONObject json;
-
                     if (containsValue(response.headers(), "application/json")) {
                         json = new JSONObject(response.body());
                     } else if (containsValue(response.headers(), "application/x-www-form-urlencoded") ||
                             containsValue(response.headers(), "text/plain")) {
                         json = queryToJson(response.body());
                     } else return CompletableFuture.failedFuture(
-                                new RuntimeException("Cannot handle accessToken type: "
-                                        + response.headers().allValues("Content-Type")));
+                            new RuntimeException("Cannot handle accessToken type: "
+                                    + response.headers().allValues("Content-Type")));
 
                     if (json == null || json.has("error")) {
                         return CompletableFuture.failedFuture(
@@ -218,28 +231,30 @@ public class OAuth2API {
 
     /**
      * Revoke an obtained access or refresh token.
-     * <p>
-     * see: <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
+     *
+     * @param tokenType the type of the token to be revoked.
+     * @param token     the token to be revoked.
+     * @see <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>
      */
-    public CompletableFuture<Void> tokenRevocation(String tokenType, String token) {
+    public CompletableFuture<Void> tokenRevocation(final @NotNull String tokenType, final @NotNull String token) {
         if (token == null) {
             return CompletableFuture.failedFuture(new RuntimeException("Cannot revoke null token"));
         }
 
         final JSONObject headers = new JSONObject();
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
 
         final boolean confidentialClient = options.getClientId() != null && options.getClientSecret() != null;
-
         if (confidentialClient) {
             String basic = options.getClientId() + ":" + options.getClientSecret();
-            headers.put("Authorization", "Basic " + BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
+            headers.put("Authorization", "Basic " +
+                    BASE64_ENCODER.encodeToString(basic.getBytes(StandardCharsets.UTF_8)));
         }
 
-        final JSONObject form = new JSONObject();
+        final JSONObject form = new JSONObject()
+                .put("token", token)
+                .put("token_type_hint", tokenType);
 
-        form.put("token", token).put("token_type_hint", tokenType);
-
-        headers.put("Content-Type", "application/x-www-form-urlencoded");
         final String payload = jsonToQuery(form);
         // specify preferred accepted accessToken type
         headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
@@ -251,6 +266,63 @@ public class OAuth2API {
                     }
 
                     return CompletableFuture.completedFuture(null); // Void type
+                });
+    }
+
+    /**
+     * Retrieve user information and other attributes for a logged-in end-user.
+     *
+     * @param accessToken the access token
+     * @return the user information wrapped in a JSON object
+     * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#UserInfo">UserInfo</a>
+     */
+    public CompletableFuture<JSONObject> userInfo(String accessToken) {
+        final JSONObject headers = new JSONObject();
+        final JSONObject extraParams = options.getExtraParams();
+        String path = options.getUserInfoPath();
+
+        if (path == null) {
+            return CompletableFuture.failedFuture(new AuthenticationException("userInfo path is not configured"));
+        }
+
+        if (extraParams != null) {
+            path += "?" + jsonToQuery(extraParams);
+        }
+
+        headers.put("Authorization", "Bearer " + accessToken);
+        // specify preferred accepted accessToken type
+        headers.put("Accept", "application/json,application/jwt,application/x-www-form-urlencoded;q=0.9");
+
+        return fetch(HttpMethod.GET, path, headers, null)
+                .thenCompose(response -> {
+                    String body = response.body();
+
+                    if (body == null) { // TODO: check if it's possible to have an empty body (body.length() == 0)
+                        return CompletableFuture.failedFuture(new AuthenticationException("No Body"));
+                    }
+
+                    // userInfo is expected to be a JWT
+                    JSONObject userInfo;
+                    if (containsValue(response.headers(), "application/json")) {
+                        userInfo = new JSONObject(body);
+                    } else if (containsValue(response.headers(), "applications/jwt")) {
+                        // userInfo is expected to be a JWT
+                        final DecodedJWT decodedJWT = JWT.decode(body);
+                        final JSONObject jwtHeader = new JSONObject(decodedJWT.getHeader());
+                        final JSONObject jwtPayload = new JSONObject(decodedJWT.getPayload());
+                        userInfo = new JSONObject().put("header", jwtHeader).put("payload", jwtPayload);
+                    } else if (containsValue(response.headers(), "application/x-www-form-urlencoded")
+                            || containsValue(response.headers(), "text/plain")) {
+                        // attempt to convert url encoded string to json
+                        userInfo = queryToJson(body);
+                    } else {
+                        return CompletableFuture.failedFuture(
+                                new AuthenticationException("Cannot handle Content-Type: "
+                                        + response.headers().allValues("Content-Type")));
+                    }
+
+                    processNonStandardHeaders(userInfo, response, options.getScopeSeparator());
+                    return CompletableFuture.completedFuture(userInfo);
                 });
     }
 
@@ -274,8 +346,8 @@ public class OAuth2API {
                             containsValue(response.headers(), "application/json")) {
                         json = new JSONObject(response.body());
                     } else return CompletableFuture.failedFuture(
-                                new RuntimeException("Cannot handle content type: "
-                                        + response.headers().allValues("Content-Type")));
+                            new RuntimeException("Cannot handle content type: "
+                                    + response.headers().allValues("Content-Type")));
 
                     if (json.has("error")) {
                         return CompletableFuture.failedFuture(new RuntimeException(extractErrorDescription(json)));
@@ -303,16 +375,260 @@ public class OAuth2API {
                 });
     }
 
-    public CompletableFuture<HttpResponse<String>> fetch(HttpMethod method, String path,
-                                                         JSONObject headers, String payload) {
+    /**
+     * The discovery will use the given site in the configuration options
+     * and attempt to load the well known descriptor.
+     *
+     * @param config the initial options, it should contain the site url
+     * @return an OAuth2 provider configured with the discovered option values
+     * @see <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>
+     */
+    public CompletableFuture<OAuth2AuthenticationProvider> discover(final WebAPI webAPI, final OAuth2Options config) {
+        if (config.getSite() == null) {
+            CompletableFuture.failedFuture(new RuntimeException("the site url cannot be null"));
+        }
 
+        // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
+        final String oidc_discovery_path = "/.well-known/openid-configuration";
+
+        String issuer = config.getSite();
+        if (issuer.endsWith(oidc_discovery_path)) {
+            issuer = issuer.substring(0, issuer.length() - oidc_discovery_path.length());
+        }
+
+        // fetch the OpenID Connect provider metadata as defined in:
+        // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+        return fetch(HttpMethod.GET, issuer + oidc_discovery_path,
+                new JSONObject().put("Accept", "application/json"), null)
+                .thenCompose(response -> {
+                    if (response.statusCode() != 200) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException("Bad Response [" + response.statusCode() + "] " + response.body()));
+                    }
+
+                    if (!containsValue(response.headers(), "application/json")) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException("Cannot handle content type: "
+                                        + response.headers().allValues("Content-Type")));
+                    }
+
+                    final JSONObject json = new JSONObject(response.body());
+
+                    // some providers return errors as JSON
+                    if (json.has("error")) {
+                        return CompletableFuture.failedFuture(new RuntimeException(extractErrorDescription(json)));
+                    }
+
+                    config.setAuthorizationPath(json.optString("authorization_endpoint", null));
+                    config.setTokenPath(json.optString("token_endpoint", null));
+                    config.setLogoutPath(json.optString("end_session_endpoint", null));
+                    config.setRevocationPath(json.optString("revocation_endpoint", null));
+                    config.setUserInfoPath(json.optString("userinfo_endpoint", null));
+                    config.setJwkPath(json.optString("jwks_uri", null));
+                    config.setIntrospectionPath(json.optString("introspection_endpoint", null));
+
+                    // The complete URL for the authorization server.
+                    // This becomes the "iss" claim in an access token.
+                    if (json.has("issuer")) {
+                        // the discovery document includes the issuer, this means we can add it
+                        JWTOptions jwtOptions = config.getJWTOptions();
+                        if (jwtOptions == null) {
+                            jwtOptions = new JWTOptions();
+                            config.setJWTOptions(jwtOptions);
+                        }
+
+                        // set the issuer
+                        jwtOptions.setIssuer(json.getString("issuer"));
+                    }
+
+                    // issuer validation
+                    if (config.isValidateIssuer()) {
+                        String issuerEndpoint = json.getString("issuer");
+                        if (issuerEndpoint != null) {
+                            // the provider is letting the user know the issuer endpoint, so we need to validate it
+                            // by removing the trailing slash (if present) and comparing it to the received endpoint
+                            if (issuerEndpoint.endsWith("/")) {
+                                issuerEndpoint = issuerEndpoint.substring(0, issuerEndpoint.length() - 1);
+                            }
+
+                            if (!issuerEndpoint.equals(config.getJWTOptions().getIssuer())) {
+                                return CompletableFuture.failedFuture(
+                                        new RuntimeException("Issuer validation failed: received ["
+                                                + issuerEndpoint + "]" + " but expected ["
+                                                + config.getJWTOptions().getIssuer() + "]"));
+                            }
+                        }
+                    }
+
+                    // reset supported response types
+                    config.setSupportedResponseTypes(null);
+                    if (json.has("response_types_supported")) {
+                        // optional config
+                        JSONArray responseTypes = json.getJSONArray("response_types_supported");
+                        responseTypes.forEach(responseType -> config.addSupportedResponseType((String) responseType));
+                    }
+
+                    // reset supported response modes
+                    config.setSupportedResponseModes(null);
+                    if (json.has("response_modes_supported")) {
+                        // optional config
+                        JSONArray responseModes = json.getJSONArray("response_modes_supported");
+                        responseModes.forEach(responseMode -> config.addSupportedResponseMode((String) responseMode));
+                    }
+
+                    // retrieve supported grant types
+                    config.setSupportedGrantTypes(null);
+                    if (json.has("grant_types_supported") && config.getFlow() != null) {
+                        // optional config
+                        JSONArray flows = json.getJSONArray("grant_types_supported");
+                        flows.forEach(grantType -> config.addSupportedGrantType((String) grantType));
+
+                        if (!flows.toList().contains(config.getFlow().getGrantType())) {
+                            return CompletableFuture.failedFuture(new RuntimeException("Unsupported flow: " +
+                                    config.getFlow().getGrantType() + ", allowed: " + flows));
+                        }
+                    }
+
+                    // reset supported subject types
+                    config.setSupportedSubjectTypes(null);
+                    if (json.has("subject_types_supported")) {
+                        // optional config
+                        JSONArray subjectTypes = json.getJSONArray("subject_types_supported");
+                        subjectTypes.forEach(subjectType -> config.addSupportedSubjectType((String) subjectType));
+                    }
+
+                    // reset supported scopes
+                    config.setSupportedScopes(null);
+                    if (json.has("scopes_supported")) {
+                        // optional config
+                        JSONArray scopes = json.getJSONArray("scopes_supported");
+                        scopes.forEach(scope -> config.addSupportedScope((String) scope));
+                    }
+
+                    // reset supported ID token signing algorithms
+                    config.setSupportedIdTokenSigningAlgValues(null);
+                    if (json.has("id_token_signing_alg_values_supported")) {
+                        // optional config
+                        JSONArray idTokenSigningAlgValues = json.getJSONArray("id_token_signing_alg_values_supported");
+                        idTokenSigningAlgValues.forEach(idTokenSigningAlgValue ->
+                                config.addSupportedIdTokenSigningAlgValue((String) idTokenSigningAlgValue));
+                    }
+
+                    // reset list of client supported authentication methods by token endpoint
+                    config.setSupportedTokenEndpointAuthMethods(null);
+                    if (json.has("token_endpoint_auth_methods_supported")) {
+                        // optional config
+                        JSONArray tokenEndpointAuthMethods = json.getJSONArray("token_endpoint_auth_methods_supported");
+                        tokenEndpointAuthMethods.forEach(tokenEndpointAuthMethod ->
+                                config.addSupportedTokenEndpointAuthMethod((String) tokenEndpointAuthMethod));
+                    }
+
+                    // reset supported claims
+                    config.setSupportedClaims(null);
+                    if (json.has("claims_supported")) {
+                        // optional config
+                        JSONArray claims = json.getJSONArray("claims_supported");
+                        claims.forEach(claim -> config.addSupportedClaim((String) claim));
+                    }
+
+                    // reset list of supported PKCE code challenge methods
+                    config.setSupportedCodeChallengeMethods(null);
+                    if (json.has("code_challenge_methods_supported")) {
+                        // optional config
+                        JSONArray codeChallengeMethods = json.getJSONArray("code_challenge_methods_supported");
+                        codeChallengeMethods.forEach(codeChallengeMethod ->
+                                config.addSupportedCodeChallengeMethod((String) codeChallengeMethod));
+                    }
+
+                    // reset list of supported client authentication methods by introspection endpoint
+                    config.setSupportedIntrospectionEndpointAuthMethods(null);
+                    if (json.has("introspection_endpoint_auth_methods_supported")) {
+                        // optional config
+                        JSONArray introspectionEndpointAuthMethods = json.getJSONArray("introspection_endpoint_auth_methods_supported");
+                        introspectionEndpointAuthMethods.forEach(introspectionEndpointAuthMethod ->
+                                config.addSupportedIntrospectionEndpointAuthMethod((String) introspectionEndpointAuthMethod));
+                    }
+
+                    // reset list of supported client authentication methods by revocation endpoint
+                    config.setSupportedRevocationEndpointAuthMethods(null);
+                    if (json.has("revocation_endpoint_auth_methods_supported")) {
+                        // optional config
+                        JSONArray revocationEndpointAuthMethods = json.getJSONArray("revocation_endpoint_auth_methods_supported");
+                        revocationEndpointAuthMethods.forEach(revocationEndpointAuthMethod ->
+                                config.addSupportedRevocationEndpointAuthMethod((String) revocationEndpointAuthMethod));
+                    }
+
+                    // reset supported request parameter
+                    config.setSupportedRequestParameter(false);
+                    if (json.has("request_parameter_supported")) {
+                        // optional config
+                        config.setSupportedRequestParameter(json.getBoolean("request_parameter_supported"));
+                    }
+
+                    // reset the signing algorithms that this provider supports for signed requests.
+                    config.setSupportedRequestObjectSigningAlgValues(null);
+                    if (json.has("request_object_signing_alg_values_supported")) {
+                        // optional config
+                        JSONArray requestObjectSigningAlgValues = json.getJSONArray("request_object_signing_alg_values_supported");
+                        requestObjectSigningAlgValues.forEach(requestObjectSigningAlgValue ->
+                                config.addSupportedRequestObjectSigningAlgValue((String) requestObjectSigningAlgValue));
+                    }
+
+                    return CompletableFuture.completedFuture(new OAuth2AuthenticationProvider(webAPI, config));
+                });
+    }
+
+    /**
+     * Logout the user from the OAuth2 provider.
+     *
+     * @param accessToken  the access token
+     * @param refreshToken the refresh token
+     */
+    public CompletableFuture<Void> logout(final @NotNull String accessToken, final @Nullable String refreshToken) {
+        final JSONObject headers = new JSONObject();
+        headers.put("Authorization", "Bearer " + accessToken);
+
+        final JSONObject form = new JSONObject();
+        form.put("client_id", options.getClientId());
+        if (options.getClientSecret() != null) {
+            form.put("client_secret", options.getClientSecret());
+        }
+        if (refreshToken != null) {
+            form.put("refresh_token", refreshToken);
+        }
+
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        final String payload = jsonToQuery(form);
+        headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
+
+        return fetch(HttpMethod.POST, options.getLogoutPath(), headers, payload)
+                .thenCompose(response -> {
+                    if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                        return CompletableFuture.failedFuture(
+                                new RuntimeException("Bad Response [" + response.statusCode() + "] " + response.body()));
+                    }
+
+                    return CompletableFuture.completedFuture(null);
+                });
+    }
+
+    /**
+     * Base method to fetch the required information from the OAuth2 provider.
+     *
+     * @param method the HTTP method to use
+     * @param path   the path to fetch
+     * @param headers the headers to send
+     * @param payload the payload to send
+     * @return an asynchronous http response wrapped in a completable future
+     */
+    private CompletableFuture<HttpResponse<String>> fetch(HttpMethod method, String path,
+                                                          JSONObject headers, String payload) {
         if (path == null || path.length() == 0) {
             // and this can happen as it is a config option that is dependent on the provider
             return CompletableFuture.failedFuture(new IllegalArgumentException("Invalid path"));
         }
 
         final String url = path.charAt(0) == '/' ? options.getSite() + path : path;
-
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().uri(URI.create(url));
 
         // apply the provider required headers
@@ -342,6 +658,13 @@ public class OAuth2API {
         return makeRequest(requestBuilder, payload);
     }
 
+    /**
+     * Make a request to the OAuth2 provider.
+     *
+     * @param requestBuilder the request builder
+     * @param payload        the payload wrapped in a string
+     * @return an asynchronous http response wrapped in a completable future
+     */
     private CompletableFuture<HttpResponse<String>> makeRequest(HttpRequest.Builder requestBuilder, String payload) {
         // send
         if (payload != null) {
@@ -377,92 +700,5 @@ public class OAuth2API {
                         return CompletableFuture.completedFuture(response);
                     }
                 });
-    }
-
-    private String jsonToQuery(JSONObject json) {
-        return json.toMap().entrySet().stream()
-                .filter(entry -> entry.getValue() != null)
-                .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
-                        URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining("&"));
-    }
-
-    private JSONObject queryToJson(String query) {
-        if (query == null) {
-            return null;
-        }
-
-        final JSONObject json = new JSONObject();
-        final String[] pairs = query.split("&");
-        for (String pair : pairs) {
-            final int idx = pair.indexOf("=");
-            final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8) : pair;
-            final String value = (idx > 0 && pair.length() > idx + 1) ?
-                    URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8) : null;
-            if (!json.has(key)) {
-                json.put(key, value);
-            } else {
-                var oldValue = json.get(key);
-                JSONArray array;
-                if (oldValue instanceof JSONArray) {
-                    array = (JSONArray) oldValue;
-                } else {
-                    array = new JSONArray();
-                    array.put(oldValue);
-                    json.put(key, array);
-                }
-
-                array.put(Objects.requireNonNullElse(value, JSONObject.NULL));
-            }
-        }
-
-        return json;
-    }
-
-    private boolean containsValue(HttpHeaders headers, String value) {
-        return headers.map().entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream())
-                .anyMatch(s -> s.contains(value));
-    }
-
-    private void processNonStandardHeaders(JSONObject json, HttpResponse<String> response, String scopeSeparator) {
-        // inspect the response header for the non-standard:
-        // X-OAuth-Scopes and X-Accepted-OAuth-Scopes
-        final var xOAuthScopes = response.headers().firstValue("X-OAuth-Scopes");
-        final var xAcceptedOAuthScopes = response.headers().firstValue("X-OAuth-Scopes");
-
-        xOAuthScopes.ifPresent(scopes -> {
-            log.trace("Received non-standard X-OAuth-Scopes: {}", scopes);
-            if (json.has("scope")) {
-                json.put("scope", json.getString("scope") + scopeSeparator + scopes);
-            } else {
-                json.put("scope", scopes);
-            }
-        });
-
-        xAcceptedOAuthScopes.ifPresent(scopes -> {
-            log.trace("Received non-standard X-OAuth-Scopes: {}", scopes);
-            json.put("acceptedScopes", scopes);
-        });
-    }
-
-    private String extractErrorDescription(JSONObject json) {
-        if (json == null) {
-            return "null";
-        }
-
-        String description;
-        var error = json.get("error");
-        if (error instanceof JSONObject) {
-            description = ((JSONObject) error).getString("message");
-        } else {
-            description = json.optString("error_description", json.getString("error"));
-        }
-
-        if (description == null) {
-            return "null";
-        }
-
-        return description;
     }
 }

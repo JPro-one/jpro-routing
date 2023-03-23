@@ -1,14 +1,15 @@
 package one.jpro.auth.oath2.provider;
 
 import com.jpro.webapi.WebAPI;
-import one.jpro.auth.authentication.AuthenticationProvider;
-import one.jpro.auth.oath2.JWTOptions;
+import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Flow;
 import one.jpro.auth.oath2.OAuth2Options;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
- * Simplified factory to create an {@link AuthenticationProvider} for Microsoft.
+ * Simplified factory to create an {@link OAuth2AuthenticationProvider} for Microsoft.
  *
  * @author Besmir Beqiri
  */
@@ -40,10 +41,39 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)
                 .setTenant(tenant)
-                .setSite("https://login.microsoftonline.com/{tenant}")
-                .setTokenPath("/oauth2/v2.0/token")
-                .setAuthorizationPath("/oauth2/v2.0/authorize")
-                .setJwkPath("/discovery/v2.0/keys")
-                .setJwtOptions(new JWTOptions().setNonceAlgorithm("SHA-256")));
+                .setSite("https://login.microsoftonline.com/{tenant}/v2.0")
+                .setTokenPath("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token")
+                .setAuthorizationPath("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize")
+                .setUserInfoPath("https://graph.microsoft.com/oidc/userinfo")
+                .setJwkPath("https://login.microsoftonline.com/{tenant}/discovery/v2.0/keys")
+                .setLogoutPath("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/logout")
+                .setJWTOptions(new JWTOptions().setNonceAlgorithm("SHA-256")));
+    }
+
+    /**
+     * Create an {@link OAuth2AuthenticationProvider} for OpenID Connect Discovery. The discovery will use the default
+     * site in the configuration options and attempt to load the well-known descriptor. If a site is provided, then
+     * it will be used to do the lookup.
+     *
+     * @param webAPI  the JPro WebAPI
+     * @param options custom OAuth2 options
+     * @return a future with the instantiated {@link OAuth2AuthenticationProvider}
+     */
+    public static CompletableFuture<OAuth2AuthenticationProvider> discover(WebAPI webAPI, OAuth2Options options) {
+        final String site = options.getSite() == null ?
+                "https://login.microsoftonline.com/{tenant}/v2.0" : options.getSite();
+        final JWTOptions jwtOptions = options.getJWTOptions() == null ?
+                new JWTOptions() : new JWTOptions(options.getJWTOptions());
+        // Microsoft default nonce algorithm
+        if (jwtOptions.getNonceAlgorithm() == null) {
+            jwtOptions.setNonceAlgorithm("SHA-256");
+        }
+
+        return new MicrosoftAuthenticationProvider(webAPI,
+                new OAuth2Options(options)
+                        // Microsoft OpenID does not return the same url where the request was sent to
+                        .setValidateIssuer(false)
+                        .setSite(site)
+                        .setJWTOptions(jwtOptions)).discover();
     }
 }

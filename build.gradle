@@ -18,7 +18,7 @@ buildscript {
   }
 }
 
-configure([project(':core'),project(':example'), project(':dev')]) {
+configure([project(':core'),project(':example'), project(':dev'), project(':core-test')]) {
   repositories {
     mavenCentral()
     maven {
@@ -52,24 +52,23 @@ configure([project(':core'),project(':example'), project(':dev')]) {
   }
 }
 
-configure([project(':core'), project(':dev'), project(':auth'), project(':popup')]) {
+configure([project(':core'), project(':dev'), project(':popup')]) {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
 
   dependencies {
     api "com.sandec.jpro:jpro-webapi:$JPRO_VERSION"
     api "SANDEC:jnodes:$JNODES_VERSION"
-    api "de.sandec:JMemoryBuddy:0.5.2"
+    api "de.sandec:JMemoryBuddy:$JMEMORYBUDDY_VERSION"
     api "org.scala-lang:scala-library:2.12.10"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"
 
     // https://mvnrepository.com/artifact/commons-validator/commons-validator
     api group: 'commons-validator', name: 'commons-validator', version: '1.7'
   }
 
-
-  group = 'com.sandec.jpro'
+  group = 'one.jpro'
   version = "$JPRO_WEB_VERSION"
 
   java {
@@ -98,7 +97,6 @@ configure([project(':core'), project(':dev'), project(':auth'), project(':popup'
       }
     }
   }
-
 }
 
 configure([project(':core')]) {
@@ -110,30 +108,42 @@ configure([project(':core')]) {
 configure([project(':dev')]) {
   dependencies {
     implementation project(':core')
-    api "org.kordamp.ikonli:ikonli-javafx:$IKONLY_VERSION"
-    api "org.kordamp.ikonli:ikonli-evaicons-pack:$IKONLY_VERSION"
-    api "org.kordamp.ikonli:ikonli-ionicons4-pack:$IKONLY_VERSION"
+    api "org.kordamp.ikonli:ikonli-javafx:$IKONLI_VERSION"
+    api "org.kordamp.ikonli:ikonli-evaicons-pack:$IKONLI_VERSION"
+    api "org.kordamp.ikonli:ikonli-ionicons4-pack:$IKONLI_VERSION"
     implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
     implementation 'org.scenic-view:scenic-view:11.0.3-SNAPSHOT-FORK'
+  }
+}
+configure([project(':core-test')]) {
+  dependencies {
+    implementation project(':core')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"
   }
 }
 
 configure([project(':example')]) {
   apply plugin: 'jpro-gradle-plugin'
-
-  //mainClassName = "example.scala.TestWebApplication"
-  //mainClassName = "example.scala.TestExtensions"
-  //mainClassName = "example.scala.ColorTransitionApp"
-  mainClassName = "example.colors.ColorsApp"
-  mainClassName = "example.popup.PopupApp"
-//  mainClassName = "example.login.LoginApp"
+//  mainClassName = "example.scala.TestWebApplication"
+//  mainClassName = "example.scala.TestExtensions"
+//  mainClassName = "example.scala.ColorTransitionApp"
+//  mainClassName = "example.colors.ColorsApp"
+//    mainClassName = "example.popup.PopupApp"
+  mainClassName = "example.login.LoginApp"
+  application.mainModule = "one.jpro.routing.example"
+  
   dependencies {
     implementation project(":auth")
     implementation project(':core')
     implementation project(':popup')
     implementation project(':dev')
-    implementation 'org.controlsfx:controlsfx:11.1.2'
+    implementation "com.sandec:mdfx:$MDFX_VERSION"
+    implementation "org.controlsfx:controlsfx:$CONTROLSFX_VERSION"
     implementation "fr.brouillard.oss:cssfx:$CSSFX_VERSION"
+    implementation "io.github.mkpaz:atlantafx-base:$ATLANTAFX_VERSION"
+    runtimeOnly "ch.qos.logback:logback-classic:$LOGBACK_VERSION"
   }
 
   javafx {

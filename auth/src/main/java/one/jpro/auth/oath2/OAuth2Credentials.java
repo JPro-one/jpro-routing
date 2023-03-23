@@ -40,7 +40,7 @@ public class OAuth2Credentials implements Credentials {
         return code;
     }
 
-    public OAuth2Credentials code(String code) {
+    public OAuth2Credentials setCode(String code) {
         this.code = code;
         return this;
     }
@@ -49,7 +49,7 @@ public class OAuth2Credentials implements Credentials {
         return codeVerifier;
     }
 
-    public OAuth2Credentials codeVerifier(String codeVerifier) {
+    public OAuth2Credentials setCodeVerifier(String codeVerifier) {
         this.codeVerifier = codeVerifier;
         return this;
     }
@@ -58,7 +58,7 @@ public class OAuth2Credentials implements Credentials {
         return redirectUri;
     }
 
-    public OAuth2Credentials redirectUri(String redirectUri) {
+    public OAuth2Credentials setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
         return this;
     }
@@ -67,7 +67,7 @@ public class OAuth2Credentials implements Credentials {
         return jwt;
     }
 
-    public OAuth2Credentials jwt(JSONObject jwt) {
+    public OAuth2Credentials setJwt(JSONObject jwt) {
         this.jwt = jwt;
         return this;
     }
@@ -76,7 +76,7 @@ public class OAuth2Credentials implements Credentials {
         return assertion;
     }
 
-    public OAuth2Credentials assertion(String assertion) {
+    public OAuth2Credentials setAssertion(String assertion) {
         this.assertion = assertion;
         return this;
     }
@@ -85,7 +85,7 @@ public class OAuth2Credentials implements Credentials {
         return password;
     }
 
-    public OAuth2Credentials password(String password) {
+    public OAuth2Credentials setPassword(String password) {
         this.password = password;
         return this;
     }
@@ -94,7 +94,7 @@ public class OAuth2Credentials implements Credentials {
         return username;
     }
 
-    public OAuth2Credentials username(String username) {
+    public OAuth2Credentials setUsername(String username) {
         this.username = username;
         return this;
     }
@@ -103,7 +103,7 @@ public class OAuth2Credentials implements Credentials {
         return scopes;
     }
 
-    public OAuth2Credentials scopes(List<String> scopes) {
+    public OAuth2Credentials setScopes(List<String> scopes) {
         this.scopes = scopes;
         return this;
     }
@@ -112,7 +112,7 @@ public class OAuth2Credentials implements Credentials {
         return flow;
     }
 
-    public OAuth2Credentials flow(OAuth2Flow flow) {
+    public OAuth2Credentials setFlow(OAuth2Flow flow) {
         this.flow = flow;
         return this;
     }
@@ -121,7 +121,7 @@ public class OAuth2Credentials implements Credentials {
         return nonce;
     }
 
-    public OAuth2Credentials nonce(String nonce) {
+    public OAuth2Credentials setNonce(String nonce) {
         this.nonce = nonce;
         return this;
     }
@@ -143,7 +143,7 @@ public class OAuth2Credentials implements Credentials {
      * Sets the normalized version of the redirect uri.
      * This method is used internally.
      */
-    OAuth2Credentials normalizedRedirectUri(String completeRedirectUri) {
+    OAuth2Credentials setNormalizedRedirectUri(String completeRedirectUri) {
         this.completeRedirectUri = completeRedirectUri;
         return this;
     }
@@ -157,19 +157,19 @@ public class OAuth2Credentials implements Credentials {
         // when there's no access token, validation shall be performed according to each flow
         switch (flow) {
             case AUTH_CODE:
-                if (code == null || code.length() == 0) {
-                    throw new CredentialValidationException("code cannot be null or empty");
+                if (code == null || code.isBlank()) {
+                    throw new CredentialValidationException("code cannot be null or blank");
                 }
-                if (redirectUri != null && redirectUri.length() == 0) {
-                    throw new CredentialValidationException("redirectUri cannot be empty");
+                if (redirectUri != null && redirectUri.isBlank()) {
+                    throw new CredentialValidationException("redirectUri cannot be blank");
                 }
                 break;
             case PASSWORD:
-                if (username == null || username.length() == 0) {
-                    throw new CredentialValidationException("username cannot be null or empty");
+                if (username == null || username.isBlank()) {
+                    throw new CredentialValidationException("username cannot be null or blank");
                 }
-                if (password == null || password.length() == 0) {
-                    throw new CredentialValidationException("password cannot be null or empty");
+                if (password == null || password.isBlank()) {
+                    throw new CredentialValidationException("password cannot be null or blank");
                 }
                 break;
             case CLIENT:
@@ -184,15 +184,21 @@ public class OAuth2Credentials implements Credentials {
         Optional.ofNullable(getCode()).ifPresent(code -> json.put("code", code));
         Optional.ofNullable(getCodeVerifier()).ifPresent(codeVerifier -> json.put("code_verifier", codeVerifier));
         Optional.ofNullable(getNormalizedRedirectUri()).ifPresent(redirectUri -> json.put("redirect_uri", redirectUri));
-        Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow));
+        Optional.ofNullable(getFlow()).ifPresent(flow -> json.put("flow", flow.getGrantType()));
         Optional.ofNullable(getJwt()).ifPresent(jwt -> json.put("jwt", jwt));
         Optional.ofNullable(getAssertion()).ifPresent(assertion -> json.put("assertion", assertion));
         Optional.ofNullable(getPassword()).ifPresent(password -> json.put("password", password));
         Optional.ofNullable(getUsername()).ifPresent(username -> json.put("username", username));
         Optional.ofNullable(Stream.ofNullable(getScopes())
                 .collect(Collector.of(JSONArray::new, JSONArray::putAll, JSONArray::putAll)))
+                .filter(jsonArray -> !jsonArray.isEmpty())
                 .ifPresent(jsonArray -> json.put("scopes", jsonArray));
         Optional.ofNullable(getNonce()).ifPresent(nonce -> json.put("nonce", nonce));
         return json;
+    }
+
+    @Override
+    public String toString() {
+        return toJSON().toString();
     }
 }

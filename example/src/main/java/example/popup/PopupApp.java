@@ -1,19 +1,20 @@
 package example.popup;
 
-import com.jpro.routing.Route;
-import com.jpro.routing.RouteApp;
-import com.jpro.routing.dev.DevFilter;
-import com.jpro.routing.popup.PopupAPI;
-import com.jpro.routing.popup.simplepopup.SimplePopup;
-import com.jpro.routing.popup.simplepopup.SimplePopups;
+import one.jpro.routing.Route;
+import one.jpro.routing.RouteApp;
+import one.jpro.routing.dev.DevFilter;
+import one.jpro.routing.popup.PopupAPI;
+import one.jpro.routing.popup.simplepopup.SimplePopup;
+import one.jpro.routing.popup.simplepopup.SimplePopups;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import simplefx.experimental.parts.FXFuture;
 
-import static com.jpro.routing.RouteUtils.*;
+import static one.jpro.routing.RouteUtils.*;
 
 public class PopupApp extends RouteApp {
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -41,7 +42,7 @@ public class PopupApp extends RouteApp {
 
         showLoading.setOnAction(e -> {
             // Create Future, which takes 5 seconds to complete
-            FXFuture future = FXFuture.runBackground(() -> {
+            FXFuture<Object> future = FXFuture.runBackground(() -> {
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException interruptedException) {

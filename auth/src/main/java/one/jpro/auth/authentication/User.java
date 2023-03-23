@@ -1,8 +1,8 @@
 package one.jpro.auth.authentication;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -17,33 +17,32 @@ import java.util.stream.Collectors;
  */
 public class User implements Authentication {
 
-    @Nonnull
-    @NotBlank
+    @NotNull
     private final String name;
 
-    @Nonnull
-    private final Collection<String> roles;
+    @NotNull
+    private final Set<String> roles;
 
-    @Nonnull
+    @NotNull
     private final Map<String, Object> attributes;
 
     /**
      * Create a server authentication holding user's name, roles and attributes.
      *
-     * @param name The name the authenticated user
-     * @param roles Roles of the authenticated user
+     * @param name       The name the authenticated user
+     * @param roles      Roles of the authenticated user
      * @param attributes Attributes of the authenticated user
      */
-    public User(@Nonnull String name,
-                @Nullable Collection<String> roles,
+    public User(@NotNull String name,
+                @Nullable Set<String> roles,
                 @Nullable Map<String, Object> attributes) {
         Objects.requireNonNull(name, "User's name is null.");
         this.name = name;
-        this.roles = (roles == null || roles.isEmpty()) ? new ArrayList<>() : roles;
+        this.roles = (roles == null || roles.isEmpty()) ? Collections.emptySet() : roles;
         this.attributes = attributes == null ? Collections.emptyMap() : attributes;
     }
 
-    public User(@Nonnull JSONObject json) {
+    public User(@NotNull JSONObject json) {
         String username = json.optString(KEY_NAME); // check with name key
         if (username == null || username.isBlank()) {
             username = json.optString("username"); // check with username key
@@ -56,9 +55,9 @@ public class User implements Authentication {
 
         if (json.has(KEY_ROLES)) {
             this.roles = json.getJSONArray(KEY_ROLES).toList().stream().map(Object::toString)
-                    .collect(Collectors.toUnmodifiableList());
+                    .collect(Collectors.toUnmodifiableSet());
         } else {
-            this.roles = new ArrayList<>();
+            this.roles = Collections.emptySet();
         }
 
         if (json.has(KEY_ATTRIBUTES)) {
@@ -69,29 +68,44 @@ public class User implements Authentication {
     }
 
     @Override
-    @Nonnull
-    @NotBlank
+    @NotNull
     public String getName() {
         return name;
     }
 
     @Override
-    @Nonnull
-    public Collection<String> getRoles() {
-        return Collections.unmodifiableCollection(roles);
+    @NotNull
+    @Unmodifiable
+    public Set<String> getRoles() {
+        return Collections.unmodifiableSet(roles);
     }
 
     @Override
-    @Nonnull
+    @NotNull
+    @Unmodifiable
     public Map<String, Object> getAttributes() {
         return Collections.unmodifiableMap(attributes);
     }
 
-    public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        json.put(KEY_NAME, getName());
-        json.put(KEY_ROLES, getRoles());
-        json.put(KEY_ATTRIBUTES, getAttributes());
-        return json;
+    public boolean hasRole(String role) {
+        return getRoles().contains(role);
+    }
+
+    public boolean hasAttribute(String key) {
+        return hasKey(toJSON().getJSONObject(KEY_ATTRIBUTES), key);
+    }
+
+    private boolean hasKey(JSONObject json, String key) {
+        boolean exists = json.has(key);
+        if (!exists) {
+            Iterator<String> keys = json.keys();
+            while (keys.hasNext()) {
+                String nextKey = keys.next();
+                if (json.get(nextKey) instanceof JSONObject) {
+                    exists = hasKey(json.getJSONObject(nextKey), key);
+                }
+            }
+        }
+        return exists;
     }
 }

@@ -1,7 +1,7 @@
 package one.jpro.auth.oath2;
 
 /**
- * OAuth2 flow.
+ * OAuth2 flows.
  *
  * @author Besmir Beqiri
  */
@@ -9,7 +9,8 @@ public enum OAuth2Flow {
 
     AUTH_CODE("authorization_code"),
     PASSWORD("password"),
-    CLIENT("client_credentials");
+    CLIENT("client_credentials"),
+    AUTH_JWT("urn:ietf:params:oauth:grant-type:jwt-bearer");
 
     private final String grantType;
 
@@ -28,5 +29,10 @@ public enum OAuth2Flow {
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return name() + " [" + grantType + "]";
     }
 }

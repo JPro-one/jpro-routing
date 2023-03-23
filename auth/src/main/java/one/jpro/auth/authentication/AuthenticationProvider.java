@@ -1,5 +1,7 @@
 package one.jpro.auth.authentication;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -10,5 +12,12 @@ import java.util.concurrent.CompletableFuture;
 @FunctionalInterface
 public interface AuthenticationProvider<T extends Credentials> {
 
-    CompletableFuture<User> authenticate(T credentials);
+    /**
+     * Authenticate a user with the given credentials.
+     *
+     * @param credentials a {@link Credentials} object containing the
+     *                    information for authenticating the user.
+     * @return the result future
+     */
+    @NotNull CompletableFuture<User> authenticate(@NotNull T credentials);
 }

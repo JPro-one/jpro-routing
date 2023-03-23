@@ -1,9 +1,5 @@
 package example.filters;
 
-import com.jpro.routing.LinkUtil;
-import com.jpro.routing.Request;
-import com.jpro.routing.RouteUtils;
-import com.jpro.routing.filter.container.Container;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -12,6 +8,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
+import one.jpro.routing.LinkUtil;
+import one.jpro.routing.Request;
+import one.jpro.routing.filter.container.Container;
 
 import java.util.List;
 

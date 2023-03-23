@@ -12,7 +12,7 @@ public interface Credentials {
     /**
      * Convert the credential information to JSON format.
      *
-     * @return a {@link JSONObject} object.
+     * @return a JSON object.
      */
     JSONObject toJSON();
 

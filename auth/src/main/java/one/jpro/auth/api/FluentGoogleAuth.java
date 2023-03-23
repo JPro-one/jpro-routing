@@ -1,6 +1,6 @@
 package one.jpro.auth.api;
 
-import com.jpro.webapi.WebAPI;
+import javafx.stage.Stage;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 
 /**
@@ -10,11 +10,27 @@ import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
  */
 public interface FluentGoogleAuth {
 
+    /**
+     * Set the client id.
+     *
+     * @param clientId the client id
+     * @return self
+     */
     FluentGoogleAuth clientId(String clientId);
-    FluentGoogleAuth clientSecret(String clientSecret);
-    GoogleAuthenticationProvider create();
 
-    interface FluentWebAPI {
-        FluentGoogleAuth webAPI(WebAPI webAPI);
-    }
+    /**
+     * Set the client secret.
+     *
+     * @param clientSecret the client secret
+     * @return self
+     */
+    FluentGoogleAuth clientSecret(String clientSecret);
+
+    /**
+     * Create a Google authentication provider configured with the provided options.
+     *
+     * @param stage the stage
+     * @return a {@link GoogleAuthenticationProvider} instance.
+     */
+    GoogleAuthenticationProvider create(Stage stage);
 }
