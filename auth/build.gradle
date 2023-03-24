@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'org.openjfx.javafxplugin'
 
 group = 'one.jpro'
-version = "$JPRO_WEB_VERSION"
+version = "0.9.0"
 
 repositories {
     mavenCentral()
@@ -57,7 +57,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             groupId project.group
-            artifactId ("jpro-routing-" + project.name)
+            artifactId ("jpro-auth")
             version project.version
             //artifact sourcesJar
         }
