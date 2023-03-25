@@ -17,11 +17,14 @@ import org.apache.commons.validator.UrlValidator;
 import simplefx.experimental.parts.FXFuture;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
-import static one.jpro.routing.RouteUtils.redirect;
-import static one.jpro.routing.RouteUtils.getNode;
+import static one.jpro.routing.RouteUtils.*;
 
 public class ColorsApp extends RouteApp {
+
+  static Pattern colorPattern = Pattern.compile("/color/([0-9a-fA-F]{6})");
+
   public static void main(String[] args) {
     launch(args);
   }
@@ -32,11 +35,21 @@ public class ColorsApp extends RouteApp {
             .and(getNode("/green", (r) -> gen("Green","/red", Color.GREEN)))
             .and(getNode("/red", (r) -> gen("Red", "/blue", Color.RED)))
             .and(getNode("/blue", (r) -> gen("Blue", "/yellow", Color.BLUE)))
-            .and(getNode("/yellow", (r) -> gen("Yellow", "/red", Color.YELLOW)))
+            .and(getNode("/yellow", (r) -> gen("Yellow", r.resolve("/color/00ff00"), Color.YELLOW)))
+            .and(r -> {
+              var matcher = colorPattern.matcher(r.path());
+              if(matcher.matches()) {
+                var colorStr = matcher.group(1);
+                var color = Color.web(colorStr);
+                return FXFuture.unit(viewFromNode(gen("#" + colorStr, r.resolve("/red"), color)));
+              } else {
+                return FXFuture.unit(null);
+              }
+            })
             .path("/colors",
                     Route.empty()
-                            .and(getNode("/green", (r) -> gen("Green","./red", Color.GREEN)))
-                            .and(getNode("/red", (r) -> gen("Red", "./green", Color.RED)))
+                            .and(getNode("/green", (r) -> gen("Green",r.resolve("/red"), Color.GREEN)))
+                            .and(getNode("/red", (r) -> gen("Red", r.resolve("/green"), Color.RED)))
             ).filter(Filters.FullscreenFilter(true))
             .filter(RouteUtils.sideTransitionFilter(1))
             .filter(DevFilter.createDevFilter())
