@@ -57,7 +57,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             groupId project.group
-            artifactId project.name
+            artifactId "jpro-auth"
             version project.version
             //artifact sourcesJar
         }
