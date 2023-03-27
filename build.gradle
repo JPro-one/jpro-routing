@@ -130,7 +130,7 @@ configure([project(':example')]) {
 //  mainClassName = "example.scala.TestExtensions"
 //  mainClassName = "example.scala.ColorTransitionApp"
 //  mainClassName = "example.colors.ColorsApp"
-//    mainClassName = "example.popup.PopupApp"
+//  mainClassName = "example.popup.PopupApp"
   mainClassName = "example.login.LoginApp"
   application.mainModule = "one.jpro.routing.example"
   
@@ -149,7 +149,8 @@ configure([project(':example')]) {
   javafx {
     version = "$JAVAFX_VERSION"
     configurations = ["implementation"]
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls',
+                'javafx.fxml', 'javafx.media', 'javafx.web' ]
   }
 
   jpro {
