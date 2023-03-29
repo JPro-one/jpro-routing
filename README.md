@@ -1,6 +1,6 @@
-# jpro-web
+# jpro-routing
 
-**jpro-web** is a minimalistic framework for [JavaFX](https://openjfx.io/).
+**jpro-routing** is a minimalistic framework for [JavaFX](https://openjfx.io/).
 Is uses a minimalistic Route pattern.
 
 Main Features:
@@ -10,7 +10,7 @@ Main Features:
  * Works on Desktop and with [Gluon Mobile](https://gluonhq.com/products/mobile/). 
  * Minimal design with minimal opinionated API.
 
-## Add jpro-web as dependency
+## Add jpro-routing as dependency
 ### Gradle
 ```
 repositories {
@@ -19,7 +19,7 @@ repositories {
     }
 }
 dependencies {
-    implementation "com.sandec.jpro:jpro-routing-core:0.13.0"
+    implementation "one.jpro:jpro-routing-core:0.14.0"
 }
 ```
 ### Maven
@@ -32,9 +32,9 @@ dependencies {
 </repositories>
 ..
 dependency>
-        <groupId>com.sandec.jpro</groupId>
-        <artifactId>jpro-web-core</artifactId>
-        <version>0.13.0</version>
+        <groupId>one.jpro</groupId>
+        <artifactId>jpro-routing-core</artifactId>
+        <version>0.14.0</version>
         <scope>compile</scope>
 </dependency>
 ```
