@@ -422,7 +422,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
                     userJSON.put(Authentication.KEY_NAME, payload.getString("email"));
                 }
 
-                authJSON.put("rootToken", "accessToken");
+                authJSON.put("claimToken", "accessToken");
             } catch (JWTDecodeException | IllegalStateException ex) {
                 log.trace("Cannot decode access token:", ex);
             }
