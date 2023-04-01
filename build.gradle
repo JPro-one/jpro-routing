@@ -69,7 +69,7 @@ configure([project(':core'), project(':dev'), project(':popup')]) {
   }
 
   group = 'one.jpro'
-  version = "$JPRO_WEB_VERSION"
+  version = "$JPRO_ROUTING_VERSION"
 
   java {
     withSourcesJar() // this also works for scala, nice!

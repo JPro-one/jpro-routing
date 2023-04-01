@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'org.openjfx.javafxplugin'
 
 group = 'one.jpro'
-version = "$JPRO_WEB_VERSION"
+version = "$JPRO_ROUTING_VERSION"
 
 repositories {
     mavenCentral()
