@@ -7,7 +7,7 @@ import simplefx.experimental._
 import simplefx.util.ReflectionUtil._
 import simplefx.util.Predef._
 
-import java.net.URLEncoder
+import java.net.{URI, URLEncoder}
 import javafx.collections.ObservableList
 import one.jpro.routing.sessionmanager.SessionManager
 import org.apache.commons.validator.routines.UrlValidator
@@ -24,12 +24,12 @@ object LinkUtil {
     openLinkExternalFun = x
   }
 
-  private val urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS)
   def isValidLink(x: String): Boolean = {
-    if(x.startsWith("http")) {
-      urlValidator.isValid(x)
-    } else {
-      urlValidator.isValid("http://a.com"+x)
+    try {
+      val uri = new URI(x)
+      true
+    } catch {
+      case _: Throwable => false
     }
   }
 
