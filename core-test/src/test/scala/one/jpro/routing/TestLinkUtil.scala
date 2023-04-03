@@ -22,4 +22,10 @@ class TestLinkUtil {
     assert(LinkUtil.isValidLink("mailto:aaa@domain.com"))
   }
 
+  @Test
+  def testValidLink4(): Unit = {
+    assert(LinkUtil.isValidLink("http://localhost:8070/info?name=Abid%26Aqib"))
+
+  }
+
 }

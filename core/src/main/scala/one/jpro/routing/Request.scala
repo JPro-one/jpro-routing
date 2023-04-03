@@ -48,8 +48,8 @@ object Request {
     if(!isValidLink(x)) {
       println("Warning - Invalid Link: " + x)
     }
-    val uri = new URI(x)
-    val query: Map[String,String] = if(uri.getQuery == null) Map() else uri.getQuery.split("&").map(x => {
+    val uri = new URI(x))
+    val query: Map[String,String] = if(uri.getRawQuery == null) Map() else uri.getRawQuery.split("&").map(x => {
       val Array(a,b) = x.split("=")
       a -> b
     }).toMap
