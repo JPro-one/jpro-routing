@@ -39,7 +39,7 @@ public final class AuthUtils {
      * @param message detail message to be used in the event that a {@code
      *                NullPointerException} is thrown
      * @return {@code str} if not {@code null} or not blank
-     * @throws NullPointerException if {@code str} is {@code null}
+     * @throws NullPointerException     if {@code str} is {@code null}
      * @throws IllegalArgumentException if {@code str} is blank
      */
     public static String requireNonNullOrBlank(String str, String message) {
@@ -51,6 +51,12 @@ public final class AuthUtils {
         return str;
     }
 
+    /**
+     * Converts a JSON object to a query string.
+     *
+     * @param json a JSON object
+     * @return a query string
+     */
     public static String jsonToQuery(JSONObject json) {
         return json.toMap().entrySet().stream()
                 .filter(entry -> entry.getValue() != null && !entry.getValue().toString().isBlank())
@@ -59,6 +65,12 @@ public final class AuthUtils {
                 .collect(Collectors.joining("&"));
     }
 
+    /**
+     * Converts a query string to a JSON object.
+     *
+     * @param query a query string
+     * @return a JSON object
+     */
     public static JSONObject queryToJson(String query) {
         if (query == null) {
             return null;
@@ -91,12 +103,26 @@ public final class AuthUtils {
         return json;
     }
 
+    /**
+     * Checks if the specified headers contain the specified value.
+     *
+     * @param headers the HTTP headers
+     * @param value   the value to check
+     * @return <code>true</code> if the specified headers contain the specified value
+     */
     public static boolean containsValue(HttpHeaders headers, String value) {
         return headers.map().entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream())
                 .anyMatch(s -> s.contains(value));
     }
 
+    /**
+     * Processes the non-standard headers.
+     *
+     * @param json           the JSON object
+     * @param response       the HTTP response
+     * @param scopeSeparator the scope separator
+     */
     public static void processNonStandardHeaders(JSONObject json, HttpResponse<String> response, String scopeSeparator) {
         // inspect the response header for the non-standard:
         // X-OAuth-Scopes and X-Accepted-OAuth-Scopes
@@ -114,6 +140,12 @@ public final class AuthUtils {
         xAcceptedOAuthScopes.ifPresent(scopes -> json.put("acceptedScopes", scopes));
     }
 
+    /**
+     * Extracts the error description from the specified JSON object.
+     *
+     * @param json the JSON object
+     * @return the error description
+     */
     public static String extractErrorDescription(JSONObject json) {
         if (json == null) {
             return "null";
