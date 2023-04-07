@@ -3,7 +3,7 @@ package one.jpro.auth.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import one.jpro.auth.authentication.*;
-import one.jpro.auth.utils.AuthUtils;
+import one.jpro.auth.utils.HttpUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,7 +24,7 @@ public class JWTAuthenticationProvider implements AuthenticationProvider<TokenCr
 
     private static final Logger log = LoggerFactory.getLogger(JWTAuthenticationProvider.class);
 
-    private static final Base64.Decoder BASE64_DECODER = AuthUtils.BASE64_DECODER;
+    private static final Base64.Decoder BASE64_DECODER = HttpUtils.BASE64_DECODER;
 
     @NotNull
     private final JWTOptions options;

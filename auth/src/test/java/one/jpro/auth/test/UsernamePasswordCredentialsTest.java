@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static one.jpro.auth.utils.AuthUtils.BASE64_ENCODER;
+import static one.jpro.auth.utils.HttpUtils.BASE64_ENCODER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

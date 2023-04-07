@@ -14,7 +14,7 @@ import one.jpro.auth.authentication.*;
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.jwt.TokenCredentials;
 import one.jpro.auth.jwt.TokenExpiredException;
-import one.jpro.auth.utils.AuthUtils;
+import one.jpro.auth.utils.HttpUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +38,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
 
     private static final Logger log = LoggerFactory.getLogger(OAuth2AuthenticationProvider.class);
 
-    private static final Base64.Decoder BASE64_DECODER = AuthUtils.BASE64_DECODER;
+    private static final Base64.Decoder BASE64_DECODER = HttpUtils.BASE64_DECODER;
 
     @NotNull
     private final WebAPI webAPI;

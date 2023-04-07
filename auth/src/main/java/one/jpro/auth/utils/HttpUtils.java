@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  *
  * @author Besmir Beqiri
  */
-public final class AuthUtils {
+public final class HttpUtils {
 
     public static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder();
     public static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
@@ -166,7 +166,7 @@ public final class AuthUtils {
         return description;
     }
 
-    private AuthUtils() {
+    private HttpUtils() {
         // Hide the default constructor.
     }
 }
