@@ -63,9 +63,6 @@ configure([project(':core'), project(':dev'), project(':popup')]) {
     api "org.scala-lang:scala-library:2.12.10"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"
-
-    // https://mvnrepository.com/artifact/commons-validator/commons-validator
-    api group: 'commons-validator', name: 'commons-validator', version: '1.7'
   }
 
   group = 'one.jpro'

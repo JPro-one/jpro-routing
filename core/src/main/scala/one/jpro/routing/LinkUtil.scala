@@ -10,7 +10,6 @@ import simplefx.util.Predef._
 import java.net.{URI, URLEncoder}
 import javafx.collections.ObservableList
 import one.jpro.routing.sessionmanager.SessionManager
-import org.apache.commons.validator.routines.UrlValidator
 
 object LinkUtil {
 

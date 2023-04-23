@@ -13,7 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import one.jpro.routing.Route;
 import one.jpro.routing.RouteApp;
-import org.apache.commons.validator.UrlValidator;
 import simplefx.experimental.parts.FXFuture;
 
 import java.util.List;

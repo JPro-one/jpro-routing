@@ -9,8 +9,9 @@ module one.jpro.routing.example {
     requires one.jpro.auth;
     requires org.json;
     requires scala.library;
-    requires commons.validator;
     requires simplefx.extended;
     requires com.sandec.mdfx;
     requires atlantafx.base;
+
+    exports example.colors;
 }
