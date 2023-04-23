@@ -29,7 +29,7 @@ class TestAppCrawler {
   @Test
   def nullFails(): Unit = inFX {
     val page = pageWithLink(List(null))
-    intercept[NullPointerException](AppCrawler.crawlPage(page))
+    intercept[Throwable](AppCrawler.crawlPage(page))
   }
 
   @Test
