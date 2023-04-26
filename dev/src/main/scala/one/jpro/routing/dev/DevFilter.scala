@@ -88,6 +88,12 @@ object DevFilter {
             in(1 s) --> updateReport()
           }
         }
+        this <++ new Label {
+          def layouts: Option[Int] = if(scene != null) {
+            Some(LinkUtil.getSessionManager(this).webApp.getLayoutCounter())
+          } else None
+          text <-- ("LayoutCounter: " + layouts.map(_.toString).getOrElse("-"))
+        }
         //this <++ new Label() {
         //  text <-- (if(request == null) "-" else "request: " + request)
         //}

@@ -11,4 +11,5 @@ module one.jpro.routing.core {
 
     exports one.jpro.routing;
     exports one.jpro.routing.filter.container;
+    exports one.jpro.routing.sessionmanager;
 }

@@ -16,7 +16,11 @@ class RouteNode(stage: Stage, route: Route) extends StackPane { THIS =>
 
   styleClass ::= "jpro-web-app"
 
+  @Bind private var layoutCounter = 0
+  def getLayoutCounter(): Int = layoutCounter
+
   override def layoutChildren(): Unit = {
+    layoutCounter += 1
     if ((this.scene ne null) && WebAPI.isBrowser) {
       webAPI.layoutRoot(this.scene)
       super.layoutChildren()
