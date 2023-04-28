@@ -5,6 +5,7 @@ module one.jpro.routing.core {
     requires transitive simplefx.core;
     requires transitive simplefx.extended;
     requires transitive simplefx.wrapping;
+    requires transitive simplefx.utility;
     requires transitive scala.library;
     requires transitive jpro.webapi;
     requires java.desktop;

@@ -38,7 +38,7 @@ configure([project(':core'),project(':example'), project(':dev'), project(':core
   javafx {
     version = "$JAVAFX_VERSION"
     configurations = ["compileOnly", "testImplementation"]
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.swing', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
   }
 
   test {
@@ -146,7 +146,7 @@ configure([project(':example')]) {
   javafx {
     version = "$JAVAFX_VERSION"
     configurations = ["implementation"]
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls',
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls','javafx.swing',
                 'javafx.fxml', 'javafx.media', 'javafx.web' ]
   }
 
