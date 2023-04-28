@@ -106,7 +106,7 @@ object DevFilter {
     }
   }
 
-  def createDevFilter(): Filter = {
+  def create(): Filter = {
     CSSFX.start()
     ContainerFilter.create(DevFilterContainerFactory)
   }
