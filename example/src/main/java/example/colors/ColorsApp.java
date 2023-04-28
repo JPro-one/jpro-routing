@@ -51,7 +51,7 @@ public class ColorsApp extends RouteApp {
                             .and(getNode("/red", (r) -> gen("Red", r.resolve("/green"), Color.RED)))
             ).filter(Filters.FullscreenFilter(true))
             .filter(RouteUtils.sideTransitionFilter(1))
-            .filter(DevFilter.createDevFilter())
+            .filter(DevFilter.create())
             .filter(ContainerFilter.create(() -> new SimpleContainer()))
             .filter(ContainerFilter.create(() -> new SimpleHamburgerMenu(List.of(
                     new SimpleHamburgerMenu.Link("Green", "/green"),

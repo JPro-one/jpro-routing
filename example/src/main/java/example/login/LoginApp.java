@@ -102,7 +102,7 @@ public class LoginApp extends BaseAuthApp {
                                 .and(getNode("/google", (r) -> providerDiscoveryView(googleAuth)))
                                 .and(getNode("/microsoft", (r) -> providerDiscoveryView(microsoftAuth)))
                                 .and(getNode("/keycloak", (r) -> providerDiscoveryView(keycloakAuth)))))
-                .filter(DevFilter.createDevFilter())
+                .filter(DevFilter.create())
                 .filter(oauth2(googleAuth, googleCredentials, this::setUser, this::setError))
                 .filter(oauth2(microsoftAuth, microsoftCredentials, this::setUser, this::setError))
                 .filter(oauth2(keycloakAuth, keycloakCredentials, this::setUser, this::setError));

@@ -58,7 +58,7 @@ class ColorTransition(stage: Stage) extends RouteNode(stage) {
       // enhancer, operations
       .filter(Filters.FullscreenFilter(true))
       .filter(RouteUtils.sideTransitionFilter(1))
-      .filter(DevFilter.createDevFilter())
+      .filter(DevFilter.create())
       //.filter(RouteUtils.containerFilter(HeaderFactory) compose RouteUtils.containerFilter(HeaderFactory))
       //.filter(RouteUtils.containerFilter(HeaderFactory))
   )

@@ -24,7 +24,7 @@ public class PopupApp extends RouteApp {
         return Route.empty()
                 .and(redirect("/", "/popup"))
                 .and(getNode("/popup", (r) -> popupSampleButtons()))
-                .filter(DevFilter.createDevFilter());
+                .filter(DevFilter.create());
     }
 
     public Node popupSampleButtons() {
