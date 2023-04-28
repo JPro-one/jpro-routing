@@ -31,7 +31,7 @@ public class FluentGoogleAuthAPI implements FluentGoogleAuth {
         if (WebAPI.isBrowser()) {
             return new GoogleAuthenticationProvider(WebAPI.getWebAPI(stage), clientId, clientSecret);
         }
-        else throw new UnsupportedOperationException("Keycloak authentication is currently supported " +
+        else throw new UnsupportedOperationException("Google authentication is currently supported " +
                 "only when running the application via JPro server.");
     }
 }
