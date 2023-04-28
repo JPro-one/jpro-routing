@@ -21,7 +21,6 @@ import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import one.jpro.routing.Filter;
-import one.jpro.routing.ResponseUtils;
 import one.jpro.routing.Route;
 import one.jpro.routing.RouteApp;
 import org.json.JSONArray;
@@ -156,9 +155,9 @@ public abstract class BaseAuthApp extends RouteApp {
     }
 
     /**
-     * The options property contains the configuration for the authentication provider.
+     * The option's property contains the configuration for the authentication provider.
      *
-     * @return the options property
+     * @return the option's property
      */
     final ObjectProperty<Options> authOptionsProperty() {
         if (authOptions == null) {
@@ -308,15 +307,14 @@ public abstract class BaseAuthApp extends RouteApp {
         return (route) -> (request) -> {
             if (request.path().equals(credentials.getRedirectUri())) {
                 return FXFuture.fromJava(authProvider.authenticate(credentials))
-                        .map(user -> {
+                        .flatMap(user -> {
                             setAuthProvider(authProvider);
                             userConsumer.accept(user);
-                            return user;
+                            return route.apply(request);
                         })
-                        .flatMap(user -> route.apply(request))
-                        .recover(ex -> {
+                        .flatRecover(ex -> {
                             errorConsumer.accept(ex);
-                            return ResponseUtils.redirect(AUTH_ERROR_PATH);
+                            return route.apply(request);
                         });
             } else {
                 return route.apply(request);
@@ -350,14 +348,13 @@ public abstract class BaseAuthApp extends RouteApp {
             if (request.path().equals("/jwt/token")) {
                 return FXFuture.fromJava(authProvider.token(tokenPath, credentials)
                                 .thenCompose(authProvider::authenticate))
-                        .map(user -> {
+                        .flatMap(user -> {
                             userConsumer.accept(user);
-                            return user;
+                            return route.apply(request);
                         })
-                        .flatMap(user -> route.apply(request))
-                        .recover(ex -> {
+                        .flatRecover(ex -> {
                             errorConsumer.accept(ex);
-                            return ResponseUtils.redirect(AUTH_ERROR_PATH);
+                            return route.apply(request);
                         });
             } else {
                 return route.apply(request);
