@@ -14,4 +14,7 @@ module one.jpro.routing.example {
     requires atlantafx.base;
 
     exports example.colors;
+    exports example.filters;
+    exports example.login;
+    exports example.popup;
 }
