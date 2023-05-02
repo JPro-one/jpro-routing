@@ -40,7 +40,7 @@ trait SessionManager { THIS =>
   def goForward(): Unit
   def isExternal(x: String): Boolean = x.startsWith("http")
   def gotoURL(url: String): Unit = {
-    if(isExternal(url) && !WebAPI.isBrowser()) {
+     if(isExternal(url)) {
       SessionManager.externalLinkImpl.accept(url)
     } else {
       gotoURL(url,true,true)
@@ -111,11 +111,10 @@ object SessionManager {
 
   def setExternalLinkImpl(f: Consumer[String]) = externalLinkImpl = f
   var externalLinkImpl: Consumer[String] = { url =>
-    // Opens link in the default browser
-    if (Desktop.isDesktopSupported && !WebAPI.isBrowser) {
-      Desktop.getDesktop.browse(URI.create(url))
+    if(WebAPI.isBrowser) {
+      this.asInstanceOf[SessionManagerWeb].webAPI.executeScript(s"""window.location.href = "$url";""")
     } else {
-      println("Desktop is not supported")
+      Desktop.getDesktop.browse(URI.create(url))
     }
   }
 }

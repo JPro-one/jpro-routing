@@ -62,9 +62,6 @@ class Header(view: View, sessionManager: SessionManager) extends HBox {
   this <++ new HeaderLink("jmemorybuddy"    , "/jmemorybuddy" )
   this <++ new HeaderLink("No Link" , "" ) {
     setLink(this, "/?1", Some("/?1"))
-    runLater {
-      setLink(this, null, None)
-    }
   }
   this <++ new HeaderLink("ManyLinks" , "" ) {
     setLink(this, "/?1", Some("/?1"))

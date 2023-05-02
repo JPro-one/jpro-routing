@@ -10,7 +10,7 @@ import simplefx.core._
 import simplefx.experimental._
 
 
-class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionManager { THIS =>
+class SessionManagerWeb(val webApp: RouteNode, val webAPI: WebAPI) extends SessionManager { THIS =>
 
   val container = new StackPane
   webApp <++ container
@@ -35,6 +35,11 @@ class SessionManagerWeb(val webApp: RouteNode, webAPI: WebAPI) extends SessionMa
     val url = _url
     x match {
       case Redirect(url) =>
+        if(isExternal(url)) {
+          this.asInstanceOf[SessionManagerWeb].webAPI.executeScript(s"""window.location.href = "$url";""")
+        } else {
+          gotoURL(url)
+        }
         gotoURL(url)
       case view: View =>
         this.url = url
