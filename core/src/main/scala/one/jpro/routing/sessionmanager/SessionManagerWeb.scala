@@ -40,7 +40,6 @@ class SessionManagerWeb(val webApp: RouteNode, val webAPI: WebAPI) extends Sessi
         } else {
           gotoURL(url)
         }
-        gotoURL(url)
       case view: View =>
         this.url = url
         view.sessionManager = this
