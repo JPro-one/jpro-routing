@@ -30,7 +30,7 @@ public class TokenCredentials implements Credentials {
      *
      * @param json the string representation of the JSON object holding the token credential's information.
      */
-    static TokenCredentials fromJSON(String json) {
+    public static TokenCredentials fromJSON(String json) {
         return new TokenCredentials(new JSONObject(json));
     }
 
@@ -39,7 +39,7 @@ public class TokenCredentials implements Credentials {
      *
      * @return a string in JSON format.
      */
-    static String toJSON(TokenCredentials tokenCredentials) {
+    public static String toJSON(TokenCredentials tokenCredentials) {
         return tokenCredentials.toJSON().toString();
     }
 
