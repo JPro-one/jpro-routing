@@ -6,7 +6,7 @@ import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationException;
 import one.jpro.auth.http.HttpMethod;
 import one.jpro.auth.jwt.JWTOptions;
-import one.jpro.auth.utils.HttpUtils;
+import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static one.jpro.auth.utils.HttpUtils.*;
+import static one.jpro.auth.utils.AuthUtils.*;
 
 /**
  * OAuth2 API provides the required functionalities to interact with an OAuth2 provider.
@@ -35,7 +35,7 @@ public class OAuth2API {
 
     private static final Pattern MAX_AGE = Pattern.compile("max-age=\"?(\\d+)\"?");
     private static final String CACHE_CONTROL = "cache-control";
-    private static final Base64.Encoder BASE64_ENCODER = HttpUtils.BASE64_ENCODER;
+    private static final Base64.Encoder BASE64_ENCODER = AuthUtils.BASE64_ENCODER;
 
     @NotNull
     private final OAuth2Options options;
@@ -377,7 +377,7 @@ public class OAuth2API {
 
     /**
      * The discovery will use the given site in the configuration options
-     * and attempt to load the well known descriptor.
+     * and attempt to load the well-known descriptor.
      *
      * @param config the initial options, it should contain the site url
      * @return an OAuth2 provider configured with the discovered option values

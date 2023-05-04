@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  *
  * @author Besmir Beqiri
  */
-public final class HttpUtils {
+public final class AuthUtils {
 
     public static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder();
     public static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
@@ -166,7 +166,17 @@ public final class HttpUtils {
         return description;
     }
 
-    private HttpUtils() {
+    /**
+     * Decode percent encoded <code>String</code> values.
+     *
+     * @param str the percent encoded <code>String</code>
+     * @return expanded form of the input, for example, "foo%20bar" becomes "foo bar"
+     */
+    public static String decodePercent(String str) {
+        return URLDecoder.decode(str, StandardCharsets.UTF_8);
+    }
+
+    private AuthUtils() {
         // Hide the default constructor.
     }
 }

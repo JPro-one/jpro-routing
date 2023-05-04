@@ -12,7 +12,7 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static one.jpro.auth.utils.HttpUtils.*;
+import static one.jpro.auth.utils.AuthUtils.*;
 
 /**
  * JWTAuth API class.
