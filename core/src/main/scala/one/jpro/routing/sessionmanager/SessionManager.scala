@@ -54,7 +54,8 @@ trait SessionManager { THIS =>
         getView(url2)
       }
       if(newView != null) {
-        newView.map { view =>
+        newView.map { response =>
+          assert(response != null, s"Response for $url2 was null")
           this.url = url2
           gotoURL(url2, view, pushState, track)
         }
