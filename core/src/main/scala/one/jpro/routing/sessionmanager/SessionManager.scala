@@ -57,7 +57,7 @@ trait SessionManager { THIS =>
         newView.map { response =>
           assert(response != null, s"Response for $url2 was null")
           this.url = url2
-          gotoURL(url2, view, pushState, track)
+          gotoURL(url2, response, pushState, track)
         }
       } else {
         new NullPointerException(s"Error: no view found for $url").printStackTrace()

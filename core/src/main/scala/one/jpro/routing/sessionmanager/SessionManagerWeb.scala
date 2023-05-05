@@ -32,7 +32,7 @@ class SessionManagerWeb(val webApp: RouteNode, val webAPI: WebAPI) extends Sessi
   })
 
   def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit = {
-    assert(x != null, "Response was null")
+    assert(x != null, "Response was null for url: " + _url)
     val url = _url
     x match {
       case Redirect(url) =>
