@@ -1,7 +1,7 @@
 module one.jpro.routing.core {
     requires transitive javafx.controls;
 
-    requires transitive jnodes;
+    requires transitive de.sandec.jnodes;
     requires transitive simplefx.core;
     requires transitive simplefx.extended;
     requires transitive simplefx.wrapping;
