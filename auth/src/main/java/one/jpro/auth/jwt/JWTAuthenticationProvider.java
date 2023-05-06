@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * JWT authentication provider.
+ * JSON Web Token authentication provider.
  *
  * @author Besmir Beqiri
  */
@@ -33,12 +33,24 @@ public class JWTAuthenticationProvider implements AuthenticationProvider<TokenCr
     @NotNull
     private final JWTAuthAPI api;
 
+    /**
+     * Default constructor.
+     *
+     * @param authOptions the authentication options
+     */
     public JWTAuthenticationProvider(@NotNull final JWTAuthOptions authOptions) {
         this.authOptions = Objects.requireNonNull(authOptions, "JWT authentication options cannot be null");
         this.options = Objects.requireNonNull(authOptions.getJWTOptions(), "JWT options cannot be null");
         this.api = new JWTAuthAPI(authOptions);
     }
 
+    /**
+     * Retrieves the token from the given token path and authentication info.
+     *
+     * @param tokenPath the token path
+     * @param authInfo  the authentication info
+     * @return a {@link CompletableFuture} holding the token credentials
+     */
     public CompletableFuture<TokenCredentials> token(@NotNull String tokenPath, @NotNull final JSONObject authInfo) {
         log.debug("Requesting token from: {}, and authentication info: {}", authOptions.getSite() + tokenPath, authInfo);
         return api.token(tokenPath, authInfo)
@@ -52,6 +64,13 @@ public class JWTAuthenticationProvider implements AuthenticationProvider<TokenCr
                 });
     }
 
+    /**
+     * Authenticates the given {@link TokenCredentials} and returns a user.
+     *
+     * @param credentials token credentials containing the
+     *                    information for authenticating the user.
+     * @return a {@link CompletableFuture} holding the {@link User} object.
+     */
     @Override
     @NotNull
     public CompletableFuture<User> authenticate(@NotNull final TokenCredentials credentials) {
