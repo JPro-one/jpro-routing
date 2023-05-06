@@ -27,18 +27,20 @@ public class JWTAuthenticationProvider implements AuthenticationProvider<TokenCr
     private static final Base64.Decoder BASE64_DECODER = AuthUtils.BASE64_DECODER;
 
     @NotNull
+    private final JWTAuthOptions authOptions;
+    @NotNull
     private final JWTOptions options;
     @NotNull
     private final JWTAuthAPI api;
 
-    public JWTAuthenticationProvider(@NotNull final JWTAuthOptions options) {
-        this.options = Objects.requireNonNull(options,
-                "JWT authentication options cannot be null").getJWTOptions();
-        this.api = new JWTAuthAPI(options);
+    public JWTAuthenticationProvider(@NotNull final JWTAuthOptions authOptions) {
+        this.authOptions = Objects.requireNonNull(authOptions, "JWT authentication options cannot be null");
+        this.options = Objects.requireNonNull(authOptions.getJWTOptions(), "JWT options cannot be null");
+        this.api = new JWTAuthAPI(authOptions);
     }
 
     public CompletableFuture<TokenCredentials> token(@NotNull String tokenPath, @NotNull final JSONObject authInfo) {
-        log.debug("Requesting token from: {}, and authentication info: {}", tokenPath, authInfo);
+        log.debug("Requesting token from: {}, and authentication info: {}", authOptions.getSite() + tokenPath, authInfo);
         return api.token(tokenPath, authInfo)
                 .thenCompose(json -> {
                     log.info("Received token: {}", json);
