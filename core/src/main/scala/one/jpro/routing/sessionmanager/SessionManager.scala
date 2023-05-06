@@ -40,8 +40,12 @@ trait SessionManager { THIS =>
   def goForward(): Unit
   def isExternal(x: String): Boolean = x.startsWith("http")
   def gotoURL(url: String): Unit = {
-     if(isExternal(url)) {
-      SessionManager.externalLinkImpl.accept(url)
+    if(isExternal(url)) {
+      if(WebAPI.isBrowser) {
+        this.asInstanceOf[SessionManagerWeb].webAPI.executeScript(s"""window.location.href = "$url";""")
+      } else {
+        SessionManager.externalLinkImpl.accept(url)
+      }
     } else {
       gotoURL(url,true,true)
     }
@@ -112,10 +116,6 @@ object SessionManager {
 
   def setExternalLinkImpl(f: Consumer[String]) = externalLinkImpl = f
   var externalLinkImpl: Consumer[String] = { url =>
-    if(WebAPI.isBrowser) {
-      this.asInstanceOf[SessionManagerWeb].webAPI.executeScript(s"""window.location.href = "$url";""")
-    } else {
-      Desktop.getDesktop.browse(URI.create(url))
-    }
+    Desktop.getDesktop.browse(URI.create(url))
   }
 }
