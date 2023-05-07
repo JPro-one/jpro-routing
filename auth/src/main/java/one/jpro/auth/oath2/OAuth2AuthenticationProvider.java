@@ -477,36 +477,40 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         JSONObject json;
         try {
             final DecodedJWT decodedToken = JWT.decode(token);
-            final String alg = decodedToken.getAlgorithm();
-            Algorithm algorithm = Algorithm.none();
-            // TODO: Add support for other algorithms
-            switch (alg) {
-                case "HS256":
-                    algorithm = Algorithm.HMAC256(options.getClientSecret());
-                    break;
-                case "RS256":
-                    JwkProvider jwkProvider;
-                    try {
-                        jwkProvider = new UrlJwkProvider(URI.create(options.getJwkPath()).toURL());
+            if (options.isVerifyToken()) {
+                final String alg = decodedToken.getAlgorithm();
+                Algorithm algorithm = Algorithm.none();
+                // TODO: Add support for other algorithms
+                switch (alg) {
+                    case "HS256":
+                        algorithm = Algorithm.HMAC256(options.getClientSecret());
+                        break;
+                    case "RS256":
+                        JwkProvider jwkProvider;
+                        try {
+                            jwkProvider = new UrlJwkProvider(URI.create(options.getJwkPath()).toURL());
 //                        jwkProvider = new JwkProviderBuilder(options.getJwkPath())
 //                                .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
 //                                .build();
-                    } catch (MalformedURLException ex) {
-                        throw new IllegalStateException("Invalid JWK path: " + options.getJwkPath());
-                    }
-                    final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
-                    algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
-                    break;
-            }
+                        } catch (MalformedURLException ex) {
+                            throw new IllegalStateException("Invalid JWK path: " + options.getJwkPath());
+                        }
+                        final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
+                        algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+                        break;
+                }
 
-            // Allow only secure algorithms
-            if (Algorithm.none().equals(algorithm)) {
-                throw new IllegalStateException("Algorithm \"none\" not allowed");
-            }
+                // Allow only secure algorithms
+                if (Algorithm.none().equals(algorithm)) {
+                    throw new IllegalStateException("Algorithm \"none\" not allowed");
+                }
 
-            final JWTVerifier verifier = JWT.require(algorithm).build();
-            final DecodedJWT verifiedToken = verifier.verify(token);
-            json = jwtToJson(verifiedToken, idToken ? "id_token" : "access_token");
+                final JWTVerifier verifier = JWT.require(algorithm).build();
+                final DecodedJWT verifiedToken = verifier.verify(token);
+                json = jwtToJson(verifiedToken, idToken ? "id_token" : "access_token");
+            } else {
+                json = jwtToJson(decodedToken, idToken ? "id_token" : "access_token");
+            }
         } catch (com.auth0.jwt.exceptions.TokenExpiredException tex) {
             throw new TokenExpiredException(tex.getMessage(), tex.getExpiredOn());
         }
