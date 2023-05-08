@@ -45,7 +45,7 @@ object LinkUtil {
   def setLink(node: Node, url: String, text: String, children: ObservableList[Node]): Unit = {
     setLink(node,url,Some(text), children)
   }
-  def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null): Unit = {
+  def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null, external: Boolean = false): Unit = {
     assert(url != "", s"Empty link: ''")
     assert(isValidLink(url), s"Invalid link: '$url''")
     node.getProperties.put("link",url)
@@ -53,18 +53,28 @@ object LinkUtil {
       node.getProperties.put("description",desc)
     }
     if(url == null || url.startsWith("/") || url.startsWith("./") || url.startsWith("../")) {
-      setLinkInternal(node,url, text, children)
+      setLinkInternalPush(node,url, text, children, external)
     } else {
-      setLinkExternal(node,url, text, children)
+      setLinkInternalNoPush(node,url, text, children, external)
     }
   }
-  def setLinkInternal(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null) = {
-    node.cursor = javafx.scene.Cursor.HAND
-    setLinkSimple(url, text, true)(node, children)
+
+  def setExternalLink(node: Node, url: String): Unit = {
+    setLink(node,url,None, null, true)
   }
-  def setLinkExternal(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null) = {
+  def setExternalLink(node: Node, url: String, text: String): Unit = {
+    setLink(node,url,Some(text), null, true)
+  }
+  def setExternalLink(node: Node, url: String, text: String, children: ObservableList[Node]): Unit = {
+    setLink(node,url,Some(text), children, true)
+  }
+  private def setLinkInternalPush(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null, external: Boolean = false) = {
     node.cursor = javafx.scene.Cursor.HAND
-    setLinkSimple(url, text, false)(node, children)
+    setLinkSimple(url, text, true, external)(node, children)
+  }
+  private def setLinkInternalNoPush(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null, external: Boolean = false) = {
+    node.cursor = javafx.scene.Cursor.HAND
+    setLinkSimple(url, text, false, external)(node, children)
   }
 
   def goBack(node: Node): Unit = {
@@ -90,16 +100,18 @@ object LinkUtil {
   class ExtendNodeWithLink(node: Node) {
     var children: ObservableList[Node] = null
 
-    def setNewLink(link: String, text: Option[String], pushState: Boolean, children: ObservableList[Node]): Unit = {
+    def setNewLink(link: String, text: Option[String], pushState: Boolean, external: Boolean, children: ObservableList[Node]): Unit = {
       if (link != null && !isValidLink(link)) {
         println("Warning, link is not valid: " + link)
       }
       this.children = children
       this.pushState = pushState
+      this.external = external
       this.link = link
       this.text = text
     }
 
+    @Bind var external: Boolean = true
     @Bind var pushState: Boolean = false
     @Bind var link: String = ""
     @Bind var text: Option[String] = None
@@ -120,12 +132,13 @@ object LinkUtil {
         """.stripMargin
       } else ""
 
+      def externalPart = if(external) "target=\"_blank\""
       def styleAnchorText = if(text.isEmpty) "" else "line-height: 0; font-size: 0; color: transparent; "
       @Bind var content = contentProperty.toBindable
       content <-- {
         if(link == null) ""
-        else s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
-           |$script
+        else s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" $externalPart style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
+           |${if(external)"" else script}
          """.stripMargin
       }
       hover --> { x =>
@@ -167,8 +180,9 @@ object LinkUtil {
   }
 
 
-  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean)(theNode: Node, children: ObservableList[Node] = null) = {
-    theNode.setNewLink(url,text,pushState,children)
+  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean, external: Boolean)(theNode: Node, children: ObservableList[Node] = null) = {
+    theNode.setNewLink(url,text,pushState,
+      external,children)
   }
 
   def setImageViewDescription(view: ImageView, description: String): Unit = {

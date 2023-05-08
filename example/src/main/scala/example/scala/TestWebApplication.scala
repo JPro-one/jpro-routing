@@ -146,16 +146,17 @@ class MainView extends Page {
   lazy val content = new VBox {
     spacing = 100
     def addGoogle: Node = {
-      new StackPane(new Label("GOOGL") {
+      new StackPane(new Label("GOOGLE EXTERNAL") {
         font = new Font(60);
       }) {
-        this <++ new HTMLView {
+        LinkUtil.setExternalLink(this, "http://google.com")
+        /*this <++ new HTMLView {
           setContent(
             """
               |<a style="display: block; width: 100%; height: 100%; background-color: #66666666;" href="http://google.com"></a>
             """.stripMargin
           )
-        }
+        }*/
       }
     }
     this <++ addGoogle
