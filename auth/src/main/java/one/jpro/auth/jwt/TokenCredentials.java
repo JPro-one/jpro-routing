@@ -1,9 +1,6 @@
 package one.jpro.auth.jwt;
 
-import one.jpro.auth.authentication.AuthenticationProvider;
-import one.jpro.auth.authentication.CredentialValidationException;
-import one.jpro.auth.authentication.Credentials;
-import one.jpro.auth.authentication.User;
+import one.jpro.auth.authentication.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -88,7 +85,7 @@ public class TokenCredentials implements Credentials {
      * @param user the user object
      */
     public TokenCredentials(@NotNull final User user) {
-        this(user.toJSON().optJSONObject("attributes").optJSONObject("auth"));
+        this(user.toJSON().optJSONObject(Authentication.KEY_ATTRIBUTES).optJSONObject("auth"));
     }
 
     @NotNull
