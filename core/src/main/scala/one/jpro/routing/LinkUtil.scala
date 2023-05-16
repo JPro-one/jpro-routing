@@ -147,13 +147,17 @@ object LinkUtil {
       setManaged(false)
     }
     if(!WebAPI.isBrowser) {
+      var sm: SessionManager = null
+      onceWhen(scene != null && scene.window != null && scene.window.showing) --> {
+        sm = LinkUtil.getSessionManager(node)
+      }
       node.onMouseClicked --> { e =>
         def isExternalLink(x: String) = x.startsWith("http") || x.startsWith("mailto")
         if(e.isStillSincePress) {
           if(isExternalLink(link)) {
             openLinkExternalFun(link)
           } else {
-            LinkUtil.getSessionManager(node).gotoURL(link)
+            sm.gotoURL(link)
           }
         }
       }
