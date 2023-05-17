@@ -138,7 +138,7 @@ object LinkUtil {
       content <-- {
         if(link == null) ""
         else s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" $externalPart style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
-           |${if(external)"" else script}
+                |${if(external)"" else script}
          """.stripMargin
       }
       hover --> { x =>
@@ -147,17 +147,13 @@ object LinkUtil {
       setManaged(false)
     }
     if(!WebAPI.isBrowser) {
-      var sm: SessionManager = null
-      onceWhen(scene != null && scene.window != null && scene.window.showing) --> {
-        sm = LinkUtil.getSessionManager(node)
-      }
       node.onMouseClicked --> { e =>
         def isExternalLink(x: String) = x.startsWith("http") || x.startsWith("mailto")
         if(e.isStillSincePress) {
           if(isExternalLink(link)) {
             openLinkExternalFun(link)
           } else {
-            sm.gotoURL(link)
+            LinkUtil.getSessionManager(node).gotoURL(link)
           }
         }
       }
