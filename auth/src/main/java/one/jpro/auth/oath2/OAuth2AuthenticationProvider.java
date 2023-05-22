@@ -9,8 +9,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.jpro.webapi.WebAPI;
+import javafx.stage.Stage;
 import one.jpro.auth.authentication.*;
+import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpOptions;
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.jwt.TokenCredentials;
 import one.jpro.auth.jwt.TokenExpiredException;
@@ -41,7 +43,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     private static final Base64.Decoder BASE64_DECODER = AuthUtils.BASE64_DECODER;
 
     @NotNull
-    private final WebAPI webAPI;
+    private final AuthenticationServer authServer;
     @NotNull
     private final OAuth2Options options;
     @NotNull
@@ -50,12 +52,21 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     /**
      * Creates a OAuth2 authentication provider.
      *
-     * @param webAPI  the web API
+     * @param stage   the JavaFX application stage
      * @param options the OAuth2 options
      */
-    public OAuth2AuthenticationProvider(@NotNull final WebAPI webAPI, @NotNull final OAuth2Options options) {
-//        this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
-        this.webAPI = webAPI; // Temporary disable null check for testing purpose
+    public OAuth2AuthenticationProvider(@NotNull final Stage stage, @NotNull final OAuth2Options options) {
+        this(AuthenticationServer.create(stage), options);
+    }
+
+    /**
+     * Creates a OAuth2 authentication provider.
+     *
+     * @param authServer the authorization server
+     * @param options    the OAuth2 options
+     */
+    public OAuth2AuthenticationProvider(@NotNull final AuthenticationServer authServer, @NotNull final OAuth2Options options) {
+        this.authServer = Objects.requireNonNull(authServer, "AuthServer cannot be null");
         this.options = Objects.requireNonNull(options, "OAuth2 options cannot be null");
         this.api = new OAuth2API(options);
         this.options.validate();
@@ -83,6 +94,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         final String authorizeUrl = api.authorizeURL(credentials
                 .setNormalizedRedirectUri(normalizeUri(credentials.getRedirectUri())));
         log.debug("Authorize URL: {}", authorizeUrl);
+        authServer.openURL(URI.create(authorizeUrl));
         return authorizeUrl;
     }
 
@@ -178,7 +190,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
             OAuth2Credentials oauth2Credentials = (OAuth2Credentials) credentials;
 
             // Wrap the Query Parameters in a JSONObject for easy access
-            final JSONObject queryParams = new JSONObject(webAPI.getURLQueryParams());
+            final JSONObject queryParams = new JSONObject(authServer.getQueryParams());
             log.debug("URL query parameters: {}", queryParams);
 
             // Retrieve the authorization code
@@ -285,7 +297,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      * @return an {@link OAuth2AuthenticationProvider} instance.
      */
     public CompletableFuture<OAuth2AuthenticationProvider> discover() {
-        return api.discover(webAPI, options);
+        return api.discover(authServer, options);
     }
 
     /**
@@ -633,8 +645,13 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         // Complete uri if is partial
         String redirectUri = uri;
         if (redirectUri != null && redirectUri.charAt(0) == '/') {
-            final String serverUrl = webAPI.getServer().contains("localhost") ?
-                    "http://" + webAPI.getServer() : "https://" + webAPI.getServer();
+            final int port = authServer.getServerPort();
+            String server = authServer.getServerHost();
+            if (port > 0) {
+                server += ":" + port;
+            }
+            final String serverUrl = authServer.getServerHost().equalsIgnoreCase(HttpOptions.DEFAULT_HOST) ?
+                    "http://" + server : "https://" + server;
             redirectUri = serverUrl + redirectUri;
         }
         return redirectUri;

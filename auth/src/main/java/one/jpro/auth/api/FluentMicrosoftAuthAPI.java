@@ -1,7 +1,7 @@
 package one.jpro.auth.api;
 
-import com.jpro.webapi.WebAPI;
 import javafx.stage.Stage;
+import one.jpro.auth.http.AuthenticationServer;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 
 /**
@@ -35,10 +35,6 @@ public class FluentMicrosoftAuthAPI implements FluentMicrosoftAuth {
 
     @Override
     public MicrosoftAuthenticationProvider create(Stage stage) {
-        if (WebAPI.isBrowser()) {
-            return new MicrosoftAuthenticationProvider(WebAPI.getWebAPI(stage), clientId, clientSecret, tenant);
-        }
-        else throw new UnsupportedOperationException("Microsoft authentication is currently supported " +
-                "only when running the application via JPro server.");
+        return new MicrosoftAuthenticationProvider(AuthenticationServer.create(stage), clientId, clientSecret, tenant);
     }
 }

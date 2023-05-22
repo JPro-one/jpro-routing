@@ -2,8 +2,8 @@ package one.jpro.auth.oath2;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.jpro.webapi.WebAPI;
 import one.jpro.auth.authentication.AuthenticationException;
+import one.jpro.auth.http.AuthenticationServer;
 import one.jpro.auth.http.HttpMethod;
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.utils.AuthUtils;
@@ -256,7 +256,7 @@ public class OAuth2API {
                 .put("token_type_hint", tokenType);
 
         final String payload = jsonToQuery(form);
-        // specify preferred accepted accessToken type
+        // specify the preferred accepted accessToken type
         headers.put("Accept", "application/json,application/x-www-form-urlencoded;q=0.9");
 
         return fetch(HttpMethod.POST, options.getRevocationPath(), headers, payload)
@@ -379,11 +379,13 @@ public class OAuth2API {
      * The discovery will use the given site in the configuration options
      * and attempt to load the well-known descriptor.
      *
+     * @param authServer the authentication server
      * @param config the initial options, it should contain the site url
      * @return an OAuth2 provider configured with the discovered option values
      * @see <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>
      */
-    public CompletableFuture<OAuth2AuthenticationProvider> discover(final WebAPI webAPI, final OAuth2Options config) {
+    public CompletableFuture<OAuth2AuthenticationProvider> discover(final AuthenticationServer authServer,
+                                                                    final OAuth2Options config) {
         if (config.getSite() == null) {
             CompletableFuture.failedFuture(new RuntimeException("the site url cannot be null"));
         }
@@ -574,7 +576,7 @@ public class OAuth2API {
                                 config.addSupportedRequestObjectSigningAlgValue((String) requestObjectSigningAlgValue));
                     }
 
-                    return CompletableFuture.completedFuture(new OAuth2AuthenticationProvider(webAPI, config));
+                    return CompletableFuture.completedFuture(new OAuth2AuthenticationProvider(authServer, config));
                 });
     }
 
