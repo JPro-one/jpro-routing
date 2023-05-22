@@ -189,7 +189,7 @@ public class LoginApp extends BaseAuthApp {
 
         final var signInBox = createButtonWithDescription(
                 "Sign in with the selected authentication provider.", "Sign In",
-                event -> getWebAPI().openURL(authProvider.authorizeUrl(authCredentials)));
+                event -> authProvider.authorizeUrl(authCredentials));
 
         final var discoveryBox = createButtonWithDescription(
                 "The OpenID Connect Discovery provides a client with configuration details.",
