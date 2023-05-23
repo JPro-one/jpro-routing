@@ -1,13 +1,8 @@
 package one.jpro.routing.sessionmanager
 
-import java.net.URL
-import java.net.URLDecoder
 import one.jpro.routing.{Redirect, Response, RouteNode, View}
-import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
-import one.jpro.routing.{Redirect, Response, RouteNode, View}
+import com.jpro.webapi.{WebAPI, WebCallback}
 import simplefx.all._
-import simplefx.core._
-import simplefx.experimental._
 
 
 class SessionManagerWeb(val webApp: RouteNode, val webAPI: WebAPI) extends SessionManager { THIS =>
@@ -110,17 +105,13 @@ class SessionManagerWeb(val webApp: RouteNode, val webAPI: WebAPI) extends Sessi
 
   def start() = {
 
-    gotoFullEncodedURL(webAPI.getServerName, false, false)
+    gotoFullEncodedURL(webAPI.getRequestedURL, false, false)
     println("registering popstate")
-    webAPI.registerJavaFunction("popstatejava", new WebCallback {
-      override def callback(s: String): Unit = {
-        gotoFullEncodedURL(s.drop(1).dropRight(1).replace("\\\"","\""), false)
-      }
+    webAPI.registerJavaFunction("popstatejava", (s: String) => {
+      gotoFullEncodedURL(s.drop(1).dropRight(1).replace("\\\"", "\""), false)
     })
-    webAPI.registerJavaFunction("jproGotoURL", new WebCallback {
-      override def callback(s: String): Unit = {
-        gotoURL(s.drop(1).dropRight(1).replace("\\\"","\""))
-      }
+    webAPI.registerJavaFunction("jproGotoURL", (s: String) => {
+      gotoURL(s.drop(1).dropRight(1).replace("\\\"", "\""))
     })
 
     webAPI.executeScript(

@@ -94,7 +94,7 @@ public interface AuthenticationServer extends AutoCloseable {
      * @return the parameters
      */
     default Map<String, List<String>> getParameters() {
-        final String uri = getFullRequestURL();
+        final String uri = getFullRequestedURL();
         int qmi = uri.indexOf('?');
         return (qmi >= 0) ? decodeParams(uri.substring(qmi + 1)) : Collections.emptyMap();
     }
@@ -137,19 +137,19 @@ public interface AuthenticationServer extends AutoCloseable {
      *
      * @return the URL
      */
-    String getFullRequestURL();
+    String getFullRequestedURL();
 
     /**
      * Return the full URL (without the query string) the client used to request the server.
      *
      * @return the URL
      */
-    default String getRequestURL() {
-        var idx = getFullRequestURL().indexOf('?');
+    default String getRequestedURL() {
+        var idx = getFullRequestedURL().indexOf('?');
         if (idx != -1) {
-            return getFullRequestURL().substring(0, idx);
+            return getFullRequestedURL().substring(0, idx);
         }
-        return getFullRequestURL();
+        return getFullRequestedURL();
     }
 
     /**

@@ -119,7 +119,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
             log.debug("***************************************************************************");
             log.debug("Server host: {}", getServerHost());
             log.debug("Server port: {}", getServerPort());
-            log.debug("Full request URL: {}", getFullRequestURL());
+            log.debug("Full requested URL: {}", getFullRequestedURL());
             log.debug("Parameters: {}", getParameters());
             log.debug("Request hashCode = {}", AuthenticationServerImpl.this.hashCode());
             log.debug("Request URI: {}", request.getUri());
@@ -248,7 +248,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
     }
 
     @Override
-    public String getFullRequestURL() {
+    public String getFullRequestedURL() {
         return uri;
     }
 
