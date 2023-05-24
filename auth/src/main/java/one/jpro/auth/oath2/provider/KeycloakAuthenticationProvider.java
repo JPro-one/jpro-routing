@@ -1,6 +1,6 @@
 package one.jpro.auth.oath2.provider;
 
-import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpServer;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Flow;
 import one.jpro.auth.oath2.OAuth2Options;
@@ -19,32 +19,32 @@ public class KeycloakAuthenticationProvider extends OAuth2AuthenticationProvider
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Keycloak.
      *
-     * @param authServer the authorization server
+     * @param httpServer the HTTP server
      * @param options custom OAuth2 options
      */
-    public KeycloakAuthenticationProvider(final AuthenticationServer authServer, final OAuth2Options options) {
-        super(authServer, options);
+    public KeycloakAuthenticationProvider(final HttpServer httpServer, final OAuth2Options options) {
+        super(httpServer, options);
     }
 
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Keycloak.
      *
-     * @param authServer the authorization server
+     * @param httpServer the HTTP server
      * @param config the json configuration exported from Keycloak admin console
      */
-    public KeycloakAuthenticationProvider(final AuthenticationServer authServer, final JSONObject config) {
-        this(authServer, OAuth2Flow.AUTH_CODE, config);
+    public KeycloakAuthenticationProvider(final HttpServer httpServer, final JSONObject config) {
+        this(httpServer, OAuth2Flow.AUTH_CODE, config);
     }
 
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Keycloak.
      *
-     * @param authServer the authorization server
+     * @param httpServer the HTTP server
      * @param flow   the OAuth2 flow to use
      * @param config the JSON configuration exported from Keycloak admin console
      */
-    public KeycloakAuthenticationProvider(final AuthenticationServer authServer, final OAuth2Flow flow, final JSONObject config) {
-        super(authServer, configure(flow, config));
+    public KeycloakAuthenticationProvider(final HttpServer httpServer, final OAuth2Flow flow, final JSONObject config) {
+        super(httpServer, configure(flow, config));
     }
 
     /**
@@ -106,12 +106,12 @@ public class KeycloakAuthenticationProvider extends OAuth2AuthenticationProvider
      * site in the configuration options and attempt to load the well-known descriptor. If a site is provided, then
      * it will be used to do the lookup.
      *
-     * @param authServer the authorization server
+     * @param httpServer the HTTP server
      * @param options custom OAuth2 options
      * @return a future with the instantiated {@link OAuth2AuthenticationProvider}
      */
-    public static CompletableFuture<OAuth2AuthenticationProvider> discover(final AuthenticationServer authServer,
+    public static CompletableFuture<OAuth2AuthenticationProvider> discover(final HttpServer httpServer,
                                                                            final OAuth2Options options) {
-        return new KeycloakAuthenticationProvider(authServer, options).discover();
+        return new KeycloakAuthenticationProvider(httpServer, options).discover();
     }
 }

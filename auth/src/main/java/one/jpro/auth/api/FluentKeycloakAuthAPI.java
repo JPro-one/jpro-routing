@@ -1,7 +1,7 @@
 package one.jpro.auth.api;
 
 import javafx.stage.Stage;
-import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpServer;
 import one.jpro.auth.oath2.OAuth2Flow;
 import one.jpro.auth.oath2.provider.KeycloakAuthenticationProvider;
 import org.json.JSONObject;
@@ -56,6 +56,6 @@ public class FluentKeycloakAuthAPI implements FluentKeycloakAuth {
         if (clientSecret != null) config.put("credentials", new JSONObject().put("secret", clientSecret));
         if (realm != null) config.put("realm", realm);
 
-        return new KeycloakAuthenticationProvider(AuthenticationServer.create(stage), flow, config);
+        return new KeycloakAuthenticationProvider(HttpServer.create(stage), flow, config);
     }
 }

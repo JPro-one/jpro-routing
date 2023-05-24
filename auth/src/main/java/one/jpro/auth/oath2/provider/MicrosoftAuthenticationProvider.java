@@ -1,6 +1,6 @@
 package one.jpro.auth.oath2.provider;
 
-import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpServer;
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.oath2.OAuth2AuthenticationProvider;
 import one.jpro.auth.oath2.OAuth2Flow;
@@ -22,23 +22,23 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Microsoft.
      *
-     * @param authServer the authentication server
+     * @param httpServer the HTTP server
      * @param options    custom OAuth2 options
      */
-    public MicrosoftAuthenticationProvider(AuthenticationServer authServer, OAuth2Options options) {
-        super(authServer, options);
+    public MicrosoftAuthenticationProvider(HttpServer httpServer, OAuth2Options options) {
+        super(httpServer, options);
     }
 
     /**
      * Create an {@link OAuth2AuthenticationProvider} for Microsoft.
      *
-     * @param authServer   the authentication server
+     * @param httpServer   the HTTP server
      * @param clientId     the client id given to you by Microsoft
      * @param clientSecret the client secret given to you by Microsoft
      * @param tenant       the guid of your application
      */
-    public MicrosoftAuthenticationProvider(AuthenticationServer authServer, String clientId, String clientSecret, String tenant) {
-        super(authServer, new OAuth2Options()
+    public MicrosoftAuthenticationProvider(HttpServer httpServer, String clientId, String clientSecret, String tenant) {
+        super(httpServer, new OAuth2Options()
                 .setFlow(OAuth2Flow.AUTH_CODE)
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)
@@ -57,11 +57,11 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
      * site in the configuration options and attempt to load the well-known descriptor. If a site is provided, then
      * it will be used to do the lookup.
      *
-     * @param authServer the authentication server
+     * @param httpServer the HTTP server
      * @param options    custom OAuth2 options
      * @return a future with the instantiated {@link OAuth2AuthenticationProvider}
      */
-    public static CompletableFuture<OAuth2AuthenticationProvider> discover(AuthenticationServer authServer, OAuth2Options options) {
+    public static CompletableFuture<OAuth2AuthenticationProvider> discover(HttpServer httpServer, OAuth2Options options) {
         final String site = options.getSite() == null ?
                 "https://login.microsoftonline.com/{tenant}/v2.0" : options.getSite();
         final JWTOptions jwtOptions = options.getJWTOptions() == null ?
@@ -71,7 +71,7 @@ public class MicrosoftAuthenticationProvider extends OAuth2AuthenticationProvide
             jwtOptions.setNonceAlgorithm("SHA-256");
         }
 
-        return new MicrosoftAuthenticationProvider(authServer,
+        return new MicrosoftAuthenticationProvider(httpServer,
                 new OAuth2Options(options)
                         // Microsoft OpenID does not return the same url where the request was sent to
                         .setValidateIssuer(false)

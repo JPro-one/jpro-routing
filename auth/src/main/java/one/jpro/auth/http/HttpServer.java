@@ -2,7 +2,7 @@ package one.jpro.auth.http;
 
 import com.jpro.webapi.WebAPI;
 import javafx.stage.Stage;
-import one.jpro.auth.http.impl.AuthenticationServerImpl;
+import one.jpro.auth.http.impl.HttpServerImpl;
 import one.jpro.auth.http.impl.JProServerImpl;
 import one.jpro.auth.utils.AuthUtils;
 import org.jetbrains.annotations.NotNull;
@@ -11,40 +11,40 @@ import java.net.URI;
 import java.util.*;
 
 /**
- * Authorization server interface.
+ * Http server interface.
  *
  * @author Besmir Beqiri
  */
-public interface AuthenticationServer extends AutoCloseable {
+public interface HttpServer extends AutoCloseable {
 
     /**
-     * Creates a local authorization server. This method must be used
+     * Creates a local http server. This method must be used
      * only for desktop/mobile applications that run locally.
      *
-     * @return the auth server
-     * @throws AuthenticationServerException if an error occurs
+     * @return the HTTP server instance
+     * @throws HttpServerException if an error occurs
      */
-    static AuthenticationServer create() {
+    static HttpServer create() {
         return create(null);
     }
 
     /**
-     * Creates an authorization server. If the application is running
+     * Creates a http server. If the application is running
      * in a browser via JPro server, then a wrapper over JPro is returned.
      * If the application is not running inside the browser,
-     * then a local authorization server is created and returned.
+     * then a local http server is created and returned.
      *
      * @param stage the application stage
-     * @return the auth server
-     * @throws AuthenticationServerException if an error occurs
+     * @return the HTTP server instance
+     * @throws HttpServerException if an error occurs
      */
-    static AuthenticationServer create(Stage stage) throws AuthenticationServerException {
+    static HttpServer create(Stage stage) throws HttpServerException {
         if (WebAPI.isBrowser() && stage != null) {
             WebAPI webAPI = WebAPI.getWebAPI(stage);
             return new JProServerImpl(webAPI);
         }
 
-        return AuthenticationServerImpl.getInstance(stage);
+        return HttpServerImpl.getInstance(stage);
     }
 
     /**
@@ -100,8 +100,7 @@ public interface AuthenticationServer extends AutoCloseable {
     }
 
     /**
-     * Decodes parameters in percent-encoded URI-format (e.g.
-     * "name=Jack%20Daniels&pass=Single%20Malt") and adds them to given Map.
+     * Decodes parameters in percent-encoded URI-format and adds them to given Map.
      *
      * @param queryParams the parameters
      */

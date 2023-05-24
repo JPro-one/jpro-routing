@@ -1,11 +1,12 @@
 package one.jpro.auth.test;
 
-import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpServer;
 import one.jpro.auth.oath2.OAuth2Options;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,9 +19,9 @@ public class GoogleAuthenticationProviderTest {
 
     @Test
     public void configWithClientIdAndClientSecret() {
-        try (AuthenticationServer authServer = AuthenticationServer.create()) {
+        try (HttpServer httpServer = HttpServer.create()) {
             GoogleAuthenticationProvider provider =
-                    new GoogleAuthenticationProvider(authServer, "clientId", "clientSecret");
+                    new GoogleAuthenticationProvider(httpServer, "clientId", "clientSecret");
             OAuth2Options options = provider.getOptions();
 
             assertEquals("https://accounts.google.com", options.getSite());
@@ -30,15 +31,13 @@ public class GoogleAuthenticationProviderTest {
             assertEquals("https://www.googleapis.com/oauth2/v3/certs", options.getJwkPath());
             assertEquals("https://oauth2.googleapis.com/tokeninfo", options.getIntrospectionPath());
             assertEquals("https://oauth2.googleapis.com/revoke", options.getRevocationPath());
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 
     @Test
-    public void autoConfigViaOpenIDConnectDiscoveryService() {
-        try (AuthenticationServer authServer = AuthenticationServer.create()) {
-            GoogleAuthenticationProvider.discover(authServer, new OAuth2Options().setClientId("clientId"))
+    public void autoConfigViaOpenIDConnectDiscoveryService() throws ExecutionException, InterruptedException {
+        try (HttpServer httpServer = HttpServer.create()) {
+            GoogleAuthenticationProvider.discover(httpServer, new OAuth2Options().setClientId("clientId"))
                     .thenAccept(provider -> {
                         OAuth2Options options = provider.getOptions();
 
@@ -64,8 +63,6 @@ public class GoogleAuthenticationProviderTest {
                                 "urn:ietf:params:oauth:grant-type:device_code",
                                 "urn:ietf:params:oauth:grant-type:jwt-bearer"), options.getSupportedGrantTypes());
                     }).get();
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }

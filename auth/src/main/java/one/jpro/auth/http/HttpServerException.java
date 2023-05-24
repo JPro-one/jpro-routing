@@ -1,26 +1,26 @@
 package one.jpro.auth.http;
 
 /**
- * A runtime exception thrown when the authentication server fails.
+ * A runtime exception thrown when the http server fails.
  *
  * @author Besmir Beqiri
  */
-public class AuthenticationServerException extends RuntimeException {
+public class HttpServerException extends RuntimeException {
 
     /**
-     * Constructs a new authentication server exception with the specified
+     * Constructs a new http server exception with the specified
      * detail message. The cause is not initialized, and may subsequently
      * be initialized by a call to {@link #initCause}.
      *
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public AuthenticationServerException(String message) {
+    public HttpServerException(String message) {
         super(message);
     }
 
     /**
-     * Constructs a new authentication server exception with the specified
+     * Constructs a new http server exception with the specified
      * detail message and cause.
      * <p>
      * Note that the detail message associated with {@code cause} is <i>not</i>
@@ -33,7 +33,7 @@ public class AuthenticationServerException extends RuntimeException {
      *                permitted and indicates that the cause is nonexistent or
      *                unknown.
      */
-    public AuthenticationServerException(String message, Throwable cause) {
+    public HttpServerException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -1,19 +1,19 @@
 package one.jpro.auth.http.impl;
 
 import com.jpro.webapi.WebAPI;
-import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpServer;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.util.Objects;
 
 /**
- * Implementation of the {@link AuthenticationServer} interface when running
+ * Implementation of the {@link HttpServer} interface when running
  * the application via JPro server.
  *
  * @author Besmir Beqiri
  */
-public class JProServerImpl implements AuthenticationServer {
+public class JProServerImpl implements HttpServer {
 
     @NotNull
     private final WebAPI webAPI;

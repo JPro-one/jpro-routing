@@ -2,8 +2,8 @@ package one.jpro.auth.http.impl;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import one.jpro.auth.http.AuthenticationServer;
-import one.jpro.auth.http.AuthenticationServerException;
+import one.jpro.auth.http.HttpServer;
+import one.jpro.auth.http.HttpServerException;
 import one.jpro.auth.http.HttpOptions;
 import one.jpro.auth.http.HttpStatus;
 import one.jpro.auth.utils.PlatformUtils;
@@ -25,26 +25,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Implementation of the {@link AuthenticationServer} interface when running
+ * Implementation of the {@link HttpServer} interface when running
  * the application in a desktop/device environment.
  *
  * @author Besmir Beqiri
  */
-public final class AuthenticationServerImpl implements AuthenticationServer {
+public final class HttpServerImpl implements HttpServer {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationServerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpServerImpl.class);
 
     private static Stage stage;
     private static HttpOptions httpOptions;
 
     private static final class SingletonHolder {
-        private static final AuthenticationServerImpl INSTANCE = initAuthServer();
+        private static final HttpServerImpl INSTANCE = initAuthServer();
 
-        private static AuthenticationServerImpl initAuthServer() {
+        private static HttpServerImpl initAuthServer() {
             try {
-                return new AuthenticationServerImpl(stage, httpOptions == null ? new HttpOptions() : httpOptions);
+                return new HttpServerImpl(stage, httpOptions == null ? new HttpOptions() : httpOptions);
             } catch (IOException ex) {
-                throw new AuthenticationServerException(ex.getMessage(), ex);
+                throw new HttpServerException(ex.getMessage(), ex);
             }
         }
 
@@ -59,19 +59,19 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
          *
          * @return AuthServer singleton.
          */
-        public static AuthenticationServerImpl getInstance() {
+        public static HttpServerImpl getInstance() {
             return SingletonHolder.INSTANCE;
         }
     }
 
-    public static AuthenticationServerImpl getInstance(Stage stage) throws AuthenticationServerException {
-        AuthenticationServerImpl.stage = stage;
+    public static HttpServerImpl getInstance(Stage stage) throws HttpServerException {
+        HttpServerImpl.stage = stage;
         return SingletonHolder.getInstance();
     }
 
-    public static AuthenticationServerImpl getInstance(Stage stage, HttpOptions httpOptions) throws AuthenticationServerException {
-        AuthenticationServerImpl.stage = stage;
-        AuthenticationServerImpl.httpOptions = httpOptions;
+    public static HttpServerImpl getInstance(Stage stage, HttpOptions httpOptions) throws HttpServerException {
+        HttpServerImpl.stage = stage;
+        HttpServerImpl.httpOptions = httpOptions;
         return SingletonHolder.getInstance();
     }
 
@@ -103,7 +103,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
      * @param options the HTTP options
      * @throws IOException if an error occurs
      */
-    private AuthenticationServerImpl(Stage stage, HttpOptions options) throws IOException {
+    private HttpServerImpl(Stage stage, HttpOptions options) throws IOException {
         this.options = options;
 
         // Create a default response
@@ -121,7 +121,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
             log.debug("Server port: {}", getServerPort());
             log.debug("Full requested URL: {}", getFullRequestedURL());
             log.debug("Parameters: {}", getParameters());
-            log.debug("Request hashCode = {}", AuthenticationServerImpl.this.hashCode());
+            log.debug("Request hashCode = {}", HttpServerImpl.this.hashCode());
             log.debug("Request URI: {}", request.getUri());
             log.debug("Request method: {}", request.getMethod());
             log.debug("Request version: {}", request.getVersion());
@@ -135,7 +135,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
             if (stage != null && stage.isShowing()) {
                 Platform.runLater(() -> {
                     this.uri = request.getUri();
-                    // TODO: trigger the browser to open the URL, or ad handler to the response
+                    // TODO: trigger the browser to open the URL, or add handler to the response
                     stage.toFront();
                 });
             }
@@ -153,7 +153,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
             connectionEventLoops.add(new ConnectionEventLoop(options, handler, connectionCounter, stop));
         }
 
-        thread = new Thread(this::run, "auth-server-thread");
+        thread = new Thread(this::run, "http-server-thread");
         thread.setDaemon(true);
 
         InetSocketAddress address = options.getHost() == null
@@ -176,7 +176,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
     }
 
     private byte[] getResourceAsBytes(@NotNull String name) throws IOException {
-        try (InputStream is = AuthenticationServer.class.getResourceAsStream(name)) {
+        try (InputStream is = HttpServer.class.getResourceAsStream(name)) {
             if (is != null) {
                 return is.readAllBytes();
             }
@@ -242,7 +242,7 @@ public final class AuthenticationServerImpl implements AuthenticationServer {
                 port = socketAddress.getPort();
             }
         } catch (IOException ex) {
-            throw new AuthenticationServerException(ex.getMessage(), ex);
+            throw new HttpServerException(ex.getMessage(), ex);
         }
         return port;
     }

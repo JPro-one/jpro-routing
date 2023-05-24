@@ -1,7 +1,7 @@
 package one.jpro.auth.api;
 
 import javafx.stage.Stage;
-import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpServer;
 import one.jpro.auth.oath2.provider.GoogleAuthenticationProvider;
 
 /**
@@ -28,6 +28,6 @@ public class FluentGoogleAuthAPI implements FluentGoogleAuth {
 
     @Override
     public GoogleAuthenticationProvider create(Stage stage) {
-        return new GoogleAuthenticationProvider(AuthenticationServer.create(stage), clientId, clientSecret);
+        return new GoogleAuthenticationProvider(HttpServer.create(stage), clientId, clientSecret);
     }
 }

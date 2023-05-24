@@ -1,6 +1,6 @@
 package one.jpro.auth.test;
 
-import one.jpro.auth.http.AuthenticationServer;
+import one.jpro.auth.http.HttpServer;
 import one.jpro.auth.oath2.OAuth2Options;
 import one.jpro.auth.oath2.provider.MicrosoftAuthenticationProvider;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,8 @@ public class MicrosoftAuthenticationProviderTest {
 
     @Test
     public void configWithClientIdAndClientSecretAndTenant() {
-        try (AuthenticationServer authServer = AuthenticationServer.create()) {
-            MicrosoftAuthenticationProvider provider = new MicrosoftAuthenticationProvider(authServer,
+        try (HttpServer httpServer = HttpServer.create()) {
+            MicrosoftAuthenticationProvider provider = new MicrosoftAuthenticationProvider(httpServer,
                     "clientId", "clientSecret",
                     MicrosoftAuthenticationProvider.COMMON_TENANT);
             OAuth2Options options = provider.getOptions();
@@ -32,14 +32,12 @@ public class MicrosoftAuthenticationProviderTest {
             assertEquals("https://login.microsoftonline.com/common/discovery/v2.0/keys", options.getJwkPath());
             assertEquals("https://login.microsoftonline.com/common/oauth2/v2.0/logout", options.getLogoutPath());
             assertEquals("SHA-256", options.getJWTOptions().getNonceAlgorithm());
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 
     @Test
     public void autoConfigViaOpenIDConnectDiscoveryService() throws ExecutionException, InterruptedException {
-        try (AuthenticationServer authServer = AuthenticationServer.create()) {
+        try (HttpServer authServer = HttpServer.create()) {
             MicrosoftAuthenticationProvider.discover(authServer, new OAuth2Options()
                             .setClientId("clientId")
                             .setTenant("common"))
@@ -66,8 +64,6 @@ public class MicrosoftAuthenticationProviderTest {
                                         "ver", "at_hash", "c_hash", "email"),
                                 options.getSupportedClaims());
                     }).get();
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }
