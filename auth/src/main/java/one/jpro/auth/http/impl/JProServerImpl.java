@@ -54,7 +54,7 @@ public class JProServerImpl implements AuthenticationServer {
 
     @Override
     public String getFullRequestedURL() {
-        return URI.create(webAPI.getRequestedURL()).toString();
+        return URI.create(webAPI.getServerName()).toString();
     }
 
     @Override
