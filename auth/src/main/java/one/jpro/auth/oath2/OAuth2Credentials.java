@@ -172,6 +172,11 @@ public class OAuth2Credentials implements Credentials {
                     throw new CredentialValidationException("password cannot be null or blank");
                 }
                 break;
+            case AUTH_JWT:
+                if (jwt == null) {
+                    throw new CredentialValidationException("jwt cannot be null");
+                }
+                break;
             case CLIENT:
                 // no fields are required
                 break;

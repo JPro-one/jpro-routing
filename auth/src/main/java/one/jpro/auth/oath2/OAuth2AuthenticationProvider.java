@@ -9,8 +9,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.jpro.webapi.WebAPI;
+import javafx.stage.Stage;
 import one.jpro.auth.authentication.*;
+import one.jpro.auth.http.HttpServer;
+import one.jpro.auth.http.HttpOptions;
 import one.jpro.auth.jwt.JWTOptions;
 import one.jpro.auth.jwt.TokenCredentials;
 import one.jpro.auth.jwt.TokenExpiredException;
@@ -41,7 +43,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     private static final Base64.Decoder BASE64_DECODER = AuthUtils.BASE64_DECODER;
 
     @NotNull
-    private final WebAPI webAPI;
+    private final HttpServer httpServer;
     @NotNull
     private final OAuth2Options options;
     @NotNull
@@ -50,12 +52,21 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
     /**
      * Creates a OAuth2 authentication provider.
      *
-     * @param webAPI  the web API
+     * @param stage   the JavaFX application stage
      * @param options the OAuth2 options
      */
-    public OAuth2AuthenticationProvider(@NotNull final WebAPI webAPI, @NotNull final OAuth2Options options) {
-//        this.webAPI = Objects.requireNonNull(webAPI, "WebAPI cannot be null");
-        this.webAPI = webAPI; // Temporary disable null check for testing purpose
+    public OAuth2AuthenticationProvider(@NotNull final Stage stage, @NotNull final OAuth2Options options) {
+        this(HttpServer.create(stage), options);
+    }
+
+    /**
+     * Creates a OAuth2 authentication provider.
+     *
+     * @param httpServer the HTTP server
+     * @param options    the OAuth2 options
+     */
+    public OAuth2AuthenticationProvider(@NotNull final HttpServer httpServer, @NotNull final OAuth2Options options) {
+        this.httpServer = Objects.requireNonNull(httpServer, "HttpServer cannot be null");
         this.options = Objects.requireNonNull(options, "OAuth2 options cannot be null");
         this.api = new OAuth2API(options);
         this.options.validate();
@@ -83,6 +94,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         final String authorizeUrl = api.authorizeURL(credentials
                 .setNormalizedRedirectUri(normalizeUri(credentials.getRedirectUri())));
         log.debug("Authorize URL: {}", authorizeUrl);
+        httpServer.openURL(URI.create(authorizeUrl));
         return authorizeUrl;
     }
 
@@ -178,7 +190,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
             OAuth2Credentials oauth2Credentials = (OAuth2Credentials) credentials;
 
             // Wrap the Query Parameters in a JSONObject for easy access
-            final JSONObject queryParams = new JSONObject(webAPI.getURLQueryParams());
+            final JSONObject queryParams = new JSONObject(httpServer.getQueryParams());
             log.debug("URL query parameters: {}", queryParams);
 
             // Retrieve the authorization code
@@ -285,7 +297,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
      * @return an {@link OAuth2AuthenticationProvider} instance.
      */
     public CompletableFuture<OAuth2AuthenticationProvider> discover() {
-        return api.discover(webAPI, options);
+        return api.discover(httpServer, options);
     }
 
     /**
@@ -477,36 +489,40 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         JSONObject json;
         try {
             final DecodedJWT decodedToken = JWT.decode(token);
-            final String alg = decodedToken.getAlgorithm();
-            Algorithm algorithm = Algorithm.none();
-            // TODO: Add support for other algorithms
-            switch (alg) {
-                case "HS256":
-                    algorithm = Algorithm.HMAC256(options.getClientSecret());
-                    break;
-                case "RS256":
-                    JwkProvider jwkProvider;
-                    try {
-                        jwkProvider = new UrlJwkProvider(URI.create(options.getJwkPath()).toURL());
+            if (options.isVerifyToken()) {
+                final String alg = decodedToken.getAlgorithm();
+                Algorithm algorithm = Algorithm.none();
+                // TODO: Add support for other algorithms
+                switch (alg) {
+                    case "HS256":
+                        algorithm = Algorithm.HMAC256(options.getClientSecret());
+                        break;
+                    case "RS256":
+                        JwkProvider jwkProvider;
+                        try {
+                            jwkProvider = new UrlJwkProvider(URI.create(options.getJwkPath()).toURL());
 //                        jwkProvider = new JwkProviderBuilder(options.getJwkPath())
 //                                .cached(options.getJWTOptions().getCacheSize(), options.getJWTOptions().getExpiresIn())
 //                                .build();
-                    } catch (MalformedURLException ex) {
-                        throw new IllegalStateException("Invalid JWK path: " + options.getJwkPath());
-                    }
-                    final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
-                    algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
-                    break;
-            }
+                        } catch (MalformedURLException ex) {
+                            throw new IllegalStateException("Invalid JWK path: " + options.getJwkPath());
+                        }
+                        final Jwk jwk = jwkProvider.get(decodedToken.getKeyId());
+                        algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+                        break;
+                }
 
-            // Allow only secure algorithms
-            if (Algorithm.none().equals(algorithm)) {
-                throw new IllegalStateException("Algorithm \"none\" not allowed");
-            }
+                // Allow only secure algorithms
+                if (Algorithm.none().equals(algorithm)) {
+                    throw new IllegalStateException("Algorithm \"none\" not allowed");
+                }
 
-            final JWTVerifier verifier = JWT.require(algorithm).build();
-            final DecodedJWT verifiedToken = verifier.verify(token);
-            json = jwtToJson(verifiedToken, idToken ? "id_token" : "access_token");
+                final JWTVerifier verifier = JWT.require(algorithm).build();
+                final DecodedJWT verifiedToken = verifier.verify(token);
+                json = jwtToJson(verifiedToken, idToken ? "id_token" : "access_token");
+            } else {
+                json = jwtToJson(decodedToken, idToken ? "id_token" : "access_token");
+            }
         } catch (com.auth0.jwt.exceptions.TokenExpiredException tex) {
             throw new TokenExpiredException(tex.getMessage(), tex.getExpiredOn());
         }
@@ -629,8 +645,13 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider<Cred
         // Complete uri if is partial
         String redirectUri = uri;
         if (redirectUri != null && redirectUri.charAt(0) == '/') {
-            final String serverUrl = webAPI.getServer().contains("localhost") ?
-                    "http://" + webAPI.getServer() : "https://" + webAPI.getServer();
+            final int port = httpServer.getServerPort();
+            String server = httpServer.getServerHost();
+            if (port > 0) {
+                server += ":" + port;
+            }
+            final String serverUrl = httpServer.getServerHost().equalsIgnoreCase(HttpOptions.DEFAULT_HOST) ?
+                    "http://" + server : "https://" + server;
             redirectUri = serverUrl + redirectUri;
         }
         return redirectUri;

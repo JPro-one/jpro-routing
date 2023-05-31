@@ -34,6 +34,7 @@ public class OAuth2Options implements Options {
     private static final String REVOCATION_PATH = "/oauth/revoke";
     private static final JWTOptions JWT_OPTIONS = new JWTOptions();
     private static final String SCOPE_SEPARATOR = " ";
+    private static final boolean VERIFY_TOKEN = true;
     private static final boolean VALIDATE_ISSUER = true;
     private static final long JWK_DEFAULT_AGE = -1L; // seconds of JWK default age (-1 means no rotation)
     private static final Pattern TENANT_PATTERN = Pattern.compile("\\{(tenant|tenantid|realm)}");
@@ -56,6 +57,7 @@ public class OAuth2Options implements Options {
     private String tokenPath;
     private String revocationPath;
     private String scopeSeparator;
+    private boolean verifyToken;
     // this is an openid-connect extension
     private boolean validateIssuer;
     private String logoutPath;
@@ -91,6 +93,7 @@ public class OAuth2Options implements Options {
      */
     public OAuth2Options() {
         flow = FLOW;
+        verifyToken = VERIFY_TOKEN;
         validateIssuer = VALIDATE_ISSUER;
         authorizationPath = AUTHORIZATION_PATH;
         tokenPath = TOKEN_PATH;
@@ -124,6 +127,7 @@ public class OAuth2Options implements Options {
         tokenPath = other.tokenPath;
         revocationPath = other.revocationPath;
         scopeSeparator = other.scopeSeparator;
+        verifyToken = other.verifyToken;
         validateIssuer = other.validateIssuer;
         logoutPath = other.logoutPath;
         userInfoPath = other.userInfoPath;
@@ -438,6 +442,15 @@ public class OAuth2Options implements Options {
 
     public OAuth2Options setScopeSeparator(String scopeSeparator) {
         this.scopeSeparator = scopeSeparator;
+        return this;
+    }
+
+    public boolean isVerifyToken() {
+        return verifyToken;
+    }
+
+    public OAuth2Options setVerifyToken(boolean verifyToken) {
+        this.verifyToken = verifyToken;
         return this;
     }
 
