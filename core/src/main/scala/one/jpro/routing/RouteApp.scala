@@ -3,7 +3,7 @@ package one.jpro.routing
 import com.jpro.webapi.WebAPI
 import javafx.application.Application
 import javafx.scene.Scene
-import javafx.stage.Stage
+import javafx.stage.{Stage, StageStyle}
 import javafx.scene.Parent
 import javafx.scene.layout.StackPane
 import one.jpro.routing.sessionmanager.SessionManager
@@ -13,6 +13,7 @@ abstract class RouteApp extends Application {
   private var _stage: Stage = null;
   private var routeNode: RouteNode = null
   private var _scene: Scene = null
+  def stageStyle(): StageStyle = StageStyle.DECORATED
   def getStage(): Stage = _stage
   def getScene(): Scene = _scene
   def getRouteNode(): RouteNode = routeNode
@@ -20,6 +21,7 @@ abstract class RouteApp extends Application {
 
   override def start(stage: Stage): Unit = {
     _stage = stage
+    stage.initStyle(stageStyle)
     routeNode = new RouteNode(stage)
 
     // Add node between RouteNode and Scene, so Popups work correctly with ScenicView
