@@ -69,6 +69,12 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
   }
   webApp <++ scrollpane
   @Bind var isFullscreen = true
+  onceWhen(webApp.scene != null && webApp.scene.window != null) --> {
+    val window = webApp.scene.window
+    if(window.isInstanceOf[Stage]) {
+      window.asInstanceOf[Stage].title <-- view.title
+    }
+  }
 
   def start() = {
     gotoURL("/", pushState = true)
