@@ -19,7 +19,7 @@ repositories {
     }
 }
 dependencies {
-    implementation "one.jpro:jpro-routing-core:0.14.0"
+    implementation "one.jpro:jpro-routing-core:0.15.0"
 }
 ```
 ### Maven
@@ -34,7 +34,7 @@ dependencies {
 dependency>
         <groupId>one.jpro</groupId>
         <artifactId>jpro-routing-core</artifactId>
-        <version>0.14.0</version>
+        <version>0.15.0</version>
         <scope>compile</scope>
 </dependency>
 ```
@@ -66,5 +66,5 @@ internal:
 
 ### clear cache:
 ```
-find ~/.m2 ~/.gradle | grep jpro-routing | grep 0.12 | xargs rm -r
+./deleteCache.sh
 ```
