@@ -72,7 +72,7 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
   onceWhen(webApp.scene != null && webApp.scene.window != null) --> {
     val window = webApp.scene.window
     if(window.isInstanceOf[Stage]) {
-      window.asInstanceOf[Stage].title <-- view.title
+      window.asInstanceOf[Stage].title <-- (if(view != null) view.title else "")
     }
   }
 
