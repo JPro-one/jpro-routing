@@ -21,6 +21,7 @@ class MyApp(stage: Stage) extends RouteNode(stage) {
     Route.empty()
       .and(get("", (r) => new MainView))
       .and(get("/", (r) => new MainView))
+      .and(get("/redirect2", (r) => Redirect("https://google.com")))
       .and(get("/main", (r) => new MainView))
       .and(get("/green", (r) => new GreenView))
       .and(get("/sub", (r) => new SubView))
@@ -171,6 +172,17 @@ class MainView extends Page {
         }
         new PopOver(content) {
         }.show(button)
+      }
+    }
+    this <++ new VBox {
+      style = "-fx-background-color: yellow; -fx-padding: 50px;"
+      this <++ new Label("Nested Links")
+      this <++ new Label("Yellow")
+      LinkUtil.setLink(this, "/yellow")
+      this <++ new Label("RED") {
+        style = "-fx-background-color: red;"
+        font = new Font(60)
+        LinkUtil.setLink(this, "/red")
       }
     }
     this <++ new Label(" label 123") { font = new Font(60)}
