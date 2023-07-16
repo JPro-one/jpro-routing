@@ -37,15 +37,12 @@ object LinkUtil {
   }
 
   def setLink(node: Node, url: String): Unit = {
-    setLink(node,url,None, null)
+    setLink(node,url,None)
   }
   def setLink(node: Node, url: String, text: String): Unit = {
-    setLink(node,url,Some(text), null)
+    setLink(node,url,Some(text))
   }
-  def setLink(node: Node, url: String, text: String, children: ObservableList[Node]): Unit = {
-    setLink(node,url,Some(text), children)
-  }
-  def setLink(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null, external: Boolean = false): Unit = {
+  def setLink(node: Node, url: String, text: Option[String] = None, external: Boolean = false): Unit = {
     assert(url != "", s"Empty link: ''")
     assert(isValidLink(url), s"Invalid link: '$url''")
     node.getProperties.put("link",url)
@@ -53,28 +50,25 @@ object LinkUtil {
       node.getProperties.put("description",desc)
     }
     if(url == null || url.startsWith("/") || url.startsWith("./") || url.startsWith("../")) {
-      setLinkInternalPush(node,url, text, children, external)
+      setLinkInternalPush(node,url, text, external)
     } else {
-      setLinkInternalNoPush(node,url, text, children, external)
+      setLinkInternalNoPush(node,url, text, external)
     }
   }
 
   def setExternalLink(node: Node, url: String): Unit = {
-    setLink(node,url,None, null, true)
+    setLink(node,url,None, true)
   }
   def setExternalLink(node: Node, url: String, text: String): Unit = {
-    setLink(node,url,Some(text), null, true)
+    setLink(node,url,Some(text), true)
   }
-  def setExternalLink(node: Node, url: String, text: String, children: ObservableList[Node]): Unit = {
-    setLink(node,url,Some(text), children, true)
-  }
-  private def setLinkInternalPush(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null, external: Boolean = false) = {
+  private def setLinkInternalPush(node: Node, url: String, text: Option[String] = None, external: Boolean = false) = {
     node.cursor = javafx.scene.Cursor.HAND
-    setLinkSimple(url, text, true, external)(node, children)
+    setLinkSimple(url, text, true, external)(node)
   }
-  private def setLinkInternalNoPush(node: Node, url: String, text: Option[String] = None, children: ObservableList[Node] = null, external: Boolean = false) = {
+  private def setLinkInternalNoPush(node: Node, url: String, text: Option[String] = None, external: Boolean = false) = {
     node.cursor = javafx.scene.Cursor.HAND
-    setLinkSimple(url, text, false, external)(node, children)
+    setLinkSimple(url, text, false, external)(node)
   }
 
   def goBack(node: Node): Unit = {
@@ -96,93 +90,139 @@ object LinkUtil {
     man.gotoURL(man.url)
   }
 
-  @extension
-  class ExtendNodeWithLink(node: Node) {
-    var children: ObservableList[Node] = null
-
-    def setNewLink(link: String, text: Option[String], pushState: Boolean, external: Boolean, children: ObservableList[Node]): Unit = {
-      if (link != null && !isValidLink(link)) {
-        println("Warning, link is not valid: " + link)
+  private object LinkDesktop {
+    @extension
+    class ExtendNodeWithLink(node: Node) {
+      def setNewLink(link: String, text: Option[String], pushState: Boolean, external: Boolean): Unit = {
+        if (link != null && !isValidLink(link)) {
+          println("Warning, link is not valid: " + link)
+        }
+        this.pushState = pushState
+        this.external = external
+        this.link = link
+        this.text = text
       }
-      this.children = children
-      this.pushState = pushState
-      this.external = external
-      this.link = link
-      this.text = text
-    }
 
-    @Bind var external: Boolean = true
-    @Bind var pushState: Boolean = false
-    @Bind var link: String = ""
-    @Bind var text: Option[String] = None
+      @Bind var external: Boolean = true
+      @Bind var pushState: Boolean = false
+      @Bind var link: String = ""
+      @Bind var text: Option[String] = None
 
-    val id = "linkid_"+random[Int].abs
-    @Bind val htmlNode = new HTMLView { htmlNode =>
-      layoutXY    <-- node.bipXY
-      node.bipWH --> { x =>
-        this.resize(x._1,x._2)
-      }
-      def script = if(pushState) {
-        s"""<script>var x = document.getElementById("${id}");
-           | x.addEventListener("click", function(event) {
-           |   if(!event.shiftKey && !event.metaKey) {
-           |     jpro.jproGotoURL(\"${link.replace("\"","\\\"")}\"); event.preventDefault();
-           |   }
-           | });</script>
-        """.stripMargin
-      } else ""
-
-      def externalPart = if(external) "target=\"_blank\""
-      def styleAnchorText = if(text.isEmpty) "" else "line-height: 0; font-size: 0; color: transparent; "
-      @Bind var content = contentProperty.toBindable
-      content <-- {
-        if(link == null) ""
-        else s"""<a id="$id" href="${link.replace(" ","%20").replace("\"","&quot;")}" $externalPart style="$styleAnchorText display: block; width: 100%; height: 100%;">${text.getOrElse("")}</a>
-                |${if(external)"" else script}
-         """.stripMargin
-      }
-      hover --> { x =>
-        node.useReflection.setHover(x)
-      }
-      setManaged(false)
-    }
-    if(!WebAPI.isBrowser) {
-      node.onMouseClicked --> { e =>
-        def isExternalLink(x: String) = x.startsWith("http") || x.startsWith("mailto")
-        if(e.isStillSincePress) {
-          if(isExternalLink(link)) {
-            openLinkExternalFun(link)
-          } else {
-            LinkUtil.getSessionManager(node).gotoURL(link)
+      if(!WebAPI.isBrowser) {
+        node.onMouseClicked --> { e =>
+          def isExternalLink(x: String) = x.startsWith("http") || x.startsWith("mailto")
+          if(e.isStillSincePress) {
+            if(isExternalLink(link)) {
+              openLinkExternalFun(link)
+            } else {
+              LinkUtil.getSessionManager(node).gotoURL(link)
+            }
           }
         }
-      }
-    } else {
-      var currentParent: ObservableList[Node] = null
-      def cleanCurrentParent(): Unit = {
-        if(currentParent != null) {
-          if(currentParent.contains(htmlNode)) {
-            currentParent.remove(htmlNode)
-          }
-          currentParent = null
-        }
-      }
-      when(node.parent != null && link != null) --> {
-        assert(children != null || node.parent.isInstanceOf[Region] || node.parent.isInstanceOf[Group], s"The parent at setLink has to be a Pane but was ${node.parent}")
-        cleanCurrentParent()
-        currentParent = if(node.parent.isInstanceOf[Region]) node.parent.asInstanceOf[Pane].getChildren
-          else if(node.parent.isInstanceOf[Group])  node.parent.asInstanceOf[Group].getChildren
-          else children
-        currentParent.add(htmlNode)
-        onDispose(cleanCurrentParent())
       }
     }
   }
 
+  private object LinkJPro {
 
-  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean, external: Boolean)(theNode: Node, children: ObservableList[Node] = null) = {
-    theNode.setNewLink(url,text,pushState,
-      external,children)
+    @extension
+    class ExtendNodeWithLink(node: Node) {
+
+      def setNewLink(link: String, text: Option[String], pushState: Boolean, external: Boolean): Unit = {
+        if (link != null && !isValidLink(link)) {
+          println("Warning, link is not valid: " + link)
+        }
+
+        this.pushState = pushState
+        this.external = external
+        this.link = link
+        this.text = text
+      }
+
+      @Bind var external: Boolean = true
+      @Bind var pushState: Boolean = false
+      @Bind var link: String = ""
+      @Bind var text: Option[String] = None
+
+      WebAPI.getWebAPI(node, webapi => {
+
+        val aElem = webapi.wrapNode("a", node)
+
+        val divBox = webapi.executeScriptWithVariable("document.createElement('div')");
+        webapi.executeScript(
+          s"""
+             |console.log('create divBox');
+             |${aElem.getName}.appendChild(${divBox.getName});
+             |${divBox.getName}.style.display = 'block';
+             |${divBox.getName}.style.position = 'absolute';
+             |console.log('divBox.added');
+             |""".stripMargin)
+        node.labWH --> { wh =>
+          // set WH to a
+          webapi.executeScript(
+            s"""
+               |console.log('divBox.getname: ${divBox.getName}');
+               |${divBox.getName}.style.width = '${wh._1}px';
+               |${divBox.getName}.style.height = '${wh._2}px';
+               |""".stripMargin)
+        }
+
+
+        @Bind var linkAndPush = <-- (link, pushState)
+        linkAndPush --> { case(link, pushState) =>
+          def script = if (pushState) {
+            s"""${aElem.getName}.onclick =  function(event) {
+               |  if(!event.shiftKey && !event.metaKey) {
+               |    jpro.jproGotoURL(\"${link.replace("\"", "\\\"")}\"); event.preventDefault();
+               |  }
+               |};""".stripMargin
+          } else s"${aElem.getName}.onclick = null;"
+          webapi.executeScript(
+            s"""${aElem.getName}.href = '${link.replace(" ", "%20").replace("'", "\\'")}';
+               |$script
+               |""".stripMargin)
+
+
+
+        }
+
+        external --> { external =>
+          if(external) {
+            webapi.executeScript(
+              s"""${aElem.getName}.target = '_blank';""".stripMargin)
+          } else {
+            webapi.executeScript(
+              s"""${aElem.getName}.removeAttribute("target");""".stripMargin)
+          }
+        }
+        text --> { x =>
+          // have to escape ' in text
+          if(x.isDefined) {
+            val escapedText = x.get.replace("'","\\'")
+            webapi.executeScript(
+              s"""${aElem.getName}.title = '${escapedText}';""".stripMargin)
+          } else {
+            webapi.executeScript(
+              s"""${aElem.getName}.removeAttribute("title");""".stripMargin)
+          }
+        }
+
+      })
+    }
+
+  }
+
+
+  private def setLinkSimple(url: String, text: Option[String], pushState: Boolean, external: Boolean)(theNode: Node) = {
+    if(!WebAPI.isBrowser) {
+      import LinkDesktop._
+      theNode.setNewLink(url,text,pushState,
+        external)
+    } else {
+      import LinkJPro._
+      theNode.setNewLink(url, text, pushState,
+        external)
+    }
   }
 
   def setImageViewDescription(view: ImageView, description: String): Unit = {
