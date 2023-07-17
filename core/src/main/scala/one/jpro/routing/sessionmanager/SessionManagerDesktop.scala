@@ -8,6 +8,7 @@ import one.jpro.routing.{Redirect, Response, RouteNode, View}
 import simplefx.all._
 import simplefx.core._
 import simplefx.experimental._
+import simplefx.util.ReflectionUtil
 
 
 class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS =>
@@ -58,15 +59,19 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
     }
   }
   val container = new StackPane()
-  val scrollpane = new ScrollPane() {
-    fitToWidth = true
-    content <-- container
-    fitToHeight <-- isFullscreen
-    //this.padding = Insets(0)
-    style = "-fx-padding: 0;"
-    background = Background.EMPTY
-     vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.AS_NEEDED)
+  val scrollpane: ScrollPane = if(System.getProperty("routing.scrollpane") != null) {
+    ReflectionUtil.callNew(System.getProperty("routing.scrollpane"))().asInstanceOf[ScrollPane]
+  } else new ScrollPane()
+
+  {
+    scrollpane.fitToWidth = true
+    scrollpane.content <-- container
+    scrollpane.fitToHeight <-- isFullscreen
+    scrollpane.style = "-fx-padding: 0;"
+    scrollpane.background = Background.EMPTY
+    scrollpane.vbarPolicy <-- (if(isFullscreen) ScrollPane.ScrollBarPolicy.NEVER else ScrollPane.ScrollBarPolicy.AS_NEEDED)
   }
+
   webApp <++ scrollpane
   @Bind var isFullscreen = true
   onceWhen(webApp.scene != null && webApp.scene.window != null) --> {
