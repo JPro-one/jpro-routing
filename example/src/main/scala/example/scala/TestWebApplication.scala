@@ -185,6 +185,9 @@ class MainView extends Page {
         LinkUtil.setLink(this, "/red")
       }
     }
+    this <++ new Button("Copy Text") {
+      CopyUtil.setCopyOnClick(this, "Hello \"World\"!")
+    }
     this <++ new Label(" label 123") { font = new Font(60)}
     this <++ new Label(" label 123") { font = new Font(60)}
     this <++ addGoogle
@@ -199,7 +202,10 @@ class SubView extends Page {
   override def fullscreen=true
 
   lazy val content = new VBox {
-    this <++ new Label("SUBVIEW") { font = new Font(60)}
+    this <++ new Label("SUBVIEW") { font = new Font(60); padding = Insets(100)}
+    this <++ new Label("SUBVIEW") { font = new Font(60); padding = Insets(100)}
+    this <++ new Label("SUBVIEW") { font = new Font(60); padding = Insets(100)}
+    this <++ new Label("SUBVIEW") { font = new Font(60); padding = Insets(100)}
     this <++ new Label("I'm fullscreen!") { font = new Font(60)}
   }
 }

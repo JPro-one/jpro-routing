@@ -42,6 +42,7 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
 
         isFullscreen = view.fullscreen
         container.children = List(view.realContent)
+        scrollpane.vvalue = 0.0
         if(oldView != null && oldView != view) {
           oldView.onClose()
           oldView.sessionManager = null
