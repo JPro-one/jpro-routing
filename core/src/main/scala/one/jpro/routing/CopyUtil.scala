@@ -13,14 +13,32 @@ object CopyUtil {
       import CopyJPro._
       node.setCopyOnClick(text)
     } else {
-      val clipboard = Clipboard.getSystemClipboard();
-      val content = new ClipboardContent();
-      content.putString(text);
-      clipboard.setContent(content);
+      import CopyDesktop._
+      node.setCopyOnClick(text)
     }
     println("setCopyOnClick: " + node + ", " + text)
   }
 
+  private object CopyDesktop {
+
+      @extension
+      class ExtendNodeWithCopy(node: Node) {
+
+        @Bind var textToCopy = ""
+
+        onMouseClicked --> {
+          val clipboard = Clipboard.getSystemClipboard();
+          val content = new ClipboardContent();
+          content.putString(textToCopy);
+          clipboard.setContent(content);
+        }
+
+
+        def setCopyOnClick(text: String): Unit = {
+          textToCopy = text
+        }
+      }
+  }
 
   private object CopyJPro {
 
@@ -37,10 +55,10 @@ object CopyUtil {
         copyText --> {
           val escapedText = copyText.replace("'", "\\'")
           webapi.executeScript(
-            s"""${jsElem.getName}.addEventListener('mousedown', function(event) {
+            s"""${jsElem.getName}.onmousedown = function(event) {
                |  console.log('copy: ${escapedText}');
                |  navigator.clipboard.writeText('${escapedText}');
-               |});
+               |};
                |""".stripMargin)
         }
       })
