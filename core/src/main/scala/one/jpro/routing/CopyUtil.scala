@@ -53,7 +53,10 @@ object CopyUtil {
       WebAPI.getWebAPI(node, webapi => {
         val jsElem = webapi.getElement(node)
         copyText --> {
-          val escapedText = copyText.replace("'", "\\'")
+          val escapedText = copyText
+            .replace("'", "\\'")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
           webapi.executeScript(
             s"""${jsElem.getName}.onmousedown = function(event) {
                |  console.log('copy: ${escapedText}');
