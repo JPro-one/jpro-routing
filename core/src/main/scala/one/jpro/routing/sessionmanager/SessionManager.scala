@@ -2,10 +2,10 @@ package one.jpro.routing.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
-import one.jpro.routing.{Response, RouteNode, View}
+import one.jpro.routing.{HistoryEntry, Response, RouteNode, View}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import de.sandec.jmemorybuddy.JMemoryBuddyLive
-import javafx.beans.property.{ObjectProperty, Property, SimpleStringProperty, StringProperty}
+import javafx.beans.property.{ObjectProperty, Property, SimpleObjectProperty, SimpleStringProperty, StringProperty}
 import javafx.collections.{FXCollections, ObservableList}
 import one.jpro.routing.{Response, RouteNode, View}
 import simplefx.all._
@@ -25,13 +25,13 @@ trait SessionManager { THIS =>
   var gtags = false
   var trackingID = ""
 
-  val getHistoryBackward: ObservableList[String] = FXCollections.observableArrayList()
-  val currentHistoryProperty: StringProperty = new SimpleStringProperty("")
-  val getHistoryForwards: ObservableList[String] = FXCollections.observableArrayList()
+  val getHistoryBackward: ObservableList[HistoryEntry] = FXCollections.observableArrayList()
+  val currentHistoryProperty: ObjectProperty[HistoryEntry] = new SimpleObjectProperty(null)
+  val getHistoryForwards: ObservableList[HistoryEntry] = FXCollections.observableArrayList()
 
-  @Bind var historyBackward: List[String] = getHistoryBackward.toBindable
-  @Bind var historyCurrent : String = currentHistoryProperty.toBindable
-  @Bind var historyForward : List[String] = getHistoryForwards.toBindable
+  @Bind var historyBackward: List[HistoryEntry] = getHistoryBackward.toBindable
+  @Bind var historyCurrent : HistoryEntry = currentHistoryProperty.toBindable
+  @Bind var historyForward : List[HistoryEntry] = getHistoryForwards.toBindable
 
   @Bind var url: String = null
   @Bind var view: View = null

@@ -2,7 +2,7 @@ package one.jpro.routing.sessionmanager
 
 import java.net.URL
 import java.net.URLDecoder
-import one.jpro.routing.{Redirect, Response, RouteNode, View}
+import one.jpro.routing.{Redirect, Response, RouteNode, View, HistoryEntry}
 import com.jpro.webapi.{InstanceCloseListener, ScriptResultListener, WebAPI, WebCallback}
 import one.jpro.routing.{Redirect, Response, RouteNode, View}
 import simplefx.all._
@@ -18,7 +18,7 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
     historyForward = historyCurrent :: historyForward
     historyCurrent = historyBackward.head
     historyBackward = historyBackward.tail
-    gotoURL(historyCurrent, false, true)
+    gotoURL(historyCurrent.path, false, true)
   }
 
   def goForward(): Unit = {
@@ -26,7 +26,7 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
     historyBackward = historyCurrent :: historyBackward
     historyCurrent = historyForward.head
     historyForward = historyForward.tail
-    gotoURL(historyCurrent, false, true)
+    gotoURL(historyCurrent.path, false, true)
   }
 
   def gotoURL(_url: String, x: Response, pushState: Boolean, track: Boolean): Unit = {
@@ -55,12 +55,12 @@ class SessionManagerDesktop(val webApp: RouteNode) extends SessionManager { THIS
           if(historyCurrent != null) {
             historyBackward = historyCurrent :: historyBackward
           }
-          historyCurrent = url
+          historyCurrent = HistoryEntry(url, view.title)
         }
     }
   }
   val container = new StackPane()
-  val scrollpane: ScrollPane = if(System.getProperty("routing.scrollpane") != null) {
+    val scrollpane: ScrollPane = if(System.getProperty("routing.scrollpane") != null) {
     ReflectionUtil.callNew(System.getProperty("routing.scrollpane"))().asInstanceOf[ScrollPane]
   } else new ScrollPane()
 
