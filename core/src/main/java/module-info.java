@@ -11,6 +11,7 @@ module one.jpro.routing.core {
     requires java.desktop;
 
     exports one.jpro.routing;
+    exports one.jpro.routing.crawl;
     exports one.jpro.routing.filter.container;
     exports one.jpro.routing.sessionmanager;
 }

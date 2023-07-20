@@ -12,13 +12,13 @@ abstract class View extends Response { THIS =>
   var isMobile: Boolean = false
   var sessionManager: SessionManager = null
   lazy val realContent: Node = content
-  def content: Node
+  protected def content: Node
   def saveScrollPosition = true
   def fullscreen = false
   def onClose(): Unit = {}
   def subView(): View = null
 
-  override def toString(): String = s"View($realContent, $title)"
+  override def toString(): String = s"View(title: $title, url: $url, description: $description)"
 
   /**
    * Only overwrite this method, if you handle the url-change by yourself.
@@ -31,8 +31,7 @@ abstract class View extends Response { THIS =>
 
     override def description: String = THIS.description
 
-    lazy val cachedContent = f(THIS.content)
-    override def content: all.Node = cachedContent
+    override def content: all.Node = f(THIS.realContent)
 
     override def fullscreen: Boolean = THIS.fullscreen
 

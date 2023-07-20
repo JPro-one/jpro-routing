@@ -29,7 +29,7 @@ object RouteUtils {
     route.apply(request).map{
       case x: View =>
         val oldNode = request.oldContent.get()
-        val newNode = x.content
+        val newNode = x.realContent
         val t = (seconds s)
         if(oldNode == null) {
           x
@@ -49,7 +49,7 @@ object RouteUtils {
     route.apply(request).map{
       case x: View =>
         val oldNode = request.oldContent.get()
-        val newNode = x.content
+        val newNode = x.realContent
         val t = (seconds s)
         if(oldNode == null) {
           x.mapContent(x => x)
@@ -78,7 +78,7 @@ object RouteUtils {
   def mapViewFilter(request: Request, f: Node => Node): View = ???
 
   def viewFromNode(x: Node): View = new View {
-    override def title: String = ""
+    override def title: String = "view-from-node"
     override def description: String = ""
     override def content: all.Node = x
   }

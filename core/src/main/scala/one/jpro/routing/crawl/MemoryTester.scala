@@ -21,7 +21,7 @@ object MemoryTester {
           checker2.setAsReferenced(factory)
           checker2.assertCollectable(view) // Hm?
           if(view.isInstanceOf[View]) {
-            checker2.assertCollectable(inFX(view.asInstanceOf[View].content))
+            checker2.assertCollectable(inFX(view.asInstanceOf[View].realContent))
           }
           checker1.assertCollectable(factory)
         })

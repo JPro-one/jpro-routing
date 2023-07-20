@@ -55,7 +55,7 @@ object ContainerFilter {
         }
         view.mapContent(x => {
           containerLogic.setRequest(container, request)
-          containerLogic.setContent(container, view.content)
+          containerLogic.setContent(container, view.realContent)
           container
         })
       case x => x
