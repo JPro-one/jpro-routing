@@ -62,11 +62,11 @@ object LinkUtil {
   def setExternalLink(node: Node, url: String, text: String): Unit = {
     setLink(node,url,Some(text), true)
   }
-  private def setLinkInternalPush(node: Node, url: String, text: Option[String] = None, external: Boolean = false) = {
+  def setLinkInternalPush(node: Node, url: String, text: Option[String] = None, external: Boolean = false) = {
     node.cursor = javafx.scene.Cursor.HAND
     setLinkSimple(url, text, true, external)(node)
   }
-  private def setLinkInternalNoPush(node: Node, url: String, text: Option[String] = None, external: Boolean = false) = {
+  def setLinkInternalNoPush(node: Node, url: String, text: Option[String] = None, external: Boolean = false) = {
     node.cursor = javafx.scene.Cursor.HAND
     setLinkSimple(url, text, false, external)(node)
   }
@@ -181,9 +181,6 @@ object LinkUtil {
             s"""${aElem.getName}.href = '${link.replace(" ", "%20").replace("'", "\\'")}';
                |$script
                |""".stripMargin)
-
-
-
         }
 
         external --> { external =>
