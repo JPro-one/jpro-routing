@@ -50,7 +50,7 @@ object Request {
     }
     val uri = new URI(x)
     val rawQuery = uri.getRawQuery
-    val query: Map[String,String] = if(rawQuery == null) Map() else rawQuery.split("&").map(x => {
+    val query: Map[String,String] = if(rawQuery == null || rawQuery == "") Map() else rawQuery.split("&").map(x => {
       val Array(a,b) = x.split("=")
       a -> b
     }).toMap
