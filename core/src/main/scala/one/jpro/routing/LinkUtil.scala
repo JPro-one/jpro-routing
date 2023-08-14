@@ -151,17 +151,14 @@ object LinkUtil {
         val divBox = webapi.executeScriptWithVariable("document.createElement('div')");
         webapi.executeScript(
           s"""
-             |console.log('create divBox');
              |${aElem.getName}.appendChild(${divBox.getName});
              |${divBox.getName}.style.display = 'block';
              |${divBox.getName}.style.position = 'absolute';
-             |console.log('divBox.added');
              |""".stripMargin)
         node.labWH --> { wh =>
           // set WH to a
           webapi.executeScript(
             s"""
-               |console.log('divBox.getname: ${divBox.getName}');
                |${divBox.getName}.style.width = '${wh._1}px';
                |${divBox.getName}.style.height = '${wh._2}px';
                |""".stripMargin)
