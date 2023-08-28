@@ -1,3 +1,12 @@
+# [JPro Routing](https://github.com/JPro-one/jpro-routing) has moved to [JPro Platform](https://github.com/JPro-one/jpro-platform)!
+
+🚨 **IMPORTANT NOTICE:** This repository has been relocated. All the content, issues, and activity have been transferred to our new repository.
+
+## Why did we move?
+We've decided to consolidate our repositories into a single one to better manage and streamline our projects.
+This will allow us to better prioritize and address issues and pull requests, as well as to release new versions faster.
+___
+
 # jpro-routing
 
 **jpro-routing** is a minimalistic framework for [JavaFX](https://openjfx.io/).
